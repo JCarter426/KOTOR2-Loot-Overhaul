@@ -831,7 +831,7 @@ if( nItemLevel > 20 ) nItemLevel = 20; // caps the die at d100
 if( nColorType == LOOT_SABER_COLOR_WEIGHTED ) {
 	// Roll to get common or rare
 	nRoll = Random(nItemLevel * 5);
-	if( nRoll < 75 ) nColor = LOOT_SABER_COLOR_COMMON;
+	if( nRoll < 75 ) nColorType = LOOT_SABER_COLOR_COMMON;
 	else nColorType = LOOT_SABER_COLOR_RARE;
 	}
 // Role for common colors
