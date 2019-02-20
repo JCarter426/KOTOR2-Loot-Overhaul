@@ -576,10 +576,10 @@ return sGlobal;
 	
 	JC 2019-01-17                                                             */
 ////////////////////////////////////////////////////////////////////////////////
-void LOOT_GetUniqueFound(int nItemType, int nItemNum) {
+int LOOT_GetUniqueFound(int nItemType, int nItemNum) {
 
 int nItemID = LOOT_UniqueItemID(nItemType, nItemNum);
-int nGlobal = GetGlobalNumber(LOOT_UniqueGlobal(nItemID));
+int nGlobal = GetGlobalNumber(LOOT_UniqueGlobal(nItemType, nItemID));
 // 128 is stored as -128 for reasons, so the global has to be converted first if
 // it has a negative value
 if( nGlobal < 0 ) nGlobal = nGlobal + 256;
@@ -824,13 +824,14 @@ return nOutput;
 	
 	JC 2019-01-25                                                             */
 ////////////////////////////////////////////////////////////////////////////////
-int GetSaberColor(int nItemLevel, int nColorType = 0) {
+int LOOT_GetSaberColor(int nItemLevel, int nColorType = 0) {
 
 if( nItemLevel > 20 ) nItemLevel = 20; // caps the die at d100
+int nColor;
 // If we're using weighted odds, determine common or rare
 if( nColorType == LOOT_SABER_COLOR_WEIGHTED ) {
 	// Roll to get common or rare
-	nRoll = Random(nItemLevel * 5);
+	int nRoll = Random(nItemLevel * 5);
 	if( nRoll < 75 ) nColorType = LOOT_SABER_COLOR_COMMON;
 	else nColorType = LOOT_SABER_COLOR_RARE;
 	}
@@ -959,7 +960,6 @@ else {
 	}
 // Check the roll to determine type
 int nOutput;
-int nRoll = Random(nRange) + 1;
 if( nRoll == 1 || nRoll == 2 ) nOutput = LOOT_UPGRADE_TYPE_ARMOR;
 else if( nRoll == 3 || nRoll == 4 ) nOutput = LOOT_UPGRADE_TYPE_RANGED;
 else if( nRoll == 5 ) nOutput = LOOT_UPGRADE_TYPE_MELEE;
@@ -1682,7 +1682,7 @@ if( nItemLevel < 3 ) nItemLevel = 3;
 // Robes have 30 variations
 int nRoll = LOOT_DiceResult(nItemLevel, LOOT_DICE_POOL_EXTREME);
 // Replacement table for if a better version of what we rolled is available
-if( nRoll == 1 ) Roll = 2; // No clothing ever
+if( nRoll == 1 ) nRoll = 2; // No clothing ever
 if( nRoll == 2 && nItemLevel >= 8 ) nRoll = 8; // Padawan --> Jedi
 if( nRoll == 3 && nItemLevel >= 9 ) nRoll = 9; // Dark Padawan --> Dark Jedi
 if( nRoll == 4 && nItemLevel >= 19 ) nRoll = 19; // Baran Do Novice --> Baran Do Sage
@@ -2097,7 +2097,7 @@ if( nItemTier < 1 && nItemTier > 4 ) {
 	}
 
 int nItemNum;
-switch( nShieldType ) {
+switch( nItemType ) {
 	case LOOT_SHIELD_ENERGY:
 		switch( nItemTier ) {
 			case 1:
@@ -2147,6 +2147,9 @@ switch( nShieldType ) {
 			}
 		break;
 	}
+
+return nItemNum;
+
 }
 
 
@@ -2673,7 +2676,7 @@ return nOutput;
 	Returns a string for item templates, without the suffix for the item
 	variation number.
 	
-	JC 2019-01-13                                                             */
+	JC 2019-02-19                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 string GetItemPrefix(int nItemType) {
 
@@ -2756,7 +2759,7 @@ if( nItemType == 0 ) {
 		nResult = LOOT_CLASS_EQUIPMENT;
 		}
 	// Now that the item class is known, return to top
-	sTemplate = LOOT_GetTreasureSpecific(nItemLevel, nResult);
+	sTemplate = GetTreasureSpecific(nItemLevel, nResult);
 	}
 else {
 	// Item class is known, but the item type isn't
@@ -2785,7 +2788,6 @@ else {
 				else {
 					nRange = 4;
 					}
-				}
 				break;
 			case LOOT_CLASS_ARMOR:
 				// No Jedi robes on Peragus
@@ -2803,6 +2805,7 @@ else {
 					nResult = LOOT_DROID_TYPE_UTILITY;
 					}
 				break;
+				}
 		// Roll for type if we don't know it yet
 		if( nResult < 10 ) nResult = 10 * ( Random(nRange) + 1 );
 		// Add item class if it's missing
@@ -2835,7 +2838,7 @@ else {
 				case LOOT_EQUIPMENT_TYPE_IMPLANT:
 					nResult = LOOT_GetImplantTier(nItemLevel);
 					break;
-				case LOOT_DROID_SHIELD:
+				case LOOT_DROID_TYPE_SHIELD:
 					nResult = LOOT_GetDroidShieldSubtype();
 					break;
 				default:
@@ -2846,103 +2849,103 @@ else {
 			if( nResult < 100 ) nResult = nItemType + nResult;
 			
 			// Entire item type known, return to top
-			sTemplate = LOOT_GetTreasureSpecific(nItemLevel, nResult);
+			sTemplate = GetTreasureSpecific(nItemLevel, nResult);
 			}
 		// Item class, type, & subtype known, generate variation
 		else {
 			switch( nItemType ) {
 				// Weapons
 				case LOOT_MELEE:
-					nItemNum = LOOT_GetMeleeNum(nItemLevel);
+					nResult = LOOT_GetMeleeNum(nItemLevel);
 					break;
 				case LOOT_BLASTER_PISTOL:
-					nItemNum = LOOT_GetPistolNum(nItemLevel);
+					nResult = LOOT_GetPistolNum(nItemLevel);
 					break;
 				case LOOT_BLASTER_RIFLE:
-					nItemNum = LOOT_GetRifleNum(nItemLevel);
+					nResult = LOOT_GetRifleNum(nItemLevel);
 					break;
 				case LOOT_LIGHTSABER_STANDARD:
-					nItemNum = LOOT_GetSaberColor(nItemLevel);
+					nResult = LOOT_GetSaberColor(nItemLevel);
 					break;
 				case LOOT_LIGHTSABER_SHORT:
-					nItemNum = LOOT_GetSaberColor(nItemLevel);
+					nResult = LOOT_GetSaberColor(nItemLevel);
 					break;
 				case LOOT_LIGHTSABER_DOUBLE_BLADED:
-					nItemNum = LOOT_GetSaberColor(nItemLevel);
+					nResult = LOOT_GetSaberColor(nItemLevel);
 					break;
 				case LOOT_MINING_LASER:
-					nItemNum = 0;
+					nResult = 0;
 					break;
 				case LOOT_ADVANCED_MINING_LASER:
-					nItemNum = 0;
+					nResult = 0;
 					break;
 				case LOOT_VIBROCUTTER:
-					nItemNum = 0;
+					nResult = 0;
 					break;
 				case LOOT_GUIDON_BEACON:
-					nItemNum = 0;
+					nResult = 0;
 					break;
 				// Upgrades
 				case LOOT_UPGRADE_R_TARGETING_SCOPE:
-					nItemNum = LOOT_GetUpgradeNum(nItemLevel, LOOT_UPGRADE_R_TARGETING_SCOPE);
+					nResult = LOOT_GetUpgradeNum(nItemLevel, LOOT_UPGRADE_R_TARGETING_SCOPE);
 					break;
 				case LOOT_UPGRADE_R_FIRING_CHAMBER:
-					nItemNum = LOOT_GetUpgradeNum(nItemLevel, LOOT_UPGRADE_R_FIRING_CHAMBER);
+					nResult = LOOT_GetUpgradeNum(nItemLevel, LOOT_UPGRADE_R_FIRING_CHAMBER);
 					break;
 				case LOOT_UPGRADE_R_POWER_PACK:
-					nItemNum = LOOT_GetUpgradeNum(nItemLevel, LOOT_UPGRADE_R_POWER_PACK);
+					nResult = LOOT_GetUpgradeNum(nItemLevel, LOOT_UPGRADE_R_POWER_PACK);
 					break;
 				case LOOT_UPGRADE_M_GRIP:
-					nItemNum = LOOT_GetUpgradeNum(nItemLevel, LOOT_UPGRADE_M_GRIP);
+					nResult = LOOT_GetUpgradeNum(nItemLevel, LOOT_UPGRADE_M_GRIP);
 					break;
 				case LOOT_UPGRADE_M_EDGE:
-					nItemNum = LOOT_GetUpgradeNum(nItemLevel, LOOT_UPGRADE_M_EDGE);
+					nResult = LOOT_GetUpgradeNum(nItemLevel, LOOT_UPGRADE_M_EDGE);
 					break;
 				case LOOT_UPGRADE_M_ENERGY_CELL:
-					nItemNum = LOOT_GetUpgradeNum(nItemLevel, LOOT_UPGRADE_M_ENERGY_CELL);
+					nResult = LOOT_GetUpgradeNum(nItemLevel, LOOT_UPGRADE_M_ENERGY_CELL);
 					break;
 				case LOOT_UPGRADE_A_OVERLAY:
-					nItemNum = LOOT_GetUpgradeNum(nItemLevel, LOOT_UPGRADE_A_OVERLAY);
+					nResult = LOOT_GetUpgradeNum(nItemLevel, LOOT_UPGRADE_A_OVERLAY);
 					break;
 				case LOOT_UPGRADE_A_UNDERLAY:
-					nItemNum = LOOT_GetUpgradeNum(nItemLevel, LOOT_UPGRADE_A_UNDERLAY);
+					nResult = LOOT_GetUpgradeNum(nItemLevel, LOOT_UPGRADE_A_UNDERLAY);
 					break;
 				case LOOT_UPGRADE_L_EMITTER:
-					nItemNum = LOOT_GetUpgradeNum(nItemLevel, LOOT_UPGRADE_L_EMITTER);
+					nResult = LOOT_GetUpgradeNum(nItemLevel, LOOT_UPGRADE_L_EMITTER);
 					break;
 				case LOOT_UPGRADE_L_LENS:
-					nItemNum = LOOT_GetUpgradeNum(nItemLevel, LOOT_UPGRADE_L_LENS);
+					nResult = LOOT_GetUpgradeNum(nItemLevel, LOOT_UPGRADE_L_LENS);
 					break;
 				case LOOT_UPGRADE_L_ENERGY_CELL:
-					nItemNum = LOOT_GetUpgradeNum(nItemLevel, LOOT_UPGRADE_L_ENERGY_CELL);
+					nResult = LOOT_GetUpgradeNum(nItemLevel, LOOT_UPGRADE_L_ENERGY_CELL);
 					break;
 				case LOOT_UPGRADE_L_POWER_CRYSTAL:
-					nItemNum = LOOT_GetPowerCrystalNum(nItemLevel);
+					nResult = LOOT_GetPowerCrystalNum(nItemLevel);
 					break;
 				case LOOT_UPGRADE_L_COLOR_CRYSTAL:
-					nItemNum = LOOT_ColorCrystalNum(LOOT_GetSaberColor(nItemLevel));
+					nResult = LOOT_ColorCrystalNum(LOOT_GetSaberColor(nItemLevel));
 					break;
 				// Equipment
 				case LOOT_BELT:
-					nItemNum = LOOT_GetBeltNum(nItemLevel);
+					nResult = LOOT_GetBeltNum(nItemLevel);
 					break;
 				case LOOT_GLOVES:
-					nItemNum = LOOT_GetGloveNum(nItemLevel);
+					nResult = LOOT_GetGloveNum(nItemLevel);
 					break;
 				case LOOT_HEADGEAR:
-					nItemNum = LOOT_GetHeadgearNum(nItemLevel);
+					nResult = LOOT_GetHeadgearNum(nItemLevel);
 					break;
 				case LOOT_IMPLANT_LEVEL_1:
-					nItemNum = LOOT_GetImplantNum(nItemLevel);
+					nResult = LOOT_GetImplantNum(nItemLevel);
 					break;
 				case LOOT_IMPLANT_LEVEL_2:
-					nItemNum = LOOT_GetImplantNum(nItemLevel);
+					nResult = LOOT_GetImplantNum(nItemLevel);
 					break;
 				case LOOT_IMPLANT_LEVEL_3:
-					nItemNum = LOOT_GetImplantNum(nItemLevel);
+					nResult = LOOT_GetImplantNum(nItemLevel);
 					break;
 				case LOOT_IMPLANT_LEVEL_4:
-					nItemNum = LOOT_GetImplantNum(nItemLevel);
+					nResult = LOOT_GetImplantNum(nItemLevel);
 					break;
 				case LOOT_ARMBAND:
 					// Vao Armband is the only possible armband
@@ -2950,41 +2953,41 @@ else {
 					break;
 				// Armor
 				case LOOT_LIGHT_ARMOR:
-					nItemNum = LOOT_GetLightArmorNum(nItemLevel);
+					nResult = LOOT_GetLightArmorNum(nItemLevel);
 					break;
 				case LOOT_MEDIUM_ARMOR:
-					nItemNum = LOOT_GetMediumArmorNum(nItemLevel);
+					nResult = LOOT_GetMediumArmorNum(nItemLevel);
 					break;
 				case LOOT_HEAVY_ARMOR:
-					nItemNum = LOOT_GetHeavyArmorNum(nItemLevel);
+					nResult = LOOT_GetHeavyArmorNum(nItemLevel);
 					break;
 				case LOOT_ROBES:
-					nItemNum = LOOT_GetRobeNum(nItemLevel);
+					nResult = LOOT_GetRobeNum(nItemLevel);
 					break;
 				// Droid Items
 				case LOOT_DROID_INTERFACE:
-					nItemNum = LOOT_GetDroidInterfaceNum(nItemLevel);
+					nResult = LOOT_GetDroidInterfaceNum(nItemLevel);
 					break;
 				case LOOT_DROID_UTILITY:
-					nItemNum = LOOT_GetDroidUtilityNum(nItemLevel);
+					nResult = LOOT_GetDroidUtilityNum(nItemLevel);
 					break;
 				case LOOT_DROID_ARMOR:
-					nItemNum = LOOT_GetDroidArmorNum(nItemLevel);
+					nResult = LOOT_GetDroidArmorNum(nItemLevel);
 					break;
 				case LOOT_DROID_SHIELD_ENERGY:
-					nItemNum = LOOT_GetDroidShieldNum(nItemLevel, nItemType);
+					nResult = LOOT_GetDroidShieldNum(nItemLevel, nItemType);
 					break;
 				case LOOT_DROID_SHIELD_ENVIRO:
-					nItemNum = LOOT_GetDroidShieldNum(nItemLevel, nItemType);
+					nResult = LOOT_GetDroidShieldNum(nItemLevel, nItemType);
 					break;
 				case LOOT_DROID_DEVICE:
-					nItemNum = LOOT_GetDroidDeviceNum(nItemLevel);
+					nResult = LOOT_GetDroidDeviceNum(nItemLevel);
 					break;
 				}
 
 			// If we don't have a template string yet, add the item prefix and
 			// number to get our template.
-			if( sTemplate == "" ) sTemplate = GetItemPrefix(nItemType) + LOOT_Suffix(nItemNum);
+			if( sTemplate == "" ) sTemplate = GetItemPrefix(nItemType) + LOOT_Suffix(nResult);
 			}
 		}
 	}
@@ -3159,7 +3162,7 @@ string GetTreasureBundle(int nItemLevel, int nItemType = 0) {
 // Caps the item level to avoid incidents
 if( nItemLevel > 30 ) nItemLevel = 30;
 // Limited selection late in the game
-if( LOOT_GetLateGame() == TRUE ) nItemType = LOOT_DisposableLateGame();
+if( LOOT_GetLateGame() == TRUE ) nItemType = LOOT_GetDisposableLateGame(nItemLevel);
 
 int nRange = 1;
 int nRoll = 0;
@@ -3218,7 +3221,7 @@ else {
 			if( nResult < 100 ) nResult = nItemType + nResult;
 			
 			// Entire item type known, return to top
-			sTemplate = LOOT_GetTreasureSpecific(nItemLevel, nResult);
+			sTemplate = GetTreasureSpecific(nItemLevel, nResult);
 			}
 		// Item class, type, & subtype known, generate template
 		else {
@@ -3288,11 +3291,11 @@ return sTemplate;
 ////////////////////////////////////////////////////////////////////////////////
 void PlaceTreasureDisposable(object oContainer = OBJECT_SELF, int numberOfItems = 1, int nItemType = 900) {
 
-if( !GetLocalBoolean(57) ) {
+if( !GetLocalBoolean(oContainer, 57) ) {
 	SetLocalBoolean(OBJECT_SELF, 57, TRUE);
 	int nPCLevel = GetGlobalNumber("G_PC_LEVEL");
 	// If we're not in the disposable range, reset the item type
-	if( nItemLevel < 900 || nItemType >= 1000 ) nItemType = 0;
+	if( nItemType < 900 || nItemType >= 1000 ) nItemType = 0;
 	// Item level is based on the player's current level
 	int nItemLevel = nPCLevel + Random(6) - 4;
 	if( nItemLevel < 1 ) nItemLevel = 1;
@@ -3331,7 +3334,7 @@ if( !GetLocalBoolean(57) ) {
 ////////////////////////////////////////////////////////////////////////////////
 void PlaceTreasure(object oContainer = OBJECT_SELF, int numberOfItems = 1, int nItemType = 0) {
 
-if( !GetLocalBoolean(57) ) {
+if( !GetLocalBoolean(oContainer, 57) ) {
 	SetLocalBoolean(OBJECT_SELF, 57, TRUE);
 	int nPCLevel = GetGlobalNumber("G_PC_LEVEL");
 	if( nPCLevel == 1 ) nPCLevel = 2; // Increases variety of items found at level 1
@@ -3354,7 +3357,6 @@ if( !GetLocalBoolean(57) ) {
 		string sItem;
 		string sItemName;
 		int nItemQuantity = 1;
-		int j;
 		if( nRoll >= 100 ) {
 			// We found a rare item!
 			sItem = GetTreasureRare(nItemLevel, nItemType);
@@ -3425,7 +3427,6 @@ for( i = 1; i <= numberOfItems; i++ ) {
 	string sItem;
 	string sItemName;
 	int nItemQuantity = 1;
-	int j;
 	if( nRoll >= 100 ) {
 		// We found a rare item!
 		sItem = GetTreasureRare(nItemLevel, nItemType);
@@ -3536,13 +3537,13 @@ void PlaceTreasurePeragus(object oContainer = OBJECT_SELF, int numberOfItems = 1
 
 int nRoll = Random(100) + GetGlobalNumber("000_RareItemChance");
 
-if(nRoll >= 88) {
+if( nRoll >= 88 ) {
 	PlaceTreasure(oContainer, numberOfItems, LOOT_CLASS_EQUIPMENT);
 	}
-else if(nRoll >= 83) {
+else if( nRoll >= 83 ) {
 	PlaceTreasure(oContainer, numberOfItems, LOOT_WEAPON_TYPE_PERAGUS);
 	}
-else if(nRoll >= 80) {
+else if( nRoll >= 80 ) {
 	PlaceTreasure(oContainer, numberOfItems, LOOT_UPGRADE_A_UNDERLAY);
 	}
 else {
