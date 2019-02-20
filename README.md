@@ -22,6 +22,6 @@ Changes:
 - Blaster and melee upgrades have been removed from Peragus loot; upgradeable weapons were unlikely in the original loot system and impossible in the new one. Armor overlays have been replaced, as they cannot be installed in the miner uniform and other armor is excluded early on. In their place, the probability of equipment items has been increased and Peragus weapons have been added.
 
 To Do:
-- Clean up code
-- Alignment restrictions for Jedi robes
-- Merchant & spawn script support (won't decompile currently)
+- [] Clean up code
+- [] Alignment restrictions for Jedi robes
+- [] Merchant & spawn script support (won't decompile currently)
