@@ -320,15 +320,18 @@ int nRange = nItemLevel; // initial definition
 int nNumDice;
 int nDiceSize;
 switch( nDiceType ) {
-	case LOOT_DICE_POOL_MILD:
+	// Mild
+	case 1:
 		nNumDice = 3;
 		nDiceSize = 20;
 		break;
-	case LOOT_DICE_POOL_MODERATE:
+	// Moderate
+	case 2:
 		nNumDice = 6;
 		nDiceSize = 10;
 		break;
-	case LOOT_DICE_POOL_EXTREME:
+	// Extreme
+	case 3:
 		nNumDice = 10;
 		nDiceSize = 6;
 		break;
@@ -436,10 +439,12 @@ int LOOT_UniqueItemID(int nItemType, int nItemNum) {
 
 int nItemID = 0;
 switch( nItemType ) {
-	case LOOT_LIGHT_ARMOR:
+	// Light Armor
+	case 410:
 		nItemID = LOOT_U_ARMOR_QEL_DROMA;
 		break;
-	case LOOT_MEDIUM_ARMOR:
+	// Medium Armor
+	case 420:
 		switch( nItemNum ) {
 			case 11:
 				nItemID = LOOT_U_ARMOR_EXAR_KUN;
@@ -449,7 +454,8 @@ switch( nItemType ) {
 				break;
 			}
 		break;
-	case LOOT_BLASTER_PISTOL:
+	// Blaster Pistol
+	case 111:
 		switch( nItemNum ) {
 			case 22:
 				nItemID = LOOT_U_BLASTER_ONASI;
@@ -463,21 +469,26 @@ switch( nItemType ) {
 				break;
 			}
 		break;
-	case LOOT_MELEE:
+	// Melee
+	case 131:
 		nItemID = LOOT_U_MELEE_FREYYR;
 		break;
-	case LOOT_ARMBAND:
+	// Armband
+	case 351:
 		// The Vao Armband doesn't have a proper item number, but since it's the
 		// only armband in random loot, this should be ok
 		nItemID = LOOT_U_ARMBAND_VAO;
 		break;
-	case LOOT_BELT:
+	// Belt
+	case 311:
 		nItemID = LOOT_U_BELT_QEL_DROMA;
 		break;
-	case LOOT_GLOVES:
+	// Gloves
+	case 321:
 		nItemID = LOOT_U_GLOVE_OSSUK;
 		break;
-	case LOOT_HEADGEAR:
+	// Headgear
+	case 331:
 		switch( nItemNum ) {
 			case 25:
 				nItemID = LOOT_U_HEADGEAR_SARESH;
@@ -487,10 +498,12 @@ switch( nItemType ) {
 				break;
 			}
 		break;
-	case LOOT_UPGRADE_L_POWER_CRYSTAL:
+	// Upgrade - Lightsaber - Power Crystal
+	case 244:
 		nItemID = LOOT_U_CRYSTAL_SOLARI;
 		break;
-	case LOOT_ROBES:
+	// Robes
+	case 441:
 		switch( nItemNum ) {
 			case 23:
 				nItemID = LOOT_U_ROBE_ARCA;
@@ -880,7 +893,7 @@ while( nOutput == FALSE && oItem != OBJECT_INVALID ) {
 		  GetBaseItemType(oItem) == BASE_ITEM_LIGHTSABER ) &&
 		GetTag(oItem) != "w_ls_x01" &&
 		GetTag(oItem) != "w_sls_x02" ) {
-			nOutput = TRUE;
+		nOutput = TRUE;
 		}
 	else oItem = GetNextItemInInventory(GetFirstPC());
 	}
@@ -1020,24 +1033,28 @@ if( nItemType != LOOT_UPGRADE_TYPE_RANGED &&
 int nRoll;
 int nOutput;
 switch( nItemType) {
-	case LOOT_UPGRADE_TYPE_RANGED:
+	// Ranged
+	case 210:
 		nRoll = Random(12) + 1;
 		if( nRoll <= 5 ) nOutput = LOOT_UPGRADE_R_TARGETING_SCOPE;
 		else if( nRoll <= 9 ) nOutput = LOOT_UPGRADE_R_FIRING_CHAMBER;
 		else nOutput = LOOT_UPGRADE_R_POWER_PACK;
 		break;
-	case LOOT_UPGRADE_TYPE_MELEE:
+	// Melee
+	case 220:
 		nRoll = Random(8) + 1;
 		if( nRoll <= 3 ) nOutput = LOOT_UPGRADE_M_EDGE;
 		else if( nRoll <= 6 ) nOutput = LOOT_UPGRADE_M_GRIP;
 		else nOutput = LOOT_UPGRADE_M_ENERGY_CELL;
 		break;
-	case LOOT_UPGRADE_TYPE_ARMOR:
+	// Armor
+	case 230:
 		nRoll = Random(5) + 1;
 		if( nRoll <= 3 ) nOutput = LOOT_UPGRADE_A_UNDERLAY;
 		else nOutput = LOOT_UPGRADE_A_OVERLAY;
 		break;
-	case LOOT_UPGRADE_TYPE_LIGHTSABER:
+	// Lightsaber
+	case 240:
 		// Parts only option
 		if( nFilter == LOOT_SABER_UPGRADE_PARTS ) {
 			nRoll = Random(15) + 1;
@@ -1201,49 +1218,60 @@ int LOOT_GetUpgradeNum(int nItemLevel, int nItemType, int nItemTier = 0) {
 int nNumTiers;
 int nItemsPerTier;
 switch( nItemType ) {
-	case LOOT_UPGRADE_R_FIRING_CHAMBER:
+	// Upgrade - Ranged - Targeting Scope
+	case 211:
+		nNumTiers = 4;
+		nItemsPerTier = 4;
+		break;
+	// Upgrade - Ranged - Firing Chamber
+	case 212:
 		nNumTiers = 3;
 		nItemsPerTier = 5;
 		break;
-	case LOOT_UPGRADE_R_POWER_PACK:
+	// Upgrade - Ranged - Power Pack
+	case 213:
 		nNumTiers = 5;
 		nItemsPerTier = 3;
 		break;
-	case LOOT_UPGRADE_R_TARGETING_SCOPE:
-		nNumTiers = 4;
-		nItemsPerTier = 4;
-		break;
-	case LOOT_UPGRADE_M_EDGE:
-		nNumTiers = 4;
-		nItemsPerTier = 4;
-		break;
-	case LOOT_UPGRADE_M_ENERGY_CELL:
-		nNumTiers = 4;
-		nItemsPerTier = 4;
-		break;
-	case LOOT_UPGRADE_M_GRIP:
+	// Upgrade - Melee - Grip
+	case 221:
 		nNumTiers = 3;
 		nItemsPerTier = 5;
 		break;
-	case LOOT_UPGRADE_A_OVERLAY:
+	// Upgrade - Melee - Edge
+	case 222:
+		nNumTiers = 4;
+		nItemsPerTier = 4;
+		break;
+	// Upgrade - Melee - Energy Cell
+	case 223:
+		nNumTiers = 4;
+		nItemsPerTier = 4;
+		break;
+	// Upgrade - Armor - Overlay
+	case 231:
 		nNumTiers = 4;
 		nItemsPerTier = 8;
 		break;
-	case LOOT_UPGRADE_A_UNDERLAY:
+	// Upgrade - Armor - Underlay
+	case 232:
 		nNumTiers = 5;
 		nItemsPerTier = 6;
 		break;
-	case LOOT_UPGRADE_L_EMITTER:
+	// Upgrade - Lightsaber - Emitter
+	case 241:
 		nNumTiers = 4;
 		nItemsPerTier = 4;
 		break;
-	case LOOT_UPGRADE_L_ENERGY_CELL:
-		nNumTiers = 4;
-		nItemsPerTier = 4;
-		break;
-	case LOOT_UPGRADE_L_LENS :
+	// Upgrade - Lightsaber - Lens
+	case 242 :
 		nNumTiers = 3;
 		nItemsPerTier = 5;
+		break;
+	// Upgrade - Lightsaber - Energy Cell
+	case 243:
+		nNumTiers = 4;
+		nItemsPerTier = 4;
 		break;
 	}
 // Determine tier based on player level if it isn't known
@@ -1270,32 +1298,39 @@ if( nItemTier < 1 || nItemTier > nNumTiers ) {
 int nItemID = ( nItemTier * 10 ) + Random(nItemsPerTier) + 1;
 // Exceptions to pad out tiers with fewer items
 switch( nItemType ) {
-	case LOOT_UPGRADE_R_TARGETING_SCOPE:
+	// Ranged - Targeting Scope
+	case 211:
 		if( nItemID == 44 ) nItemID = 34;
 		break;
-	case LOOT_UPGRADE_M_EDGE:
+	// Melee - Edge
+	case 221:
 		if( nItemID == 44 ) nItemID = 32 ;
 		break;
-	case LOOT_UPGRADE_M_ENERGY_CELL:
+	// Melee - Energy Cell
+	case 223:
 		if( nItemID == 44 ) nItemID = 34;
 		break;
-	case LOOT_UPGRADE_A_OVERLAY:
+	// Armor - Overlay
+	case 231:
 		if( nItemID == 47 ) nItemID = 36;
 		if( nItemID == 48 ) nItemID = 38;
 		break;
-	case LOOT_UPGRADE_L_EMITTER:
+	// Lightsaber - Emitter
+	case 241:
 		if( nItemID == 42 ) nItemID = 31;
 		if( nItemID == 43 ) nItemID = 32;
 		if( nItemID == 44 ) nItemID = 34;
 		break;
-	case LOOT_UPGRADE_L_ENERGY_CELL:
+	// Lightsaber - Lens
+	case 242:
+		if( nItemID == 34 ) nItemID = 24;
+		if( nItemID == 35 ) nItemID = 25;
+		break;
+	// Lightsaber - Energy Cell
+	case 243:
 		if( nItemID == 42 ) nItemID = 31;
 		if( nItemID == 43 ) nItemID = 33;
 		if( nItemID == 44 ) nItemID = 34;
-		break;
-	case LOOT_UPGRADE_L_LENS:
-		if( nItemID == 34 ) nItemID = 24;
-		if( nItemID == 35 ) nItemID = 25;
 		break;
 	}
 // Convert item ID to a real item variation
@@ -1414,7 +1449,7 @@ int LOOT_GetHeadgearNum(int nItemLevel) {
 int nRoll = LOOT_DiceResult(nItemLevel, LOOT_DICE_POOL_MODERATE);
 
 // No breath mask in Peragus dormitories
-if( nRoll == 2 && GetStringRight(GetModuleName()) == "105PER" ) {
+if( nRoll == 2 && GetStringRight(GetModuleName(), 3) == "105PER" ) {
 	nRoll = LOOT_DiceResult(nItemLevel - 1, LOOT_DICE_POOL_MODERATE);
 	if( nRoll >= 2 ) nRoll = nRoll + 1;
 	}
@@ -1943,7 +1978,8 @@ if( nItemTier < 1 || nItemTier > 3 ) {
 
 int nOutput = 1; // default to 1
 switch( nItemType ) {
-	case LOOT_DROID_SHIELD_ENERGY:
+	// Droid Shield - Energy
+	case 541:
 		switch( nItemTier ) {
 			case 1:
 				nOutput = 1; // Deflector Mark I
@@ -1956,7 +1992,8 @@ switch( nItemType ) {
 				break;
 			}
 		break;
-	case LOOT_DROID_SHIELD_ENVIRO:
+	// Droid Shield - Shield
+	case 542:
 		switch( nItemTier ) {
 			case 1:
 				nOutput = 3; // Defense Barrier
@@ -2098,7 +2135,8 @@ if( nItemTier < 1 && nItemTier > 4 ) {
 
 int nItemNum;
 switch( nItemType ) {
-	case LOOT_SHIELD_ENERGY:
+	// Shield - Energy
+	case 931:
 		switch( nItemTier ) {
 			case 1:
 				nItemNum = 1; // Energy Shield
@@ -2114,7 +2152,8 @@ switch( nItemType ) {
 				break;
 			}
 		break;
-	case LOOT_SHIELD_ENVIRO:
+	// Shield - Enviro
+	case 932:
 		switch( nItemTier ) {
 			case 1:
 				nItemNum = 1; // Energy Shield
@@ -2130,7 +2169,8 @@ switch( nItemType ) {
 				break;
 		}
 		break;
-	case LOOT_SHIELD_MELEE:
+	// Shield - Melee
+	case 933:
 		switch( nItemTier ) {
 			case 1:
 				nItemNum = 2; // Mandalorian Melee Shield
@@ -2182,13 +2222,16 @@ if( nItemTier < 1 && nItemTier > 4 ) {
 	}
 
 int nOutput = 1; // default to 1 item
-if( nItemType == LOOT_SHIELD_ENVIRO && nItemTier == 3 ) {
+// Enviro 3
+if( nItemType == 932 && nItemTier == 3 ) {
 	nOutput = Random(2) + 1;
 	}
-if( nItemType == LOOT_SHIELD_MELEE && nItemTier == 3 ) {
+// Melee 3
+if( nItemType == 933 && nItemTier == 3 ) {
 	nOutput = Random(2) + 1;
 	}
-if( nItemType == LOOT_SHIELD_MELEE && nItemTier == 4 ) {
+// Melee 4
+if( nItemType == 933 && nItemTier == 4 ) {
 	nOutput = Random(3) + 1;
 	}
 
@@ -2765,7 +2808,8 @@ else {
 	// Item class is known, but the item type isn't
 	if( nItemType % 100 == 0 ) {
 		switch( nItemType ) {
-			case LOOT_CLASS_WEAPONS:
+			// Weapons
+			case 100:
 				// Only Peragus weapons on Peragus
 				if( GetStringRight(GetModuleName(), 3) == "PER" ) {
 					nResult = LOOT_WEAPON_TYPE_PERAGUS;
@@ -2775,10 +2819,12 @@ else {
 					nRange = 3;
 					}
 				break;
-			case LOOT_CLASS_UPGRADES:
+			// Upgrades
+			case 200:
 				nResult = LOOT_GetUpgradeType();
 				break;
-			case LOOT_CLASS_EQUIPMENT:
+			// Equipment
+			case 300:
 				// If the Vao Armband hasn't been found, there's a chance to
 				// roll for armbands
 				if( LOOT_GetUniqueFound(LOOT_ARMBAND, 0) == FALSE && nCheckUnique == TRUE ) {
@@ -2789,7 +2835,8 @@ else {
 					nRange = 4;
 					}
 				break;
-			case LOOT_CLASS_ARMOR:
+			// Armor
+			case 400:
 				// No Jedi robes on Peragus
 				if( GetStringRight(GetModuleName(), 3) == "PER" ) {
 					nRange = 3;
@@ -2798,7 +2845,8 @@ else {
 					nRange = 4;
 					}
 				break;
-			case LOOT_CLASS_DROID:
+			// Droid
+			case 500:
 				nResult = nItemType + ( 10 * ( Random(5) + 1 ) );
 				// Droid armor less common, droid utility items more common
 				if( nResult == LOOT_DROID_TYPE_ARMOR && Random(2) == 1 ) {
@@ -2818,27 +2866,35 @@ else {
 		// Item class and type are known, but the item subtype isn't
 		if( nItemType % 10 == 0 ) {
 			switch( nItemType ) {
-				case LOOT_WEAPON_TYPE_LIGHTSABER:
+				// Lightsaber
+				case 140:
 					nResult = LOOT_GetSaberSubtype();
 					break;
-				case LOOT_WEAPON_TYPE_PERAGUS:
+				// Peragus Weapons
+				case 150:
 					nResult = LOOT_GetPeragusWeapon();
-				case LOOT_UPGRADE_TYPE_RANGED:
+				// Upgrade - Ranged
+				case 210:
 					nResult = LOOT_GetUpgradeSubtype(LOOT_UPGRADE_TYPE_RANGED);
 					break;
-				case LOOT_UPGRADE_TYPE_MELEE:
+				// Upgrade - Melee
+				case 220:
 					nResult = LOOT_GetUpgradeSubtype(LOOT_UPGRADE_TYPE_MELEE);
 					break;
-				case LOOT_UPGRADE_TYPE_ARMOR:
+				// Upgrade - Armor
+				case 230:
 					nResult = LOOT_GetUpgradeSubtype(LOOT_UPGRADE_TYPE_ARMOR);
 					break;
-				case LOOT_UPGRADE_TYPE_LIGHTSABER:
+				// Upgrade - Lightsaber
+				case 240:
 					nResult = LOOT_GetUpgradeSubtype(LOOT_UPGRADE_TYPE_LIGHTSABER);
 					break;
-				case LOOT_EQUIPMENT_TYPE_IMPLANT:
+				// Implant
+				case 340:
 					nResult = LOOT_GetImplantTier(nItemLevel);
 					break;
-				case LOOT_DROID_TYPE_SHIELD:
+				// Droid Shield
+				case 540:
 					nResult = LOOT_GetDroidShieldSubtype();
 					break;
 				default:
@@ -2854,133 +2910,169 @@ else {
 		// Item class, type, & subtype known, generate variation
 		else {
 			switch( nItemType ) {
-				// Weapons
-				case LOOT_MELEE:
-					nResult = LOOT_GetMeleeNum(nItemLevel);
-					break;
-				case LOOT_BLASTER_PISTOL:
+				// Blaster Pistol
+				case 111:
 					nResult = LOOT_GetPistolNum(nItemLevel);
 					break;
-				case LOOT_BLASTER_RIFLE:
+				// Blaster Rifle
+				case 121:
 					nResult = LOOT_GetRifleNum(nItemLevel);
 					break;
-				case LOOT_LIGHTSABER_STANDARD:
+				// Melee
+				case 131:
+					nResult = LOOT_GetMeleeNum(nItemLevel);
+					break;
+				// Lightsaber - Standard
+				case 141:
 					nResult = LOOT_GetSaberColor(nItemLevel);
 					break;
-				case LOOT_LIGHTSABER_SHORT:
+				// Lightsaber - Short
+				case 142:
 					nResult = LOOT_GetSaberColor(nItemLevel);
 					break;
-				case LOOT_LIGHTSABER_DOUBLE_BLADED:
+				// Lightsaber - Double-Bladed
+				case 143:
 					nResult = LOOT_GetSaberColor(nItemLevel);
 					break;
-				case LOOT_MINING_LASER:
+				// Mining Laser
+				case 151:
 					nResult = 0;
 					break;
-				case LOOT_ADVANCED_MINING_LASER:
+				// Advanced Mining Laser
+				case 152:
 					nResult = 0;
 					break;
-				case LOOT_VIBROCUTTER:
+				// Vibrocutter
+				case 153:
 					nResult = 0;
 					break;
-				case LOOT_GUIDON_BEACON:
+				// Guidon Beacon
+				case 154:
 					nResult = 0;
 					break;
-				// Upgrades
-				case LOOT_UPGRADE_R_TARGETING_SCOPE:
+				// Upgrade - Ranged - Targeting Scope
+				case 211:
 					nResult = LOOT_GetUpgradeNum(nItemLevel, LOOT_UPGRADE_R_TARGETING_SCOPE);
 					break;
-				case LOOT_UPGRADE_R_FIRING_CHAMBER:
+				// Upgrade - Ranged - Firing Chamber
+				case 212:
 					nResult = LOOT_GetUpgradeNum(nItemLevel, LOOT_UPGRADE_R_FIRING_CHAMBER);
 					break;
-				case LOOT_UPGRADE_R_POWER_PACK:
+				// Upgrade - Ranged - Power Pack
+				case 213:
 					nResult = LOOT_GetUpgradeNum(nItemLevel, LOOT_UPGRADE_R_POWER_PACK);
 					break;
-				case LOOT_UPGRADE_M_GRIP:
+				// Upgrade - Melee - Grip
+				case 221:
 					nResult = LOOT_GetUpgradeNum(nItemLevel, LOOT_UPGRADE_M_GRIP);
 					break;
-				case LOOT_UPGRADE_M_EDGE:
+				// Upgrade - Melee - Edge
+				case 222:
 					nResult = LOOT_GetUpgradeNum(nItemLevel, LOOT_UPGRADE_M_EDGE);
 					break;
-				case LOOT_UPGRADE_M_ENERGY_CELL:
+				// Upgrade - Melee - Energy Cell
+				case 223:
 					nResult = LOOT_GetUpgradeNum(nItemLevel, LOOT_UPGRADE_M_ENERGY_CELL);
 					break;
-				case LOOT_UPGRADE_A_OVERLAY:
+				// Upgrade - Overlay
+				case 231:
 					nResult = LOOT_GetUpgradeNum(nItemLevel, LOOT_UPGRADE_A_OVERLAY);
 					break;
-				case LOOT_UPGRADE_A_UNDERLAY:
+				// Upgrade - Underlay
+				case 232:
 					nResult = LOOT_GetUpgradeNum(nItemLevel, LOOT_UPGRADE_A_UNDERLAY);
 					break;
-				case LOOT_UPGRADE_L_EMITTER:
+				// Upgrade - Lightsaber - Emitter
+				case 241:
 					nResult = LOOT_GetUpgradeNum(nItemLevel, LOOT_UPGRADE_L_EMITTER);
 					break;
-				case LOOT_UPGRADE_L_LENS:
+				// Upgrade - Lightsaber - Lens
+				case 242:
 					nResult = LOOT_GetUpgradeNum(nItemLevel, LOOT_UPGRADE_L_LENS);
 					break;
-				case LOOT_UPGRADE_L_ENERGY_CELL:
+				// Upgrade - Lightsaber - Energy Cell
+				case 243:
 					nResult = LOOT_GetUpgradeNum(nItemLevel, LOOT_UPGRADE_L_ENERGY_CELL);
 					break;
-				case LOOT_UPGRADE_L_POWER_CRYSTAL:
+				// Upgrade - Lightsaber - Power Crystal
+				case 244:
 					nResult = LOOT_GetPowerCrystalNum(nItemLevel);
 					break;
-				case LOOT_UPGRADE_L_COLOR_CRYSTAL:
+				// Upgrade - Lightsaber - Color Crystal
+				case 245:
 					nResult = LOOT_ColorCrystalNum(LOOT_GetSaberColor(nItemLevel));
 					break;
-				// Equipment
-				case LOOT_BELT:
+				// Belt
+				case 311:
 					nResult = LOOT_GetBeltNum(nItemLevel);
 					break;
-				case LOOT_GLOVES:
+				// Gloves
+				case 321:
 					nResult = LOOT_GetGloveNum(nItemLevel);
 					break;
-				case LOOT_HEADGEAR:
+				// Headgear
+				case 331:
 					nResult = LOOT_GetHeadgearNum(nItemLevel);
 					break;
-				case LOOT_IMPLANT_LEVEL_1:
+				// Implant Level 1
+				case 341:
 					nResult = LOOT_GetImplantNum(nItemLevel);
 					break;
-				case LOOT_IMPLANT_LEVEL_2:
+				// Implant Level 2
+				case 342:
 					nResult = LOOT_GetImplantNum(nItemLevel);
 					break;
-				case LOOT_IMPLANT_LEVEL_3:
+				// Implant Level 3
+				case 343:
 					nResult = LOOT_GetImplantNum(nItemLevel);
 					break;
-				case LOOT_IMPLANT_LEVEL_4:
+				// Implant Level 4
+				case 344:
 					nResult = LOOT_GetImplantNum(nItemLevel);
 					break;
-				case LOOT_ARMBAND:
+				// Armband
+				case 351:
 					// Vao Armband is the only possible armband
 					sTemplate = "a_band_x02";
 					break;
-				// Armor
-				case LOOT_LIGHT_ARMOR:
+				// Light Armor
+				case 411:
 					nResult = LOOT_GetLightArmorNum(nItemLevel);
 					break;
-				case LOOT_MEDIUM_ARMOR:
+				// Medium Armor
+				case 421:
 					nResult = LOOT_GetMediumArmorNum(nItemLevel);
 					break;
-				case LOOT_HEAVY_ARMOR:
+				// Heavy Armor
+				case 431:
 					nResult = LOOT_GetHeavyArmorNum(nItemLevel);
 					break;
-				case LOOT_ROBES:
+				// Robes
+				case 441:
 					nResult = LOOT_GetRobeNum(nItemLevel);
 					break;
-				// Droid Items
-				case LOOT_DROID_INTERFACE:
+				// Droid Interface
+				case 511:
 					nResult = LOOT_GetDroidInterfaceNum(nItemLevel);
 					break;
-				case LOOT_DROID_UTILITY:
+				// Droid Utility
+				case 521:
 					nResult = LOOT_GetDroidUtilityNum(nItemLevel);
 					break;
-				case LOOT_DROID_ARMOR:
+				// Droid Armor
+				case 531:
 					nResult = LOOT_GetDroidArmorNum(nItemLevel);
 					break;
-				case LOOT_DROID_SHIELD_ENERGY:
+				// Droid Shield - Energy
+				case 541:
 					nResult = LOOT_GetDroidShieldNum(nItemLevel, nItemType);
 					break;
-				case LOOT_DROID_SHIELD_ENVIRO:
+				// Droid Shield - Enviro
+				case 542:
 					nResult = LOOT_GetDroidShieldNum(nItemLevel, nItemType);
 					break;
-				case LOOT_DROID_DEVICE:
+				// Droid Device
+				case 551:
 					nResult = LOOT_GetDroidDeviceNum(nItemLevel);
 					break;
 				}
@@ -3028,112 +3120,139 @@ string sPrefix = "";
 int nItemNum = 1;
 int nItemQuantity = 1; // default to 1 item
 switch( nItemType) {
-	case LOOT_CREDITS:
+	// Credits
+	case 911:
 		sTemplate = "g_i_credits015";
-        nItemQuantity = Random(10 * nItemLevel) + Random(50) + 20;
+	    nItemQuantity = Random(10 * nItemLevel) + Random(50) + 20;
 		break;
-	case LOOT_COMPONENTS:
+	// Components
+	case 921:
 		sTemplate = "compont_00001";
 		nItemQuantity = Random(nItemLevel) + Random(nItemLevel) + 1;
 		break;
-	case LOOT_CHEMICALS:
+	// Chemicals
+	case 922:
 		sTemplate = "chem_00001";
 		nItemQuantity = Random(nItemLevel) + Random(nItemLevel) + 1;
 		break;
-	case LOOT_SHIELD_ENERGY:
+	// Shield - Energy
+	case 931:
 		sPrefix = "a_shield_";
 		nItemNum = LOOT_GetShieldNum(nItemLevel, nItemType);
 		nItemQuantity = LOOT_GetShieldQuantity(nItemLevel, nItemType);
 		break;
-	case LOOT_SHIELD_ENVIRO:
+	// Shield - Enviro
+	case 932:
 		sPrefix = "a_shield_";
 		nItemNum = LOOT_GetShieldNum(nItemLevel, nItemType);
 		nItemQuantity = LOOT_GetShieldQuantity(nItemLevel, nItemType);
 		break;
-	case LOOT_SHIELD_MELEE:
+	// Shield - Melee
+	case 933:
 		sPrefix = "a_shield_";
 		nItemNum = LOOT_GetShieldNum(nItemLevel, nItemType);
 		nItemQuantity = LOOT_GetShieldQuantity(nItemLevel, nItemType);
 		break;
-	case LOOT_MEDPAC:
+	// Medpac
+	case 941:
 		sPrefix = "g_i_medeqpmnt";
 		nItemNum = LOOT_GetMedpacTier(nItemLevel);
 		break;
-	case LOOT_REPAIR_KIT:
+	// Repair Kit
+	case 942:
 		sPrefix = "g_i_drdrepeqp0";
 		nItemNum = LOOT_GetMedpacTier(nItemLevel);
 		break;
-	case LOOT_STIM_CON:
+	// Stim - Constitution
+	case 951:
 		sPrefix = "g_i_adrnaline0";
 		nItemNum = LOOT_GetStimNum(nItemLevel, nItemType);
 		break;
-	case LOOT_STIM_DEX:
+	// Stim - Dexterity
+	case 952:
 		sPrefix = "g_i_adrnaline0";
 		nItemNum = LOOT_GetStimNum(nItemLevel, nItemType);
 		break;
-	case LOOT_STIM_STR:
+	// Stim - Strength
+	case 953:
 		sPrefix = "g_i_adrnaline0";
 		nItemNum = LOOT_GetStimNum(nItemLevel, nItemType);
 		break;
-	case LOOT_MEDPAC_II:
+	// Extra Medpacs
+	case 954:
 		sPrefix = "g_i_medeqpmnt";
 		nItemNum = LOOT_GetMedpacTier(nItemLevel);
 		break;
-	case LOOT_STIM_BAT:
+	// Stim - Battle
+	case 955:
 		sPrefix = "g_i_adrnaline0";
 		nItemNum = LOOT_GetStimNum(nItemLevel, nItemType);
 		break;
-	case LOOT_CREDITS_II:
+	// Extra Credits
+	case 961:
 		sTemplate = "g_i_credits015";
-        nItemQuantity = Random(2 * nItemLevel) + Random(50) + 10;
+		nItemQuantity = Random(2 * nItemLevel) + Random(50) + 10;
 		break;
-	case LOOT_GRENADE_ADHESIVE:
+	// Grenade - Adhesive
+	case 971:
 		sTemplate = "g_w_adhsvgren001";
 		nItemQuantity = LOOT_GetGrenadeQuantity(nItemLevel, nItemType);
 		break;
-	case LOOT_GRENADE_CONCUSSION:
+	// Grenade - Concussion
+	case 972:
 		sTemplate = "g_w_stungren01";
 		nItemQuantity = LOOT_GetGrenadeQuantity(nItemLevel, nItemType);
 		break;
-	case LOOT_GRENADE_CRYOBAN:
+	// Grenade - CryoBan
+	case 973:
 		sTemplate = "g_w_cryobgren001";
 		nItemQuantity = LOOT_GetGrenadeQuantity(nItemLevel, nItemType);
 		break;
-	case LOOT_GRENADE_THERMAL_DETONATOR:
+	// Grenade - Thermal Detonator
+	case 974:
 		sTemplate = "g_w_thermldet01";
 		nItemQuantity = LOOT_GetGrenadeQuantity(nItemLevel, nItemType);
 		break;
-	case LOOT_GRENADE_PLASMA:
+	// Grenade - Plasma
+	case 975:
 		sTemplate = "g_w_firegren001";
 		nItemQuantity = LOOT_GetGrenadeQuantity(nItemLevel, nItemType);
 		break;
-	case LOOT_GRENADE_ION:
+	// Grenade - Ion
+	case 976:
 		sTemplate = "g_w_iongren01";
 		nItemQuantity = LOOT_GetGrenadeQuantity(nItemLevel, nItemType);
 		break;
-	case LOOT_GRENADE_POISON:
+	// Grenade - Poison
+	case 977:
 		sTemplate = "g_w_poisngren01";
 		nItemQuantity = LOOT_GetGrenadeQuantity(nItemLevel, nItemType);
 		break;
-	case LOOT_GRENADE_SONIC:
+	// Grenade - Sonic
+	case 978:
 		sTemplate = "g_w_sonicgren01";
 		nItemQuantity = LOOT_GetGrenadeQuantity(nItemLevel, nItemType);
 		break;
-	case LOOT_GRENADE_FRAG:
+	// Grenade - Frag
+	case 979:
 		sTemplate = "g_w_fraggren01";
 		nItemQuantity = LOOT_GetGrenadeQuantity(nItemLevel, nItemType);
 		break;
-	case LOOT_PARTS:
+	// Parts
+	case 981:
 		sTemplate = "g_i_parts01";
 		break;
-	case LOOT_COMPUTER_SPIKE:
+	// Computer Spikes
+	case 982:
 		sTemplate = "g_i_progspike01";
 		break;
-	case LOOT_SECURITY_SPIKE:
+	// Security Spikes
+	case 983:
 		sPrefix = "g_i_secspike";
 		nItemNum = LOOT_GetSecSpikeTier(nItemLevel);
 		break;
-	case LOOT_ROCKET:
+	// Rockets
+	case 991:
 		sPrefix = "w_rocket_";
 		nItemNum = LOOT_GetRocketNum(nItemLevel);
 		break;
@@ -3196,19 +3315,24 @@ else {
 		// Item class and type are known, but the item subtype isn't
 		if( nItemType % 10 == 0 ) {
 			switch( nItemType ) {
-				case LOOT_TYPE_COMPONENTS:
+				// Components & Chemicals
+				case 920:
 					nRange = 2;
 					break;
-				case LOOT_TYPE_SHIELD:
+				// Shields
+				case 930:
 					nRange = 3;
 					break;
-				case LOOT_TYPE_MEDICAL:
+				// Medical Items
+				case 940:
 					nRange = 2;
 					break;
-				case LOOT_TYPE_STIMS:
+				// Stimulants
+				case 950:
 					nRange = 5;
 					break;
-				case LOOT_TYPE_GRENADES:
+				// Grenades
+				case 970:
 					nResult = LOOT_GetGrenadeSubtype(nItemLevel);
 					break;
 				default:
