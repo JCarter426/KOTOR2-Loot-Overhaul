@@ -5,9 +5,11 @@ Changes:
 - Most random number rolls have been replaced with a new dice mechanic. The roll is still skewed based on the player's level, but it should now result in a wider variety of items.
 - Each type of item has been given a custom script function. The specifics vary, tailored to each item type, but generally they adjust the probabilities to distribute items more logically (e.g. standard lightsabers are more common than double-bladed lightsabers) and replace items with higher-quality ones when they are available (e.g. the Watchman Blaster is replaced by the Elite Watchman Blaster if the player's level is high enough).
 - It was possible to collect multiple copies of what ought to be unique items (e.g. Exar Kun's Light Battle Suit, Circlet of Saresh). The random loot system will now keep track of which items you've found and won't give duplicates of unique items.
-- It is no longer possible to find blasters on Peragus through random loot, what with the ban on them. All weapons have been replaced by a selection of Peragus-specific items: mining laser, advanced mining laser, vibrocutter, and guidon beacon. The stats for these items have been unified across all areas and they will now stack in the inventory menu.
-- It is no longer possible to find a Breath Mask in the Peragus dormitories via random loot. There is one placed there manually already, so it didn't make sense with the design.
 - The Vao Armband has been restored via random loot. No other armbands are included in random loot, so previously this one was left out.
+- The Vibrocutter and Guidon Beacon have been restored via random loot.
+- It is no longer possible to find blasters on Peragus through random loot, what with the ban on them. All weapons there have been replaced by a selection of Peragus-specific items (Mining Laser, Advanced Mining Laser, and the restored Vibrocutter and Guidon Beacon)
+- Pergaus items have had their stats unified across all areas. They will also now stack in the inventory menu.
+- It is no longer possible to find a Breath Mask in the Peragus dormitories via random loot. There is one placed there manually already, so it didn't make sense with the design.
 - It is no longer possible to receive Clothing (a_robe_01) through random loot. When rolled, it is replaced with a robe item that has actual value.
 - It isn't possible to find armor until your player reaches level 5, because you're meant to be naked on Peragus - this hasn't changed. However, the level scale for armor items has been adjusted so once you do start finding armor, you start at the bottom. Previously, the lower-numbered items were likely to be skipped.
 - It is no longer possible to find robes on Peragus through random loot. The level scale for robes has been adjusted to account for this, so once you do start finding robes, the lower-numbered items aren't skipped.
@@ -26,3 +28,4 @@ To Do:
 - [ ] Re-read 3500+ lines of code to double-check everything
 - [ ] Alignment restrictions for Jedi robes
 - [ ] Merchant & spawn script support (won't decompile currently)
+- [ ] Provision for unique items that doesn't rely on globals

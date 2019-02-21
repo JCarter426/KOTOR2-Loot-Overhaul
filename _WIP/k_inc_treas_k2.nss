@@ -99,7 +99,7 @@ int LOOT_LIGHT_ARMOR = 411;
 int LOOT_ARMOR_TYPE_MEDIUM = 420;
 int LOOT_MEDIUM_ARMOR = 421;
 // Armor - Heavy Armor 430
-int LOOT_ARMOR_TYPE_HEAVY = 431;
+int LOOT_ARMOR_TYPE_HEAVY = 430;
 int LOOT_HEAVY_ARMOR = 431;
 // Armor - Robes 440
 int LOOT_ARMOR_TYPE_ROBES = 440;
@@ -320,23 +320,23 @@ int nRange = nItemLevel; // initial definition
 int nNumDice;
 int nDiceSize;
 switch( nDiceType ) {
-	// Mild
+	// Mild dice pool
 	case 1:
 		nNumDice = 3;
 		nDiceSize = 20;
 		break;
-	// Moderate
+	// Moderate dice pool
 	case 2:
 		nNumDice = 6;
 		nDiceSize = 10;
 		break;
-	// Extreme
+	// Extreme dice pool
 	case 3:
 		nNumDice = 10;
 		nDiceSize = 6;
 		break;
+	// Default option doesn't use dice pool
 	default:
-		// Default option doesn't use dice pool
 		nNumDice = 1;
 		nDiceSize = 30;
 		break;
@@ -349,17 +349,15 @@ if( nNumDice != 1 ) {
 	// Target range is (a little more than) half the size of the dice pool
 	int nDicePool = nNumDice * nDiceSize;
 	int nHalfPool = nDicePool / 2;
+	if( nRange > nHalfPool ) nRange = nHalfPool;
 	// The midpoint is rounded up for odd dice pool sizes so we stay positive
 	// after subtracting the offset.
 	int nMid = ( ( nDicePool + nNumDice ) / 2 ) + ( nNumDice % 2 );
-	// PC level offsets the min and max values of the target range
+	// Item level offsets the min and max values of the target range
 	int nOffset = nItemLevel;
 	if( nOffset > nMid - nNumDice ) nOffset = nMid - nNumDice;
 	int nMin = nMid + 1 - nOffset;
 	int nMax = nMid + nHalfPool - nOffset;
-	// We also put a cap on the max value to prevent high rolls at very low item
-	// levels
-	if( nRange > nHalfPool ) nRange = nHalfPool;
 	// Initial dice pool
 	nRoll = LOOT_DicePool(nNumDice, nDiceSize);
 	nOutput = nRoll - nMin + 1;
@@ -371,7 +369,6 @@ if( nNumDice != 1 ) {
 	}
 // No dice pool, even odds
 else {
-	// Range based on item level
 	if( nRange > nDiceSize ) nRange = nDiceSize;
 	nOutput = Random(nRange) + 1;
 	}
@@ -390,6 +387,8 @@ return nOutput;
 ////////////////////////////////////////////////////////////////////////////////
 string LOOT_Suffix(int nItemNum) {
 
+if( nItemNum < 0 ) nItemNum = 1;
+if( nItemNum > 99 ) nItemNum = 1;
 string sSuffix = IntToString(nItemNum);
 if( nItemNum < 10 ) sSuffix = "0" + sSuffix;
 if( nItemNum == 0 ) sSuffix = "";
@@ -400,13 +399,13 @@ return sSuffix;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_GetLateGame()
+/*	LOOT_IsLateGame()
 	
 	Checks whether it's late in the game (after boarding the Ravager).
 	
 	JC 2019-02-12                                                             */
 ////////////////////////////////////////////////////////////////////////////////
-int LOOT_GetLateGame() {
+int LOOT_IsLateGame() {
 
 string sModule = GetModuleName();
 if( sModule == "851NIH" ||
@@ -675,10 +674,12 @@ if( nRoll == 18 && nItemLevel >= 27 ) nRoll = 27; // Watchman Blaster --> Elite 
 if( nRoll == 20 && nItemLevel >= 28 ) nRoll = 28; // Mandalorian Ripper --> Mandalorian Disintegrator
 // Replace Onasi Blaster if two have been found before
 if( nRoll = 22 && LOOT_GetUniqueFound(LOOT_BLASTER_PISTOL, -1) == TRUE ) {
-	nRoll = Random(6) + 24;
+	nRoll = 26;
 	}
 // Onasi Blaster --> Micro-Pulse Blaster if we aren't checking unique items
-if( nRoll == 22 && nItemLevel >= 26 && nCheckUnique == FALSE ) nRoll = 26; 
+if( nRoll == 22 && nItemLevel >= 26 && nCheckUnique == FALSE ) {
+	nRoll = 26;
+	}
 // Replace Freedon Nadd's Blaster if it was found before
 if( nRoll == 30 && LOOT_GetUniqueFound(LOOT_BLASTER_PISTOL, nRoll) == TRUE ) {
 	nRoll = Random(6) + 24;
@@ -803,7 +804,6 @@ return nOutput;
 	* COMMON (blue, red, green, yellow, violet)
 	* RARE (cyan, silver, orange, viridian, and any additional colors added with
 	       nExtraSaberColors)
-	
 	Additionally, violet is considered semi-rare and is always half as likely
 	as the other common colors.
 	
@@ -816,7 +816,6 @@ return nOutput;
 	* ANY - Equal chance for all colors, regardless of rarity
 	
 	Returns a number between 1 and 11 for the original game colors:
-	
 	* 1 = BLUE
 	* 2 = RED
 	* 3 = GREEN
@@ -860,6 +859,7 @@ else if( nColorType == LOOT_SABER_COLOR_RARE ) {
 else {
 	nColor = Random(9 + nExtraSaberColors) + 1;
 	}
+// Get the real number
 // No #6 (Malak's saber). No #7 (bronze) if no extra saber colors are used.
 int nOutput;
 if( nColor >= 6 && nExtraSaberColors < 1 ) nOutput = nColor + 2;
@@ -936,13 +936,14 @@ return nOutput;
 ////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_GetUpgradeType() {
+/*	LOOT_GetUpgradeType()
 	
 	Determines the type of upgrade (ARMOR, RANGED, MELEE, or LIGHTSABER).
 	
-	Probability is roughly based on how common the items are, so upgrades for
-	more common items are more common. Armor and ranged upgrades are more
-	common than melee and lightsaber upgrades, with a 2:2:1:1 ratio.
+	Probability is roughly based on how common the items that use the upgrades
+	are, so upgrades for more common items are more common. Armor and ranged
+	upgrades are more common than melee and lightsaber upgrades, with a 2:2:1:1
+	ratio.
 	
 	- nFilter: Used to exlude certain results if desired
 	  * LOOT_UPGRADE_ANY: Any upgade type
@@ -952,7 +953,7 @@ return nOutput;
 	
 	JC 2019-02-14                                                             */
 ////////////////////////////////////////////////////////////////////////////////
-int LOOT_GetUpgradeType(int nFilter = 0) {
+int LOOT_GetUpgradeType(int nItemLevel, int nFilter = 0) {
 
 int nRoll;
 // No lightsaber upgrades if that's specified
@@ -1006,9 +1007,6 @@ return nOutput;
 	LIGHTSABER
 	  Emitter, Lens, Energy Cell, Color Crystal, Power Crystal
 	  5:5:5:3:2
-	
-	Lightsaber emitter, lens, and energy cell upgrades may be excluded if the
-	player has not built a lightsaber with Bao-Dur.
 	
 	- nItemType: Upgrade type (LOOT_UPGRADE_TYPE_*)
 	- nFilter: Used to exclude certain results if desired
@@ -1065,21 +1063,11 @@ switch( nItemType) {
 			}
 		// No color crystal option
 		else if( nFilter == LOOT_SABER_UPGRADE_NO_COLOR ) {
-			if( LOOT_HasUpgradeSaber() == TRUE ) {
-				nRoll = Random(18) + 1;
-				}
-			else {
-				nRoll = 18;
-				}
+			nRoll = 18;
 			}
 		// All saber upgrades
 		else {
-			if( LOOT_HasUpgradeSaber() == TRUE ) {
-				nRoll = Random(20) + 1;
-				}
-			else {
-				nRoll = Random(5) + 16;
-				}
+			nRoll = Random(5) + 16;
 			}
 		// Check the roll to determine subtype
 		if( nRoll <= 5 ) nOutput = LOOT_UPGRADE_L_EMITTER;
@@ -2821,7 +2809,13 @@ else {
 				break;
 			// Upgrades
 			case 200:
-				nResult = LOOT_GetUpgradeType();
+				// No lightsaber upgrades if item level < 6 or PC level < 10
+				if( nItemLevel < 6 || nPCLevel < 10 ) {
+					nResult = LOOT_GetUpgradeType(LOOT_UPGRADE_NO_SABER);
+					}
+				else {
+					nResult = LOOT_GetUpgradeType(LOOT_UPGRADE_ANY);
+					}
 				break;
 			// Equipment
 			case 300:
@@ -3106,7 +3100,7 @@ return sTemplate;
 string GetBundlePrefix(int nItemLevel, int nItemType) {
 
 // Limited selection late in the game
-if( LOOT_GetLateGame() == TRUE ) nItemType = LOOT_GetDisposableLateGame(nItemLevel);
+if( LOOT_IsLateGame() == TRUE ) nItemType = LOOT_GetDisposableLateGame(nItemLevel);
 // Legacy support to filter out scrubbed rocket IDs, just in case
 if( nItemType == 992 ||
 	nItemType == 993 ||
@@ -3281,7 +3275,7 @@ string GetTreasureBundle(int nItemLevel, int nItemType = 0) {
 // Caps the item level to avoid incidents
 if( nItemLevel > 30 ) nItemLevel = 30;
 // Limited selection late in the game
-if( LOOT_GetLateGame() == TRUE ) nItemType = LOOT_GetDisposableLateGame(nItemLevel);
+if( LOOT_IsLateGame() == TRUE ) nItemType = LOOT_GetDisposableLateGame(nItemLevel);
 
 int nRange = 1;
 int nRoll = 0;
