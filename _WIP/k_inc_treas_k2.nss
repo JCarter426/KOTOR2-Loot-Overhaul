@@ -300,11 +300,11 @@ return nScore;
 	   from approximately 0.5% to 7.5% at max level.
 	
 	This allows for different types of items to have probability distributions
-	that suit them. For some types, the higher-numbered are definitely better,
-	so we want an extreme distribution that favors items of our level. In other
-	cases, though, the lower-numbered items may not be so bad, or there may be
-	an advantage to having a variety of items rather than copies of one; here,
-	a less extreme distribution may be more appropriate.
+	that suit them. For some types, the higher-numbered items are definitely
+	better,	so we want an extreme distribution that favors items of our level.
+	n other	cases, though, the lower-numbered items may not be so bad, or there
+	may be an advantage to having a variety of items rather than copies of one;
+	here, a less extreme distribution may be more appropriate.
 	
 	- nItemLevel: Item level determining the quality of the items we can get
 	- nDiceType: What sort of dice to roll, determining probability distribution
@@ -772,7 +772,7 @@ return nRoll;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_GetSaberSubtype() {
+/*	LOOT_GetSaberSubtype()
 	
 	Determines lightsaber subtype (STANDARD, SHORT, or DOUBLE-BLADED).
 	
@@ -795,7 +795,7 @@ return nOutput;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_GetSaberColor() {
+/*	LOOT_GetSaberColor()
 	
 	Determines the color for a lightsaber with different rolls depending on
 	which option is input.
@@ -872,7 +872,7 @@ return nOutput;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_HasUpgradeSaber() {
+/*	LOOT_HasUpgradeSaber()
 	
 	Returns true if the player has completed the "Crafting a Lightsaber" quest
 	with Bao-Dur, or if they have a lightsaber in their inventory.
@@ -953,7 +953,7 @@ return nOutput;
 	
 	JC 2019-02-14                                                             */
 ////////////////////////////////////////////////////////////////////////////////
-int LOOT_GetUpgradeType(int nItemLevel, int nFilter = 0) {
+int LOOT_GetUpgradeType(int nFilter = 0) {
 
 int nRoll;
 // No lightsaber upgrades if that's specified
@@ -985,7 +985,7 @@ return nOutput;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_GetUpgradeSubtype() {
+/*	LOOT_GetUpgradeSubtype()
 	
 	Randomly determines an upgrade subtype based on the input type.
 	
@@ -1008,7 +1008,7 @@ return nOutput;
 	  Emitter, Lens, Energy Cell, Color Crystal, Power Crystal
 	  5:5:5:3:2
 	
-	- nItemType: Upgrade type (LOOT_UPGRADE_TYPE_*)
+	- nItemType: Item type (LOOT_UPGRADE_TYPE_*)
 	- nFilter: Used to exclude certain results if desired
 	  LIGHTSABER
 	  * LOOT_SABER_UPGRADE_ANY: Any lightsaber upgrade
@@ -1067,7 +1067,7 @@ switch( nItemType) {
 			}
 		// All saber upgrades
 		else {
-			nRoll = Random(5) + 16;
+			nRoll = Random(20) + 1;
 			}
 		// Check the roll to determine subtype
 		if( nRoll <= 5 ) nOutput = LOOT_UPGRADE_L_EMITTER;
@@ -1084,13 +1084,12 @@ return nOutput;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_ColorCrystalNum() {
+/*	LOOT_ColorCrystalNum()
 	
 	Converts a saber color to the matching crystal color because these numbers
 	don't match because who knows why.
 	
-	Returns a number from 1-10 for the original game colors:
-	
+	Returns a number from 1-10 for the original game colors:	
 	* 1 = BLUE
 	* 2 = GREEN
 	* 3 = YELLOW
@@ -1125,7 +1124,6 @@ switch( nInput ) {
 	case 4:
 		nOutput = 3;
 		break;
-	case 6:
 	// Bronze
 	case 7:
 		nOutput = 10;
@@ -1188,14 +1186,14 @@ return nRoll;
 	
 	Upgrades are divided into tiers (e.g. Armorweave Underlay Mark I, Armorweave
 	Underlay Mark II...) but the upgrade types have different numbers of tiers
-	with different amounts of items in each tier. Player level is used to
+	with different amounts of items in each tier. Item level is used to
 	calculate the appropriate tier, using the least common multiple of the max
 	level (30) and the total number of upgrade items for the given type. Once
 	the tier is known, a random item variant is picked, with even odds for all
 	varieties.
 	
 	- nItemLevel: Item level determining the quality of the items we can get
-	- nItemType: Type of upgrade
+	- nItemType: Item type (LOOT_UPGRADE_* full item type)
 	- nItemTier: Optional number to specify an item tier
 	
 	JC 2019-01-31                                                             */
@@ -1206,57 +1204,57 @@ int LOOT_GetUpgradeNum(int nItemLevel, int nItemType, int nItemTier = 0) {
 int nNumTiers;
 int nItemsPerTier;
 switch( nItemType ) {
-	// Upgrade - Ranged - Targeting Scope
+	// Ranged - Targeting Scope
 	case 211:
 		nNumTiers = 4;
 		nItemsPerTier = 4;
 		break;
-	// Upgrade - Ranged - Firing Chamber
+	// Ranged - Firing Chamber
 	case 212:
 		nNumTiers = 3;
 		nItemsPerTier = 5;
 		break;
-	// Upgrade - Ranged - Power Pack
+	// Ranged - Power Pack
 	case 213:
 		nNumTiers = 5;
 		nItemsPerTier = 3;
 		break;
-	// Upgrade - Melee - Grip
+	// Melee - Grip
 	case 221:
 		nNumTiers = 3;
 		nItemsPerTier = 5;
 		break;
-	// Upgrade - Melee - Edge
+	// Melee - Edge
 	case 222:
 		nNumTiers = 4;
 		nItemsPerTier = 4;
 		break;
-	// Upgrade - Melee - Energy Cell
+	// Melee - Energy Cell
 	case 223:
 		nNumTiers = 4;
 		nItemsPerTier = 4;
 		break;
-	// Upgrade - Armor - Overlay
+	// Armor - Overlay
 	case 231:
 		nNumTiers = 4;
 		nItemsPerTier = 8;
 		break;
-	// Upgrade - Armor - Underlay
+	// Armor - Underlay
 	case 232:
 		nNumTiers = 5;
 		nItemsPerTier = 6;
 		break;
-	// Upgrade - Lightsaber - Emitter
+	// Lightsaber - Emitter
 	case 241:
 		nNumTiers = 4;
 		nItemsPerTier = 4;
 		break;
-	// Upgrade - Lightsaber - Lens
+	// Lightsaber - Lens
 	case 242 :
 		nNumTiers = 3;
 		nItemsPerTier = 5;
 		break;
-	// Upgrade - Lightsaber - Energy Cell
+	// Lightsaber - Energy Cell
 	case 243:
 		nNumTiers = 4;
 		nItemsPerTier = 4;
@@ -1271,7 +1269,7 @@ if( nItemTier < 1 || nItemTier > nNumTiers ) {
 		nItemScale = nItemLevel;
 		}
 	else if( 30 % nNumItems == 0 ) {
-		nItemScale = ( nItemLevel + ( 30 / nNumItems ) - 1 ) / nNumItems;
+		nItemScale = ( nItemLevel + ( 30 / nNumItems ) - 1 ) / nNumTiers;
 		}
 	else if( nNumItems < 30 ) {
 		nItemScale = ( ( nItemLevel * nNumItems ) + 30 - nNumItems ) / 30;
@@ -1435,9 +1433,8 @@ return nRoll;
 int LOOT_GetHeadgearNum(int nItemLevel) {
 
 int nRoll = LOOT_DiceResult(nItemLevel, LOOT_DICE_POOL_MODERATE);
-
-// No breath mask in Peragus dormitories
-if( nRoll == 2 && GetStringRight(GetModuleName(), 3) == "105PER" ) {
+// No Breath Mask in Peragus dormitories
+if( nRoll == 2 && GetModuleName() == "105PER" ) {
 	nRoll = LOOT_DiceResult(nItemLevel - 1, LOOT_DICE_POOL_MODERATE);
 	if( nRoll >= 2 ) nRoll = nRoll + 1;
 	}
@@ -1477,14 +1474,14 @@ return nRoll;
 	
 	Implant tiers have a sort of bell curve distribution. You're more likely to
 	get implants matching your current Constitution score, or one level higher
-	or	lower. However, it's possible to get any implant level with	any score,
+	or lower. However, it's possible to get any implant level with	any score,
 	so there's a chance of getting items to give to party members with higher
 	or lower Constitution than your own.
 	
-	I've also incorporated the player level to skew the results towards higher
+	I've also incorporated the item level to skew the results towards higher
 	quality	items as the game progresses. The target values for each implant
 	tier are fixed, based on your Constitution score, but the die size is
-	determined by the player level. It can be anything from a d96 (level 1) to
+	determined by the item level. It can be anything from a d96 (level 1) to
 	a d125 (level 30+).
 	
 	Implant Level:    1       2       3       4
@@ -1507,19 +1504,20 @@ return nRoll;
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetImplantTier(int nItemLevel) {
 
+if( nItemLevel > 30 ) nItemLevel = 30;
 int nCON = GetAbilityModifier(ABILITY_CONSTITUTION, GetFirstPC());
 int nRoll = Random(95 + nItemLevel) + 1;
 int nOutput;
 if( nCON <= 1 ) {
 	if( nRoll <= 60 ) nOutput = 1;
-	else if( nRoll <= 70 ) nOutput = 2;
-	else if( nRoll <= 80 ) nOutput = 3;
+	else if( nRoll <= 80 ) nOutput = 2;
+	else if( nRoll <= 90 ) nOutput = 3;
 	else nOutput = 4;
 	}
 else if( nCON == 2 ) {
 	if( nRoll <= 20 ) nOutput = 1;
 	else if( nRoll <= 70 ) nOutput = 2;
-	else if( nRoll <= 90 ) nOutput = 4;
+	else if( nRoll <= 90 ) nOutput = 3;
 	else nOutput = 4;
 	}
 else if( nCON == 3 ) {
@@ -1577,10 +1575,6 @@ return nRoll;
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetLightArmorNum(int nItemLevel) {
 
-// Item level is reduced for armor because you don't start getting it at all
-// until level 5
-nItemLevel = nItemLevel - 4;
-if( nItemLevel < 3 ) nItemLevel = 3;
 // Armors have 15 variations
 int nRoll = ( LOOT_DiceResult(nItemLevel, LOOT_DICE_POOL_MODERATE) + 1 ) / 2;
 int nItemScale = ( ( nItemLevel + 1 ) / 2 );
@@ -1618,10 +1612,6 @@ return nRoll;
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetMediumArmorNum(int nItemLevel) {
 
-// Item level is reduced for armor because you don't start getting it at all
-// until level 5
-nItemLevel = nItemLevel - 4;
-if( nItemLevel < 3 ) nItemLevel = 3;
 // Armors have 15 variations
 int nRoll = ( LOOT_DiceResult(nItemLevel, LOOT_DICE_POOL_MODERATE) + 1 ) / 2;
 int nItemScale = ( ( nItemLevel + 1 ) / 2 );
@@ -1666,10 +1656,6 @@ return nRoll;
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetHeavyArmorNum(int nItemLevel) {
 
-// Item level is reduced for armor because you don't start getting it at all
-// until level 5
-nItemLevel = nItemLevel - 4;
-if( nItemLevel < 3 ) nItemLevel = 3;
 // Armors have 15 variations
 int nRoll = ( LOOT_DiceResult(nItemLevel, LOOT_DICE_POOL_MODERATE) + 1 ) / 2;
 int nItemScale = ( ( nItemLevel + 1 ) / 2 );
@@ -1700,8 +1686,8 @@ int LOOT_GetRobeNum(int nItemLevel) {
 
 // Item level is reduced because the scaling for robes has to be slowed down on
 // account of how you can't roll for robes at all until after Peragus.
-nItemLevel = nItemLevel - 7;
-if( nItemLevel < 3 ) nItemLevel = 3;
+nItemLevel = nItemLevel - 2;
+if( nItemLevel < 1 ) nItemLevel = 1;
 // Robes have 30 variations
 int nRoll = LOOT_DiceResult(nItemLevel, LOOT_DICE_POOL_EXTREME);
 // Replacement table for if a better version of what we rolled is available
@@ -1766,7 +1752,35 @@ return nOutput;
 ////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_GetDroidInterfaceNum() {
+/*	LOOT_GetDroidItemType()
+	
+	Determines droid item type.
+	
+	* 1/8 chance ARMOR
+	* 1/8 chance UTILITY
+	* 2/8 chance INTERFACE
+	* 2/8 chance SHIELD
+	* 2/8 chance DEVICE
+	
+	JC 2019-02-23                                                             */
+////////////////////////////////////////////////////////////////////////////////
+int LOOT_GetDroidItemType() {
+
+int nOutput;
+int nRoll = Random(8) + 1;
+if( nRoll == 1 ) nOutput = LOOT_DROID_TYPE_ARMOR;
+else if( nRoll == 2 ) nOutput = LOOT_DROID_TYPE_UTILITY;
+else if( nRoll == 3 || nRoll == 4 ) nOutput = LOOT_DROID_TYPE_INTERFACE;
+else if( nRoll == 5 || nRoll == 6 ) nOutput = LOOT_DROID_TYPE_SHIELD;
+else nOutput = LOOT_DROID_TYPE_DEVICES;
+
+return nOutput;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/*	LOOT_GetDroidInterfaceNum()
 	
 	Generates item variation for droid interfaces.
 	
@@ -1796,7 +1810,7 @@ return nRoll;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_GetDroidUtilityNum() {
+/*	LOOT_GetDroidUtilityNum()
 	
 	Generates item variation for droid utilities.
 	
@@ -1833,7 +1847,7 @@ return nRoll;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_GetDroidArmorNum() {
+/*	LOOT_GetDroidArmorNum()
 	
 	Generates item variation for droid armor.
 	
@@ -1892,7 +1906,7 @@ return nRoll;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_GetDroidShieldSubtype() {
+/*	LOOT_GetDroidShieldSubtype()
 	
 	Generates subtype for droid shields.
 	
@@ -1910,7 +1924,7 @@ return LOOT_DROID_TYPE_SHIELD + Random(2) + 1;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_GetDroidShieldTier() {
+/*	LOOT_GetDroidShieldTier()
 	
 	Determines item tier for droid shields. Both shield subtypes have three
 	tiers.
@@ -1932,7 +1946,7 @@ return nOutput;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_GetDroidShieldNum() {
+/*	LOOT_GetDroidShieldNum()
 	
 	Generates item variation for droid shields.
 	
@@ -1947,7 +1961,7 @@ return nOutput;
 	  Defense Barrier --> Energy Collector --> Unity Grid
 	
 	- nItemLevel: Item level determining the quality of the items we can get
-	- nSubtype: Shield subtype (LOOT_DROID_SHIELD_*)
+	- nItemType: Item type (LOOT_DROID_SHIELD_*)
 	- nItemTier: Optional number to specify an item tier
 	
 	JC 2019-02-13                                                             */
@@ -1980,7 +1994,7 @@ switch( nItemType ) {
 				break;
 			}
 		break;
-	// Droid Shield - Shield
+	// Droid Shield - Environmental
 	case 542:
 		switch( nItemTier ) {
 			case 1:
@@ -2002,7 +2016,7 @@ return nOutput;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_GetDroidDeviceNum() {
+/*	LOOT_GetDroidDeviceNum()
 	
 	Generates item variation for droid devices.
 	
@@ -2041,7 +2055,7 @@ return nRoll;
 ////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_GetShieldSubtype() {
+/*	LOOT_GetShieldSubtype()
 	
 	Generates subtype for shields.
 	
@@ -2061,7 +2075,7 @@ return LOOT_TYPE_SHIELD + Random(3) + 1;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_GetShieldTier() {
+/*	LOOT_GetShieldTier()
 	
 	Determines item tier for shields.
 	
@@ -2085,7 +2099,7 @@ return nOutput;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_GetShieldNum() {
+/*	LOOT_GetShieldNum()
 	
 	Generates item variation for shields.
 	
@@ -2097,13 +2111,13 @@ return nOutput;
 	  Energy Shield --> Arkanian Energy Shield --> 1d2 x Arkanian Energy Shield
 	  --> Verpine Prototype Shield
 	* MELEE
-	  Mandalorian Melee Shield > Mandalorian Power Shield > 1d2 x Mandalorian
-	  Power Shield > 1d3 x Mandalorian Power Shield
+	  Mandalorian Melee Shield --> Mandalorian Power Shield --> 1d2 x
+	  Mandalorian Power Shield --> 1d3 x Mandalorian Power Shield
 	
 	Item quantities are handled through the LOOT_GetShieldQuantity() function.
 	
 	- nItemLevel: Item level determining the quality of the items we can get
-	- nItemType: Type of item (LOOT_* item classifications)
+	- nItemType: Type of item (LOOT_SHIELD_*)
 	- nItemTier: Optional number to specify an item tier
 	
 	JC 2019-02-12                                                             */
@@ -2182,7 +2196,7 @@ return nItemNum;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_GetShieldQuantity() {
+/*	LOOT_GetShieldQuantity()
 	
 	Determines amount of shields to give, based on type.
 	
@@ -2194,11 +2208,11 @@ return nItemNum;
 	  Energy Shield --> Arkanian Energy Shield --> 1d2 x Arkanian Energy Shield
 	  --> Verpine Prototype Shield
 	* MELEE
-	  Mandalorian Melee Shield > Mandalorian Power Shield > 1d2 x Mandalorian
-	  Power Shield > 1d3 x Mandalorian Power Shield
+	  Mandalorian Melee Shield --> Mandalorian Power Shield --> 1d2 x
+	  Mandalorian Power Shield --> 1d3 x Mandalorian Power Shield
 	
 	- nItemLevel: Item level determining the quality of the items we can get
-	- nItemType: Type of item (LOOT_* item classifications)
+	- nItemType: Type of item (LOOT_SHIELD_*)
 	
 	JC 2019-02-12                                                             */
 ////////////////////////////////////////////////////////////////////////////////
@@ -2228,7 +2242,7 @@ return nOutput;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_GetMedpacTier() {
+/*	LOOT_GetMedpacTier()
 	
 	Determines item tier for medical items (medpacs and repair kits).
 	
@@ -2249,7 +2263,7 @@ return nOutput;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_GetStimSubtype() {
+/*	LOOT_GetStimSubtype()
 	
 	Generates subtype for stimulants.
 	
@@ -2287,7 +2301,7 @@ return nOutput;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_GetStimTier() {
+/*	LOOT_GetStimTier()
 	
 	Determines item tier for stimulants.
 	
@@ -2312,7 +2326,7 @@ return nOutput;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_GetStimNum() {
+/*	LOOT_GetStimNum()
 	
 	Generates item variation number for stimulants.
 	
@@ -2321,7 +2335,7 @@ return nOutput;
 	a separate item prefix.
 	
 	- nItemLevel: Item level determining the quality of the items we can get
-	- nItemType: Type of item (LOOT_* item classifications)
+	- nItemType: Type of item (LOOT_STIM_* full item type)
 	- nItemTier: Optional number to specify an item tier
 	
 	JC 2019-02-13                                                             */
@@ -2365,7 +2379,7 @@ return nOutput;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_GetGrenadeSubtype() {
+/*	LOOT_GetGrenadeSubtype()
 	
 	Determines grenade subtype (ADHESIVE, CONCUSSION, CRYOBAN, FRAG, ION,
 	PLASMA, POISON, SONIC, or THERMAL DETONATOR).
@@ -2526,7 +2540,7 @@ return nOutput;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_GetGrenadeQuantity() {
+/*	LOOT_GetGrenadeQuantity()
 	
 	Determines amount of grenades to give, based on type.
 
@@ -2534,7 +2548,7 @@ return nOutput;
 	increased to 1d2 and the quantity of very common grenades up to 2d2.
 	
 	- nItemLevel: Item level determining the quantity of items we get
-	- nItemType: Type of item (LOOT_* item classifications)
+	- nItemType: Type of item (LOOT_GRENADE_*)
 	
 	JC 2019-02-18                                                             */
 ////////////////////////////////////////////////////////////////////////////////
@@ -2556,9 +2570,9 @@ if( nItemType != LOOT_GRENADE_ADHESIVE &&
 int nOutput = 1; // default to 1 item
 if( nItemType == LOOT_GRENADE_FRAG ) {
 	if( nItemLevel < 7 ) nOutput = Random(2) + 1;
-	if( nItemLevel >= 7 && nItemLevel < 11 ) nOutput = Random(3) + 1;
-	if( nItemLevel >= 11 && nItemLevel < 15 ) nOutput = Random(4) + 1;
-	if( nItemLevel >= 15 ) nOutput = Random(2) + Random(2) + 2;
+	else if( nItemLevel >= 7 && nItemLevel < 11 ) nOutput = Random(3) + 1;
+	else if( nItemLevel >= 11 && nItemLevel < 15 ) nOutput = Random(4) + 1;
+	else nOutput = Random(2) + Random(2) + 2;
 	}
 if( nItemType == LOOT_GRENADE_ADHESIVE ||
 	nItemType == LOOT_GRENADE_CONCUSSION ||
@@ -2576,7 +2590,7 @@ return nOutput;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_GetSecSpikeTier() {
+/*	LOOT_GetSecSpikeTier()
 	
 	Determines security spike tier.
 
@@ -2594,10 +2608,8 @@ return nOutput;
 int LOOT_GetSecSpikeTier(int nItemLevel) {
 
 int nOutput = ( nItemLevel + Random(10) + 1 ) % 10;
-if( nOutput < 1 ) nOutput = 1;
-// This function could be expanded to include more tiers simply by changing the
-// following limit
-if( nOutput > 2 ) nOutput = 2;
+if( nOutput < 2 ) nOutput = 1;
+else nOutput = 2;
 
 return nOutput;
 
@@ -2605,7 +2617,7 @@ return nOutput;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_GetRocketNum() {
+/*	LOOT_GetRocketNum()
 	
 	Determines item variation for Mira's rockets.
 	
@@ -2669,7 +2681,7 @@ return nOutput;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_GetDisposableLateGame() {
+/*	LOOT_GetDisposableLateGame()
 	
 	Determines disposable item type for loot rolled late in the game.
 	
@@ -2768,9 +2780,10 @@ return "";
 ////////////////////////////////////////////////////////////////////////////////
 string GetTreasureSpecific(int nItemLevel, int nItemType = 0) {
 
-// Caps the item level to avoid incidents
+// Cap the item level to avoid incidents
 if( nItemLevel > 30 ) nItemLevel = 30;
 
+int nPCLevel = GetGlobalNumber("G_PC_LEVEL");
 int nRange = 1;
 int nRoll = 0;
 int nResult = 0;
@@ -2821,7 +2834,7 @@ else {
 			case 300:
 				// If the Vao Armband hasn't been found, there's a chance to
 				// roll for armbands
-				if( LOOT_GetUniqueFound(LOOT_ARMBAND, 0) == FALSE && nCheckUnique == TRUE ) {
+				if( LOOT_GetUniqueFound(LOOT_ARMBAND, 0) == FALSE ) {
 					nRange = 5;
 					}
 				// Otherwise, armbands aren't included in random loot
@@ -2841,11 +2854,7 @@ else {
 				break;
 			// Droid
 			case 500:
-				nResult = nItemType + ( 10 * ( Random(5) + 1 ) );
-				// Droid armor less common, droid utility items more common
-				if( nResult == LOOT_DROID_TYPE_ARMOR && Random(2) == 1 ) {
-					nResult = LOOT_DROID_TYPE_UTILITY;
-					}
+				nResult = LOOT_GetDroidItemType();
 				break;
 				}
 		// Roll for type if we don't know it yet
@@ -2891,6 +2900,7 @@ else {
 				case 540:
 					nResult = LOOT_GetDroidShieldSubtype();
 					break;
+				// Everything else has only 1 thing per thing
 				default:
 					nResult = 1;
 					break;
@@ -3179,7 +3189,7 @@ switch( nItemType) {
 		break;
 	// Stim - Battle
 	case 955:
-		sPrefix = "g_i_adrnaline0";
+		sPrefix = "g_i_cmbtshot0";
 		nItemNum = LOOT_GetStimNum(nItemLevel, nItemType);
 		break;
 	// Extra Credits
@@ -3272,7 +3282,7 @@ return sTemplate + SWTR_GetQuantity(nItemQuantity);
 ////////////////////////////////////////////////////////////////////////////////
 string GetTreasureBundle(int nItemLevel, int nItemType = 0) {
 
-// Caps the item level to avoid incidents
+// Cap the item level to avoid incidents
 if( nItemLevel > 30 ) nItemLevel = 30;
 // Limited selection late in the game
 if( LOOT_IsLateGame() == TRUE ) nItemType = LOOT_GetDisposableLateGame(nItemLevel);
@@ -3329,6 +3339,7 @@ else {
 				case 970:
 					nResult = LOOT_GetGrenadeSubtype(nItemLevel);
 					break;
+				// Everything else has only 1 thing per thing
 				default:
 					nResult = 1;
 					break;
@@ -3375,7 +3386,7 @@ return sTemplate;
 ////////////////////////////////////////////////////////////////////////////////
 /*	GetTreasureRare()
 	
-	Generates a template string for an item of higher quality than the player'sGlobal
+	Generates a template string for an item of higher quality than the player's
 	current level (+5 bonus).
 	
 	- nItemLevel: Item level determining the quality of items we can get
@@ -3591,7 +3602,6 @@ for( i = 1; i <= numberOfItems; i++ ) {
 	
 	- oContainer: Object to contain the loot
 	- numberOfItems: Number of items to place
-	- nItemType: Type of item (LOOT_* item classifications)
 	
 	JC 2019-02-19                                                             */
 ////////////////////////////////////////////////////////////////////////////////
@@ -3624,7 +3634,7 @@ for ( i = 1; i <= numberOfItems; i++ ) {
 	
 	- oContainer: Object to contain the loot
 	- numberOfItems: Number of items to place
-	- nItemType: Type of item (LOOT_* item classifications)
+	- nItemType: Type of item (LOOT_* item classifications, droid items only)
 	
 	JC 2019-02-19                                                             */
 ////////////////////////////////////////////////////////////////////////////////
@@ -3655,6 +3665,13 @@ void PlaceTreasurePeragus(object oContainer = OBJECT_SELF, int numberOfItems = 1
 
 int nRoll = Random(100) + GetGlobalNumber("000_RareItemChance");
 
+// If the input item type is valid, use it
+if( nItemType / 100 == 3 ||
+	nItemType / 10 == 15 ||
+	nItemType == LOOT_UPGRADE_A_UNDERLAY ) {
+	PlaceTreasure(oContainer, numberOfItems, nItemType);
+	}
+// Otherwise, roll for item type
 if( nRoll >= 88 ) {
 	PlaceTreasure(oContainer, numberOfItems, LOOT_CLASS_EQUIPMENT);
 	}
