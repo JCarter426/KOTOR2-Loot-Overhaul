@@ -6,10 +6,6 @@
 //	CONFIGURATION
 ////////////////////////////////////////////////////////////////////////////////
 
-// Sets whether we should check if certain items have been found before adding
-// them, to prevent duplicates of unique items (e.g. Bindo's Band, Thon's Robe).
-int nCheckUnique = TRUE;
-
 // Sets how many saber colors to add to the base amount. This is here to add
 // support for the cut bronze color, but it will work for more if they stick to
 // the naming scheme.
@@ -234,6 +230,14 @@ int LOOT_U_ROBE_THON = 32;
 int LOOT_U_ROBE_CRADO = 64;
 int LOOT_U_ROBE_NOMI = 128;
 
+
+////////////////////////////////////////////////////////////////////////////////
+//	DECLARATIONS
+////////////////////////////////////////////////////////////////////////////////
+
+int LOOT_GetUniqueFound(int nItemType, int nItemNum);
+void LOOT_SetUniqueFound(int nItemType, int nItemNum, int nState);
+string GetItemPrefix(int nItemType);
 
 ////////////////////////////////////////////////////////////////////////////////
 //	UTILITY FUNCTIONS
@@ -556,21 +560,21 @@ return nItemID;
 string LOOT_UniqueGlobal(int nItemType, int nItemID) {
 
 string sGlobal = "";
-if( nItemType == LOOT_ARMBAND ||
-	nItemType == LOOT_BELT ||
-	nItemType == LOOT_GLOVES ||
-	nItemType == LOOT_HEADGEAR ||
-	nItemType == LOOT_UPGRADE_L_POWER_CRYSTAL ) {
-	sGlobal = "LOOT_U_EQUIP";
+if( nItemType == LOOT_ROBES ) {
+	sGlobal = "LOOT_U_ROBES";
 	}
-if( nItemType == LOOT_LIGHT_ARMOR ||
+else if( nItemType == LOOT_LIGHT_ARMOR ||
 	nItemType == LOOT_MEDIUM_ARMOR ||
 	nItemType == LOOT_BLASTER_PISTOL ||
 	nItemType == LOOT_MELEE ) {
 	sGlobal = "LOOT_U_ARMS";
 	}
-if( nItemType == LOOT_ROBES ) {
-	sGlobal = "LOOT_U_ROBES";
+else if( nItemType == LOOT_ARMBAND ||
+	nItemType == LOOT_BELT ||
+	nItemType == LOOT_GLOVES ||
+	nItemType == LOOT_HEADGEAR ||
+	nItemType == LOOT_UPGRADE_L_POWER_CRYSTAL ) {
+	sGlobal = "LOOT_U_EQUIP";
 	}
 
 return sGlobal;
@@ -579,27 +583,61 @@ return sGlobal;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_GetUniqueFound()
+/*	LOOT_UniqueItemTag()
 
-	Checks if a unique item has already been found.
+	Returns the tag of a unique item.
 	
-	- nItemType: Item type (LOOT_* item classifications)
-	- nItemID: Unique item ID (LOOT_U_*)
+	- int nItemType: Item type (LOOT_* item classifications)
+	- int nItemNum: Item variation number
 	
-	JC 2019-01-17                                                             */
+	JC 2019-02-24                                                             */
 ////////////////////////////////////////////////////////////////////////////////
-int LOOT_GetUniqueFound(int nItemType, int nItemNum) {
+string LOOT_UniqueItemTag(int nItemType, int nItemNum) {
 
-int nItemID = LOOT_UniqueItemID(nItemType, nItemNum);
-int nGlobal = GetGlobalNumber(LOOT_UniqueGlobal(nItemType, nItemID));
-// 128 is stored as -128 for reasons, so the global has to be converted first if
-// it has a negative value
-if( nGlobal < 0 ) nGlobal = nGlobal + 256;
-// Mod operation will tell us if our item ID is in there
-int nRemainder = nGlobal % ( nItemID * 2 );
+string sTag;
+// Exception for Vao Armband
+if( nItemType == LOOT_ARMBAND ) {
+	sTag = "a_band_x02";
+	}
+// Exception for 2nd Onasi Blaster
+else if( nItemType == LOOT_BLASTER_PISTOL && nItemNum == -1 ) {
+	sTag = "w_blaste_22";
+	}
+// Otherwise, prefix + suffix
+else {
+	sTag = GetItemPrefix(nItemType) + LOOT_Suffix(nItemNum);
+	}
 
-if( nRemainder >= nItemID ) return  nCheckUnique;
-return FALSE;
+return sTag;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/*	LOOT_CountItemsEquipped()
+
+	Checks if an item is in any of the specified creature's equipment slots and
+	returns how many are found.
+	
+	- oCreature: Creature to check
+	- sItem: Tag of the item to look for
+	
+	JC 2019-02-24                                                             */
+////////////////////////////////////////////////////////////////////////////////
+int LOOT_CountItemsEquipped(object oCreature, string sItem) {
+
+int i;
+int j = 0;
+object oItem;
+string sTag;
+for( i = 0; i <= 19; i++ ) {
+	oItem = GetItemInSlot(i, oCreature);
+	if( GetIsObjectValid(oItem) ) sTag = GetTag(oItem);
+	else sTag = "";
+	if( sTag == sItem ) j++;
+	}
+
+return j;
 
 }
 
@@ -631,6 +669,101 @@ if( nState == TRUE ) nValue = nGlobal + nItemID;
 else nValue = nGlobal - nItemID;
 
 SetGlobalNumber(sGlobal, nValue);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/*	LOOT_CountItemsEquipped()
+
+	Counts how many of a given item are possessed by the party. Checks the
+	individual party members' equipment slots as well as their shared inventory.
+	
+	- oCreature: Creature to check
+	- sItem: Tag of the item to look for
+	
+	JC 2019-02-24                                                             */
+////////////////////////////////////////////////////////////////////////////////
+int LOOT_HasEnoughItems(string sItem, int nAmount) {
+
+object oPC = GetFirstPC();
+object oPM1 = OBJECT_INVALID;
+object oPM2 = OBJECT_INVALID;
+
+int i = 1;
+int j = FALSE;
+while( j == FALSE ) {
+	object oNearest = GetNearestObject(OBJECT_TYPE_CREATURE, oPC, i);
+	if( GetIsObjectValid(oNearest) ){
+		if( IsObjectPartyMember(oNearest) ) {
+			if( oPM1 == OBJECT_INVALID ) {
+				oPM1 = oNearest;
+				}
+			else {
+				oPM2 = oNearest;
+				j = TRUE;
+				}
+			}
+		i++;
+		}
+	else j = TRUE;
+	}
+int nCount = LOOT_CountItemsEquipped(GetFirstPC(), sItem);
+if( GetIsObjectValid(oPM1) ) nCount = nCount + LOOT_CountItemsEquipped(oPM1, sItem);
+if( GetIsObjectValid(oPM2) ) nCount = nCount + LOOT_CountItemsEquipped(oPM2, sItem);
+object oItem = GetItemPossessedBy(GetFirstPC(), sItem);
+if( GetIsObjectValid(oItem) ) nCount = nCount + GetItemStackSize(oItem);	
+
+if( nCount >= nAmount ) return TRUE;
+return FALSE;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/*	LOOT_GetUniqueFound()
+
+	Checks if a unique item has already been found.
+	
+	- nItemType: Item type (LOOT_* item classifications)
+	- nItemID: Unique item ID (LOOT_U_*)
+	
+	JC 2019-02-24                                                             */
+////////////////////////////////////////////////////////////////////////////////
+int LOOT_GetUniqueFound(int nItemType, int nItemNum) {
+
+int nItemID = LOOT_UniqueItemID(nItemType, nItemNum);
+int nGlobal = GetGlobalNumber(LOOT_UniqueGlobal(nItemType, nItemID));
+// 128 is stored as -128 for reasons, so the global has to be converted first if
+// it has a negative value
+if( nGlobal < 0 ) nGlobal = nGlobal + 256;
+// Mod operation will tell us if our item ID is in there
+int nRemainder = nGlobal % ( nItemID * 2 );
+// Check if item has been found
+int nOutput;
+// First, check the global
+if( nRemainder >= nItemID ) {
+	nOutput = TRUE;
+	}
+// If the global hasn't been set, check the party equipment & inventory to see
+// if the item is in there anyway
+else {
+	int nAmount = 1;
+	if( nItemType == LOOT_BLASTER_PISTOL &&
+		nItemID == LOOT_U_BLASTER_ONASI_II ) {
+		nAmount = 2; // allow 2 Onasi Blasters
+		}
+	string sItem = LOOT_UniqueItemTag(nItemType, nItemNum);
+	if( LOOT_HasEnoughItems(sItem, nAmount) ) {
+		LOOT_SetUniqueFound(nItemType, nItemNum, TRUE);
+		nOutput = TRUE;
+		}
+	else {
+		nOutput = FALSE;
+		}
+	}
+
+return nOutput;
 
 }
 
@@ -674,10 +807,6 @@ if( nRoll == 18 && nItemLevel >= 27 ) nRoll = 27; // Watchman Blaster --> Elite 
 if( nRoll == 20 && nItemLevel >= 28 ) nRoll = 28; // Mandalorian Ripper --> Mandalorian Disintegrator
 // Replace Onasi Blaster if two have been found before
 if( nRoll = 22 && LOOT_GetUniqueFound(LOOT_BLASTER_PISTOL, -1) == TRUE ) {
-	nRoll = 26;
-	}
-// Onasi Blaster --> Micro-Pulse Blaster if we aren't checking unique items
-if( nRoll == 22 && nItemLevel >= 26 && nCheckUnique == FALSE ) {
 	nRoll = 26;
 	}
 // Replace Freedon Nadd's Blaster if it was found before
@@ -2723,50 +2852,51 @@ return nOutput;
 ////////////////////////////////////////////////////////////////////////////////
 string GetItemPrefix(int nItemType) {
 
-if( nItemType == LOOT_BLASTER_PISTOL ) return "w_blaste_";
-if( nItemType == LOOT_BLASTER_RIFLE ) return "w_brifle_";
-if( nItemType == LOOT_MELEE ) return "w_melee_";
-if( nItemType == LOOT_LIGHTSABER_STANDARD ) return "g_w_lghtsbr";
-if( nItemType == LOOT_LIGHTSABER_SHORT ) return "g_w_shortsbr";
-if( nItemType == LOOT_LIGHTSABER_DOUBLE_BLADED ) return "g_w_dblsbr0";
-if( nItemType == LOOT_MINING_LASER ) return "mininglaser";
-if( nItemType == LOOT_ADVANCED_MINING_LASER ) return "advancedminingla";
-if( nItemType == LOOT_VIBROCUTTER ) return "vibrocutter";
-if( nItemType == LOOT_GUIDON_BEACON ) return "guidonbeacon";
-if( nItemType == LOOT_UPGRADE_R_TARGETING_SCOPE ) return "u_r_targ_";
-if( nItemType == LOOT_UPGRADE_R_FIRING_CHAMBER ) return "u_r_firi_";
-if( nItemType == LOOT_UPGRADE_R_POWER_PACK ) return "u_r_powe_";
-if( nItemType == LOOT_UPGRADE_M_GRIP ) return "u_m_grip_";
-if( nItemType == LOOT_UPGRADE_M_EDGE ) return "u_m_edge_";
-if( nItemType == LOOT_UPGRADE_M_ENERGY_CELL ) return "u_m_cell_";
-if( nItemType == LOOT_UPGRADE_A_OVERLAY ) return "u_a_over_";
-if( nItemType == LOOT_UPGRADE_A_UNDERLAY ) return "u_a_unde_";
-if( nItemType == LOOT_UPGRADE_L_EMITTER ) return "u_l_emit_";
-if( nItemType == LOOT_UPGRADE_L_LENS ) return "u_l_lens_";
-if( nItemType == LOOT_UPGRADE_L_ENERGY_CELL ) return "u_l_cell_";
-if( nItemType == LOOT_UPGRADE_L_POWER_CRYSTAL ) return "u_l_crys_";
-if( nItemType == LOOT_UPGRADE_L_COLOR_CRYSTAL ) return "u_l_colo_";
-if( nItemType == LOOT_BELT ) return "a_belt_";
-if( nItemType == LOOT_GLOVES ) return "a_gloves_";
-if( nItemType == LOOT_HEADGEAR ) return "a_helmet_";
-if( nItemType == LOOT_IMPLANT_LEVEL_1 ) return "e_imp1_";
-if( nItemType == LOOT_IMPLANT_LEVEL_2 ) return "e_imp2_";
-if( nItemType == LOOT_IMPLANT_LEVEL_3 ) return "e_imp3_";
-if( nItemType == LOOT_IMPLANT_LEVEL_4 ) return "e_imp4_";
-if( nItemType == LOOT_HEAVY_ARMOR ) return "a_heavy_";
-if( nItemType == LOOT_MEDIUM_ARMOR ) return "a_medium_";
-if( nItemType == LOOT_LIGHT_ARMOR ) return "a_light_";
-if( nItemType == LOOT_ROBES ) return "a_robe_";
-if( nItemType == LOOT_DROID_UTILITY ) return "d_utility_";
-if( nItemType == LOOT_DROID_INTERFACE ) return "d_interface_";
-if( nItemType == LOOT_DROID_ARMOR ) return "d_armor_";
-if( nItemType == LOOT_DROID_SHIELD_ENERGY ) return "d_shield_";
-if( nItemType == LOOT_DROID_SHIELD_ENVIRO ) return "d_shield_";
-if( nItemType == LOOT_DROID_DEVICE ) return "d_device_";
+switch( nItemType ) {
+	case 111: return "w_blaste_";
+	case 121: return "w_brifle_";
+	case 131: return "w_melee_";
+	case 141: return "g_w_lghtsbr";
+	case 142: return "g_w_shortsbr";
+	case 143: return "g_w_dblsbr0";
+	case 151: return "mininglaser";
+	case 152: return "advancedminingla";
+	case 153: return "vibrocutter";
+	case 154: return "guidonbeacon";
+	case 211: return "u_r_targ_";
+	case 212: return "u_r_firi_";
+	case 213: return "u_r_powe_";
+	case 221: return "u_m_grip_";
+	case 222: return "u_m_edge_";
+	case 223: return "u_m_cell_";
+	case 231: return "u_a_over_";
+	case 232: return "u_a_unde_";
+	case 241: return "u_l_emit_";
+	case 242: return "u_l_lens_";
+	case 243: return "u_l_cell_";
+	case 244: return "u_l_crys_";
+	case 245: return "u_l_colo_";
+	case 311: return "a_belt_";
+	case 321: return "a_gloves_";
+	case 331: return "a_helmet_";
+	case 341: return "e_imp1_";
+	case 342: return "e_imp2_";
+	case 343: return "e_imp3_";
+	case 344: return "e_imp4_";
+	case 411: return "a_heavy_";
+	case 421: return "a_medium_";
+	case 431: return "a_light_";
+	case 441: return "a_robe_";
+	case 511: return "d_utility_";
+	case 521: return "d_interface_";
+	case 531: return "d_armor_";
+	case 541: return "d_shield_";
+	case 542: return "d_shield_";
+	case 551: return "d_device_";
+	}
 return "";
 
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 /*	GetTreasureSpecific()
