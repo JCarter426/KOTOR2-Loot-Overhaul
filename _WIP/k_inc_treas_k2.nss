@@ -239,6 +239,7 @@ int LOOT_GetUniqueFound(int nItemType, int nItemNum);
 void LOOT_SetUniqueFound(int nItemType, int nItemNum, int nState);
 string GetItemPrefix(int nItemType);
 
+
 ////////////////////////////////////////////////////////////////////////////////
 //	UTILITY FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
@@ -542,6 +543,37 @@ return nItemID;
 
 
 ////////////////////////////////////////////////////////////////////////////////
+/*	LOOT_UniqueItemTag()
+
+	Returns the tag of a unique item.
+	
+	- int nItemType: Item type (LOOT_* item classifications)
+	- int nItemNum: Item variation number
+	
+	JC 2019-02-24                                                             */
+////////////////////////////////////////////////////////////////////////////////
+string LOOT_UniqueItemTag(int nItemType, int nItemNum) {
+
+string sTag;
+// Exception for Vao Armband
+if( nItemType == LOOT_ARMBAND ) {
+	sTag = "a_band_x02";
+	}
+// Exception for 2nd Onasi Blaster
+else if( nItemType == LOOT_BLASTER_PISTOL && nItemNum == -1 ) {
+	sTag = "w_blaste_22";
+	}
+// Otherwise, prefix + suffix
+else {
+	sTag = GetItemPrefix(nItemType) + LOOT_Suffix(nItemNum);
+	}
+
+return sTag;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 /*	LOOT_UniqueGlobal()
 
 	Returns a string for the global that keeps track of the specified unique
@@ -578,37 +610,6 @@ else if( nItemType == LOOT_ARMBAND ||
 	}
 
 return sGlobal;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_UniqueItemTag()
-
-	Returns the tag of a unique item.
-	
-	- int nItemType: Item type (LOOT_* item classifications)
-	- int nItemNum: Item variation number
-	
-	JC 2019-02-24                                                             */
-////////////////////////////////////////////////////////////////////////////////
-string LOOT_UniqueItemTag(int nItemType, int nItemNum) {
-
-string sTag;
-// Exception for Vao Armband
-if( nItemType == LOOT_ARMBAND ) {
-	sTag = "a_band_x02";
-	}
-// Exception for 2nd Onasi Blaster
-else if( nItemType == LOOT_BLASTER_PISTOL && nItemNum == -1 ) {
-	sTag = "w_blaste_22";
-	}
-// Otherwise, prefix + suffix
-else {
-	sTag = GetItemPrefix(nItemType) + LOOT_Suffix(nItemNum);
-	}
-
-return sTag;
 
 }
 
