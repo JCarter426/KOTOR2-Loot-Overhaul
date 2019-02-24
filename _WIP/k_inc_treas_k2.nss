@@ -436,7 +436,7 @@ return FALSE;
 	Returns the alignment of the area we're in.
 	(0 == EVIL, 50 == NEUTRAL, 100 = GOOD)
 	
-	JC 2019-02-12                                                             */
+	JC 2019-02-24                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetAreaAlignment() {
 
