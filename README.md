@@ -26,5 +26,5 @@ To Do:
 - [x] Clean up code
 - [x] Re-read 3500+ lines of code to double-check everything
 - [x] Provision for unique items that doesn't rely on globals
-- [ ] Alignment restrictions for Jedi robes
+- [x] Alignment restrictions for Jedi robes
 - [ ] Merchant & spawn script support (won't decompile currently)

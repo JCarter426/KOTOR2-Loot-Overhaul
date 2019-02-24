@@ -1,3 +1,4 @@
+
 #include "k_inc_q_crystal"
 #include "k_inc_treasure"
 
@@ -424,6 +425,52 @@ if( sModule == "851NIH" ||
 	return TRUE;
 	}
 return FALSE;
+
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+/*	LOOT_GetAreaAlignment()
+	
+	Returns the alignment of the area we're in.
+	(0 == EVIL, 50 == NEUTRAL, 100 = GOOD)
+	
+	JC 2019-02-12                                                             */
+////////////////////////////////////////////////////////////////////////////////
+int LOOT_GetAreaAlignment() {
+
+string sModule = GetModuleName();
+// Light areas
+if( sModule == "262TEL" ||
+	sModule == "601DAN" ||
+	sModule == "602DAN" ||
+	sModule == "604DAN" ||
+	sModule == "605DAN" ||
+	sModule == "610DAN" ||
+	sModule == "650DAN" ) {
+	return 100;
+	}
+// Dark areas
+else if( sModule == "410DXN" ||
+	sModule == "411DXN" ||
+	sModule == "701KOR" ||
+	sModule == "702KOR" ||
+	sModule == "710KOR" ||
+	sModule == "851NIH" ||
+	sModule == "852NIH" ||
+	sModule == "901MAL" ||
+	sModule == "902MAL" ||
+	sModule == "903MAL" ||
+	sModule == "904MAL" ||
+	sModule == "905MAL" ||
+	sModule == "906MAL" ) {
+	return 0;
+	}
+// Neutral for everything else
+else {
+	return 50;
+	}
 
 }
 
@@ -1873,6 +1920,64 @@ if( nRoll >= 23 ) {
 	}
 
 return nOutput;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/*	LOOT_AlignmentRobe()
+	
+	Changes a robe number to match the specified alignment.
+	
+	Applies to:
+	* Padawan Robe / Dark Padawan Robe
+	* Jedi Robe / Dark Jedi Robe
+	* Jedi Knight Robe / Dark Jedi Knight Robe
+	* Jedi Master Robe / Dark Jedi Master Robe
+	
+	- sItemName = Item template (a_robe_*)
+	- nAlignment = Alignment score (0 to 99, dark to light)
+	
+	JC 2019-02-24                                                             */
+////////////////////////////////////////////////////////////////////////////////
+string LOOT_AlignmentRobe(string sItemName, int nAlignment) {
+
+int nItemNum = StringToInt(GetStringRight(sItemName, 2));
+int nNewNum = nItemNum;
+if( nAlignment >= 50 ) {
+	switch( nItemNum ) {
+		case 3:
+			nNewNum = 2;
+			break;
+		case 9:
+			nNewNum = 8;
+			break;
+		case 14:
+			nNewNum = 13;
+			break;
+		case 18:
+			nNewNum = 17;
+			break;
+		}
+	}
+else {
+	switch( nItemNum ) {
+		case 2:
+			nNewNum = 3;
+			break;
+		case 8:
+			nNewNum = 9;
+			break;
+		case 13:
+			nNewNum = 14;
+			break;
+		case 17:
+			nNewNum = 18;
+			break;
+		}
+	}
+
+return GetItemPrefix(LOOT_ROBES) + LOOT_Suffix(nNewNum);
 
 }
 
@@ -3643,6 +3748,12 @@ if( !GetLocalBoolean(oContainer, 57) ) {
 			sItemName = GetSubString(sItem, 0, j);
 			}
 		else sItemName = sItem;
+		// Make sure robes match the area's alignment
+		int nAlignment = LOOT_GetAreaAlignment();
+		if( nAlignment != 50 &&
+			GetSubString(sItemName, 0, GetStringLength(sItemName) - 2) == GetItemPrefix(LOOT_ROBES) ) {
+			sItemName = LOOT_AlignmentRobe(sItemName, nAlignment);		
+			}
 			
 		// Place the item in the container
 		CreateItemOnObject(sItemName, oContainer, nItemQuantity);
@@ -3713,7 +3824,12 @@ for( i = 1; i <= numberOfItems; i++ ) {
 		sItemName = GetSubString(sItem, 0, j);
 		}
 	else sItemName = sItem;
-		
+	// Make sure robes match a creature's alignment
+	if( GetObjectType(oContainer) == OBJECT_TYPE_CREATURE &&
+		GetSubString(sItemName, 0, GetStringLength(sItemName) - 2) == GetItemPrefix(LOOT_ROBES) ) {
+		sItemName = LOOT_AlignmentRobe(sItemName, GetGoodEvilValue(oContainer));		
+		}
+	
 	// Place the item in the container
 	CreateItemOnObject(sItemName, oContainer, nItemQuantity);
 	}
@@ -3730,6 +3846,7 @@ for( i = 1; i <= numberOfItems; i++ ) {
 	10% chance lightsaber upgrades, power crystals only
 	10% chance robes
 	10% chance equipment
+	60% chance disposables
 	
 	- oContainer: Object to contain the loot
 	- numberOfItems: Number of items to place
