@@ -442,7 +442,8 @@ int LOOT_GetAreaAlignment() {
 
 string sModule = GetModuleName();
 // Light areas
-if( sModule == "262TEL" ||
+if( sModule == "204TEL" ||
+	sModule == "262TEL" ||
 	sModule == "601DAN" ||
 	sModule == "602DAN" ||
 	sModule == "604DAN" ||
@@ -457,6 +458,7 @@ else if( sModule == "410DXN" ||
 	sModule == "701KOR" ||
 	sModule == "702KOR" ||
 	sModule == "710KOR" ||
+	sModule == "711KOR" ||
 	sModule == "851NIH" ||
 	sModule == "852NIH" ||
 	sModule == "901MAL" ||
