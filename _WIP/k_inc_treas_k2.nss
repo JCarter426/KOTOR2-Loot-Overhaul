@@ -854,12 +854,12 @@ if( nRoll == 16 && nItemLevel >= 24 ) nRoll = 24; // Mandalorian Heavy Blaster -
 if( nRoll == 18 && nItemLevel >= 27 ) nRoll = 27; // Watchman Blaster --> Elite Watchman Blaster
 if( nRoll == 20 && nItemLevel >= 28 ) nRoll = 28; // Mandalorian Ripper --> Mandalorian Disintegrator
 // Replace Onasi Blaster if two have been found before
-if( nRoll = 22 && LOOT_GetUniqueFound(LOOT_BLASTER_PISTOL, -1) == TRUE ) {
-	nRoll = 26;
+if( nRoll == 22 && LOOT_GetUniqueFound(LOOT_BLASTER_PISTOL, -1) == TRUE ) {
+	nRoll == 26;
 	}
 // Replace Freedon Nadd's Blaster if it was found before
 if( nRoll == 30 && LOOT_GetUniqueFound(LOOT_BLASTER_PISTOL, nRoll) == TRUE ) {
-	nRoll = Random(6) + 24;
+	nRoll == Random(6) + 24;
 	}
 // Set globals for unique items if we rolled any
 if( nRoll == 22 || nRoll == 30 ) {
@@ -1583,7 +1583,7 @@ if( nRoll == 21 && nItemLevel >= 29 ) nRoll = 29; // Automation Gloves --> Impro
 // If Ossluk's Gloves were already found, replace them
 if( nRoll == 27 && LOOT_GetUniqueFound(LOOT_GLOVES, nRoll) == TRUE ) {
 	nRoll = Random(8) + 22;
-	if( nRoll = 27 ) nRoll = 30;
+	if( nRoll == 27 ) nRoll = 30;
 	}
 // Set globals for unique items if we rolled any
 if( nRoll == 27 ) {
@@ -1629,7 +1629,7 @@ if( nRoll == 25 && LOOT_GetUniqueFound(LOOT_HEADGEAR, nRoll) == TRUE ) {
 	else if( Random(2) == 0 ) nRoll = 23; // Matukai Meditation Band
 	else nRoll = 30; // Force Focusing Visor
 	}
-if( nRoll = 26 && LOOT_GetUniqueFound(LOOT_HEADGEAR, nRoll) == TRUE ) {
+if( nRoll == 26 && LOOT_GetUniqueFound(LOOT_HEADGEAR, nRoll) == TRUE ) {
 	if( LOOT_GetUniqueFound(LOOT_HEADGEAR, 25) == FALSE ) nRoll = 25; // Circlet of Saresh if it hasn't been found
 	else if( Random(2) == 0 ) nRoll = 23; // Matukai Meditation Band
 	else nRoll = 30; // Force Focusing Visor
@@ -2066,7 +2066,7 @@ if( nRoll == 1 && nItemScale >= 8 ) nRoll = 8; // Droid Motion Tracker --> Droid
 if( nRoll == 2 && nItemScale >= 7 ) {
 	// Droid Upgrade Slot isn't needed after level 7
 	nRoll = Random(nItemScale - 1) + 1;
-	if( nRoll = 2 ) nRoll = nItemScale;
+	if( nRoll == 2 ) nRoll = nItemScale;
 	}
 if( nRoll == 4 && nItemScale >= 13 ) {
 	// Droid Advanced Upgrade Slot isn't needed after level 13
@@ -2120,7 +2120,7 @@ if( nRoll == 3 && nItemScale >= 5 && nItemScale < 13 ) {
 	}
 if( nRoll == 3 && nItemScale >= 5 && nItemScale >= 13 ) nRoll = 5;
 // Impact Armor III --> Modular Plating II
-if( nRoll = 5 && nItemScale >= 10 && nItemScale < 13 ) nRoll = 6;
+if( nRoll == 5 && nItemScale >= 10 && nItemScale < 13 ) nRoll = 6;
 // Modular Plating II --> Modular Plating III
 if( nRoll == 6 && nItemScale >= 7 && nItemScale < 13 ) {
 	if( Random(2) == 1 ) nRoll = 7;
