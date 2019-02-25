@@ -3589,7 +3589,7 @@ else {
 			if( nResult < 100 ) nResult = nItemType + nResult;
 			
 			// Entire item type known, return to top
-			sTemplate = GetTreasureSpecific(nItemLevel, nResult);
+			sTemplate = GetBundlePrefix(nItemLevel, nResult);
 			}
 		// Item class, type, & subtype known, generate template
 		else {
