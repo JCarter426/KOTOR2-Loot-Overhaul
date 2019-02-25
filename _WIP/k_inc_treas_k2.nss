@@ -691,38 +691,7 @@ return j;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_SetUniqueFound()
-
-	Sets whether a unique item has been found.
-	
-	- nItemType: Item type (LOOT_* item classifications)
-	- nItemID: Unique item ID (LOOT_U_*)
-	- nState: Set whether it's been found or not (TRUE or FALSE);
-	
-	JC 2019-01-17                                                             */
-////////////////////////////////////////////////////////////////////////////////
-void LOOT_SetUniqueFound(int nItemType, int nItemNum, int nState) {
-
-string sGlobal = LOOT_UniqueGlobal(nItemType, nItemNum);
-int nGlobal = GetGlobalNumber(sGlobal);
-int nItemID = LOOT_UniqueItemID(nItemType, nItemNum);
-// 2 Onasi Blasters are permitted, so we have to switch IDs for the second
-if( ( nItemType == LOOT_BLASTER_PISTOL &&
-	nItemID == LOOT_U_BLASTER_ONASI ) &&
-	LOOT_GetUniqueFound(LOOT_BLASTER_PISTOL, 22) == TRUE ) {
-	nItemID = nItemID * 2;
-	}
-int nValue;
-if( nState == TRUE ) nValue = nGlobal + nItemID;
-else nValue = nGlobal - nItemID;
-
-SetGlobalNumber(sGlobal, nValue);
-
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_CountItemsEquipped()
+/*	LOOT_HasEnoughItems()
 
 	Counts how many of a given item are possessed by the party. Checks the
 	individual party members' equipment slots as well as their shared inventory.
@@ -828,6 +797,37 @@ else {
 	}
 
 return nOutput;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/*	LOOT_SetUniqueFound()
+
+	Sets whether a unique item has been found.
+	
+	- nItemType: Item type (LOOT_* item classifications)
+	- nItemID: Unique item ID (LOOT_U_*)
+	- nState: Set whether it's been found or not (TRUE or FALSE);
+	
+	JC 2019-01-17                                                             */
+////////////////////////////////////////////////////////////////////////////////
+void LOOT_SetUniqueFound(int nItemType, int nItemNum, int nState) {
+
+string sGlobal = LOOT_UniqueGlobal(nItemType, nItemNum);
+int nGlobal = GetGlobalNumber(sGlobal);
+int nItemID = LOOT_UniqueItemID(nItemType, nItemNum);
+// 2 Onasi Blasters are permitted, so we have to switch IDs for the second
+if( ( nItemType == LOOT_BLASTER_PISTOL &&
+	nItemID == LOOT_U_BLASTER_ONASI ) &&
+	LOOT_GetUniqueFound(LOOT_BLASTER_PISTOL, 22) == TRUE ) {
+	nItemID = nItemID * 2;
+	}
+int nValue;
+if( nState == TRUE ) nValue = nGlobal + nItemID;
+else nValue = nGlobal - nItemID;
+
+SetGlobalNumber(sGlobal, nValue);
 
 }
 
