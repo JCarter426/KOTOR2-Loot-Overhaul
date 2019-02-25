@@ -853,7 +853,7 @@ if( nRoll == 15 && nItemLevel >= 20 ) nRoll = 20; // Sith Disruptor --> Mandalor
 if( nRoll == 16 && nItemLevel >= 24 ) nRoll = 24; // Mandalorian Heavy Blaster --> Zabrak Heavy Blaster
 if( nRoll == 18 && nItemLevel >= 27 ) nRoll = 27; // Watchman Blaster --> Elite Watchman Blaster
 if( nRoll == 20 && nItemLevel >= 28 ) nRoll = 28; // Mandalorian Ripper --> Mandalorian Disintegrator
-if( nRoll == 12 && nItemLevel >= 22 ) nRoll = 22; // Onasi Blaster --> Micro-Pulse Blaster
+if( nRoll == 22 && nItemLevel >= 26 ) nRoll = 26; // Onasi Blaster --> Micro-Pulse Blaster
 // Replace Onasi Blaster if two have been found before (if it wasn't already
 // replaced due to item level)
 if( nRoll == 22 && LOOT_GetUniqueFound(LOOT_BLASTER_PISTOL, -1) == TRUE ) {
