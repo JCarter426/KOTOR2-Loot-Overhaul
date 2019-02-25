@@ -757,11 +757,27 @@ while( j == FALSE ) {
 	else j = TRUE;
 	}
 int nCount = LOOT_CountItemsEquipped(GetFirstPC(), sItem);
-if( GetIsObjectValid(oPM1) ) nCount = nCount + LOOT_CountItemsEquipped(oPM1, sItem);
-if( GetIsObjectValid(oPM2) ) nCount = nCount + LOOT_CountItemsEquipped(oPM2, sItem);
-object oItem = GetItemPossessedBy(GetFirstPC(), sItem);
-if( GetIsObjectValid(oItem) ) nCount = nCount + GetItemStackSize(oItem);	
-
+object oItem;
+int k = 0;
+while( nCount < nAmount && k <= 3 ) {
+	switch( k ) {
+		case 0:
+			if( GetIsObjectValid(oPM1) ) nCount = nCount + LOOT_CountItemsEquipped(oPM1, sItem);
+			break;
+		case 1:
+			if( GetIsObjectValid(oPM2) ) nCount = nCount + LOOT_CountItemsEquipped(oPM2, sItem);
+			break;
+		case 2:
+			oItem = GetItemPossessedBy(GetFirstPC(), sItem);
+			if( GetIsObjectValid(oItem) ) nCount = nCount + GetItemStackSize(oItem);
+			break;
+		case 3:
+			oItem = GetItemPossessedBy(OBJECT_SELF, sItem);
+			if( GetIsObjectValid(oItem) ) nCount = nCount + GetItemStackSize(oItem);
+			break;
+		}
+	k++;
+	}
 if( nCount >= nAmount ) return TRUE;
 return FALSE;
 
@@ -1268,7 +1284,7 @@ return nOutput;
 	Converts a saber color to the matching crystal color because these numbers
 	don't match because who knows why.
 	
-	Returns a number from 1-10 for the original game colors:	
+	Returns a number from 1-10 for the original game colors:
 	* 1 = BLUE
 	* 2 = GREEN
 	* 3 = YELLOW
@@ -3755,7 +3771,7 @@ if( !GetLocalBoolean(oContainer, 57) ) {
 		int nAlignment = LOOT_GetAreaAlignment();
 		if( nAlignment != 50 &&
 			GetSubString(sItemName, 0, GetStringLength(sItemName) - 2) == GetItemPrefix(LOOT_ROBES) ) {
-			sItemName = LOOT_AlignmentRobe(sItemName, nAlignment);		
+			sItemName = LOOT_AlignmentRobe(sItemName, nAlignment);
 			}
 			
 		// Place the item in the container
@@ -3830,7 +3846,7 @@ for( i = 1; i <= numberOfItems; i++ ) {
 	// Make sure robes match a creature's alignment
 	if( GetObjectType(oContainer) == OBJECT_TYPE_CREATURE &&
 		GetSubString(sItemName, 0, GetStringLength(sItemName) - 2) == GetItemPrefix(LOOT_ROBES) ) {
-		sItemName = LOOT_AlignmentRobe(sItemName, GetGoodEvilValue(oContainer));		
+		sItemName = LOOT_AlignmentRobe(sItemName, GetGoodEvilValue(oContainer));
 		}
 	
 	// Place the item in the container
