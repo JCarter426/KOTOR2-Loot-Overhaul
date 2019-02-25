@@ -1103,7 +1103,7 @@ int nRoll = Random(6) + 1;
 if( nRoll == 1 || nRoll == 2 ) nOutput = LOOT_MINING_LASER;
 else if( nRoll == 3 || nRoll == 4 ) nOutput = LOOT_ADVANCED_MINING_LASER;
 else if( nRoll == 5 ) nOutput = LOOT_VIBROCUTTER;
-else nRoll = LOOT_GUIDON_BEACON;
+else nOutput = LOOT_GUIDON_BEACON;
 
 return nOutput;
 
@@ -3114,6 +3114,7 @@ else {
 				// Peragus Weapons
 				case 150:
 					nResult = LOOT_GetPeragusWeapon();
+					break;
 				// Upgrade - Ranged
 				case 210:
 					nResult = LOOT_GetUpgradeSubtype(LOOT_UPGRADE_TYPE_RANGED);
