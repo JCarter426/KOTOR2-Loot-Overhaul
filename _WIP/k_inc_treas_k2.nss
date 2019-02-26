@@ -1466,7 +1466,7 @@ if( nItemTier < 1 || nItemTier > nNumTiers ) {
 		nItemScale = nItemLevel;
 		}
 	else if( 30 % nNumItems == 0 ) {
-		nItemScale = ( nItemLevel + ( 30 / nNumItems ) - 1 ) / nNumTiers;
+		nItemScale = ( nItemLevel + ( 30 / nNumItems ) - 1 ) / ( 30 / nNumItems );
 		}
 	else if( nNumItems < 30 ) {
 		nItemScale = ( ( nItemLevel * nNumItems ) + 30 - nNumItems ) / 30;
