@@ -3010,9 +3010,9 @@ switch( nItemType ) {
 	case 342: return "e_imp2_";
 	case 343: return "e_imp3_";
 	case 344: return "e_imp4_";
-	case 411: return "a_heavy_";
+	case 411: return "a_light_";
 	case 421: return "a_medium_";
-	case 431: return "a_light_";
+	case 431: return "a_heavy_";
 	case 441: return "a_robe_";
 	case 511: return "d_utility_";
 	case 521: return "d_interface_";
