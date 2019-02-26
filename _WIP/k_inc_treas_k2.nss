@@ -1594,6 +1594,7 @@ int LOOT_GetGloveNum(int nItemLevel) {
 int nRoll = LOOT_DiceResult(nItemLevel, LOOT_DICE_POOL_MODERATE);
 // Replacement table for if a better version of what we rolled is available
 if( nRoll == 2 && nItemLevel >= 7 ) nRoll = 7; // Exchange Casual Gloves --> Exchange Work Gloves
+if( nRoll == 3 && nItemLevel >= 14 ) nRoll = 14; // Strength Gauntlets --> Eriadu Strength Amplifier
 if( nRoll == 4 && nItemLevel >= 15 ) nRoll = 15; // Taris Survival Gloves --> Karakan Gauntlets
 if( nRoll == 9 && nItemLevel >= 16 ) nRoll = 16; // Detonator Gloves --> Bothan Precision Gloves
 if( nRoll == 12 && nItemLevel >= 22 ) nRoll = 22; // Jal Shey Perception Gloves --> Jal Shey Meditation Gloves

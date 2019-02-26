@@ -7,6 +7,7 @@ Changes:
 - Many robes were left out of random loot. It was not possible to roll any higher than 17 (Jedi Master Robe) so most of the higher-quality robes could not be found anywhere in the game.
 - The rare item roll gave a 95% chance of rolling the highest possible value. I'm not sure what the intent was, but I doubt that was it. You're still guaranteed to find a rare item for every fifth item found, but now it will likely be that fifth item instead of the third.
 - When rolling a rare item, it was possible to roll *too* high and receive no item at all.
+- Strength Gauntlets have been restored. Previously there was no 3rd glove variation, so random loot would give nothing in its place.
 - The Vao Armband has been restored via random loot.
 - The Vibrocutter and Guidon Beacon have been restored via random loot.
 - It was only possible to receive 5 out of 11 of Mira's rockets through random loot.
