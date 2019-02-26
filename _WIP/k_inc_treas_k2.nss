@@ -493,11 +493,11 @@ int LOOT_UniqueItemID(int nItemType, int nItemNum) {
 int nItemID = 0;
 switch( nItemType ) {
 	// Light Armor
-	case 410:
+	case 411:
 		nItemID = LOOT_U_ARMOR_QEL_DROMA;
 		break;
 	// Medium Armor
-	case 420:
+	case 421:
 		switch( nItemNum ) {
 			case 11:
 				nItemID = LOOT_U_ARMOR_EXAR_KUN;
@@ -3156,9 +3156,10 @@ else {
 					break;
 				// Armband
 				case 350:
-					// If the Vao Armband has already been found, redirect to headgear
+					// If the Vao Armband has already been found, redirect to
+					// another equipment item
 					if( LOOT_GetUniqueFound(LOOT_ARMBAND, 0) == TRUE ) {
-						nResult = LOOT_HEADGEAR;
+						nResult = LOOT_CLASS_EQUIPMENT + ( 10 * Random(4) );
 						}
 					else {
 						nResult = 1;
