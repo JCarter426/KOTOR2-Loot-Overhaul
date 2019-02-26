@@ -3154,6 +3154,16 @@ else {
 				case 340:
 					nResult = LOOT_GetImplantTier(nItemLevel);
 					break;
+				// Armband
+				case 350:
+					// If the Vao Armband has already been found, redirect to headgear
+					if( LOOT_GetUniqueFound(LOOT_ARMBAND, 0) == TRUE ) {
+						nResult = LOOT_HEADGEAR;
+						}
+					else {
+						nResult = 1;
+						}
+					break;
 				// Droid Shield
 				case 540:
 					nResult = LOOT_GetDroidShieldSubtype();
