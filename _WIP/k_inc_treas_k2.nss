@@ -1884,7 +1884,7 @@ int LOOT_GetRobeNum(int nItemLevel) {
 
 // Item level is reduced because the scaling for robes has to be slowed down on
 // account of how you can't roll for robes at all until after Peragus.
-nItemScale = nItemLevel - 2;
+int nItemScale = nItemLevel - 2;
 if( nItemScale < 1 ) nItemScale = 1;
 // Robes have 30 variations
 int nRoll = LOOT_DiceResult(nItemScale, LOOT_DICE_POOL_EXTREME);
