@@ -394,9 +394,9 @@ return nOutput;
 string LOOT_Suffix(int nItemNum) {
 
 if( nItemNum < 0 ) nItemNum = 1;
-if( nItemNum > 99 ) nItemNum = 1;
 string sSuffix = IntToString(nItemNum);
 if( nItemNum < 10 ) sSuffix = "0" + sSuffix;
+if( nItemNum > 99 ) sSuffix = "x" + GetStringRight(sSuffix, 2);
 if( nItemNum == 0 ) sSuffix = "";
 
 return sSuffix;
@@ -1892,6 +1892,7 @@ int nRoll = LOOT_DiceResult(nItemScale, LOOT_DICE_POOL_EXTREME);
 if( nRoll == 1 ) nRoll = 2; // No clothing ever
 if( nRoll == 2 && nItemScale >= 8 ) nRoll = 8; // Padawan --> Jedi
 if( nRoll == 3 && nItemScale >= 9 ) nRoll = 9; // Dark Padawan --> Dark Jedi
+if( nRoll == 4 && nItemScale >= 10 && nItemScale < 19 ) nRoll = 110; // Baran Do Novice --> Baran Do Advisor OR
 if( nRoll == 4 && nItemScale >= 19 ) nRoll = 19; // Baran Do Novice --> Baran Do Sage
 if( nRoll == 5 && nItemScale >= 15 ) nRoll = 15; // Matukai Apprentice --> Matukai Adept
 if( nRoll == 6 && nItemScale >= 16 ) nRoll = 16; // Zeison Sha Initiate --> Zeison Sha Warrior
