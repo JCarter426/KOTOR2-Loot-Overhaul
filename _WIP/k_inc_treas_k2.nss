@@ -1884,23 +1884,23 @@ int LOOT_GetRobeNum(int nItemLevel) {
 
 // Item level is reduced because the scaling for robes has to be slowed down on
 // account of how you can't roll for robes at all until after Peragus.
-nItemLevel = nItemLevel - 2;
-if( nItemLevel < 1 ) nItemLevel = 1;
+nItemScale = nItemLevel - 2;
+if( nItemScale < 1 ) nItemScale = 1;
 // Robes have 30 variations
-int nRoll = LOOT_DiceResult(nItemLevel, LOOT_DICE_POOL_EXTREME);
+int nRoll = LOOT_DiceResult(nItemScale, LOOT_DICE_POOL_EXTREME);
 // Replacement table for if a better version of what we rolled is available
 if( nRoll == 1 ) nRoll = 2; // No clothing ever
-if( nRoll == 2 && nItemLevel >= 8 ) nRoll = 8; // Padawan --> Jedi
-if( nRoll == 3 && nItemLevel >= 9 ) nRoll = 9; // Dark Padawan --> Dark Jedi
-if( nRoll == 4 && nItemLevel >= 19 ) nRoll = 19; // Baran Do Novice --> Baran Do Sage
-if( nRoll == 5 && nItemLevel >= 15 ) nRoll = 15; // Matukai Apprentice --> Matukai Adept
-if( nRoll == 6 && nItemLevel >= 16 ) nRoll = 16; // Zeison Sha Initiate --> Zeison Sha Warrior
-if( nRoll == 7 && nItemLevel >= 11 ) nRoll = 11; // Jal Shey Neophyte --> Jal Shey Advisor
-if( nRoll == 8 && nItemLevel >= 13 ) nRoll = 13; // Jedi --> Jedi Knight
-if( nRoll == 9 && nItemLevel >= 14 ) nRoll = 14; // Dark Jedi --> Dark Jedi Knight
-if( nRoll == 11 && nItemLevel >= 20 ) nRoll = 20; // Jal Shey Advisor --> Jal Shey Mentor
-if( nRoll == 13 && nItemLevel >= 17 ) nRoll = 17; // Jedi Knight --> Jedi Master
-if( nRoll == 14 && nItemLevel >= 18 ) nRoll = 18; // Dark Jedi Knight --> Dark Jedi Master
+if( nRoll == 2 && nItemScale >= 8 ) nRoll = 8; // Padawan --> Jedi
+if( nRoll == 3 && nItemScale >= 9 ) nRoll = 9; // Dark Padawan --> Dark Jedi
+if( nRoll == 4 && nItemScale >= 19 ) nRoll = 19; // Baran Do Novice --> Baran Do Sage
+if( nRoll == 5 && nItemScale >= 15 ) nRoll = 15; // Matukai Apprentice --> Matukai Adept
+if( nRoll == 6 && nItemScale >= 16 ) nRoll = 16; // Zeison Sha Initiate --> Zeison Sha Warrior
+if( nRoll == 7 && nItemScale >= 11 ) nRoll = 11; // Jal Shey Neophyte --> Jal Shey Advisor
+if( nRoll == 8 && nItemScale >= 13 ) nRoll = 13; // Jedi --> Jedi Knight
+if( nRoll == 9 && nItemScale >= 14 ) nRoll = 14; // Dark Jedi --> Dark Jedi Knight
+if( nRoll == 11 && nItemScale >= 20 ) nRoll = 20; // Jal Shey Advisor --> Jal Shey Mentor
+if( nRoll == 13 && nItemScale >= 17 ) nRoll = 17; // Jedi Knight --> Jedi Master
+if( nRoll == 14 && nItemScale >= 18 ) nRoll = 18; // Dark Jedi Knight --> Dark Jedi Master
 // Unique item checks
 int nOutput;
 // If we rolled a unique item that we found before, replace it with one we haven't found
@@ -1936,7 +1936,7 @@ else {
 	nOutput = nRoll;
 	}
 // Set globals for unique items if we rolled any
-if( nRoll >= 23 ) {
+if( nOutput >= 23 ) {
 	LOOT_SetUniqueFound(LOOT_ROBES, nOutput, TRUE);
 	}
 
