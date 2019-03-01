@@ -10,6 +10,7 @@ Changes:
 - Strength Gauntlets have been restored. Previously there was no 3rd glove variation, so random loot would give nothing in its place.
 - The Vao Armband has been restored via random loot.
 - The Vibrocutter and Guidon Beacon have been restored via random loot.
+- The Baran Do Advisor Robes have been restored via random loot.
 - It was only possible to receive 5 out of 11 of Mira's rockets through random loot.
 - It was possible to collect multiple copies of what ought to be unique items (e.g. Exar Kun's Light Battle Suit, Circlet of Saresh). The random loot system will now keep track of which items you've found and won't give duplicates of unique items.
 - It was not possible to receive Battle Stimulants through random loot.
