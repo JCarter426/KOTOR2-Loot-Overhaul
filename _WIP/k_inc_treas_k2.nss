@@ -1,4 +1,3 @@
-
 #include "k_inc_q_crystal"
 #include "k_inc_treasure"
 
@@ -3750,7 +3749,7 @@ if( !GetLocalBoolean(oContainer, 57) ) {
 		if( nItemType > 0 && nItemType < 900 && nRandom < 90 ) nRandom = 90;
 		// Rare item chance
 		// Base score of 90-94 + the current global value vs DC 100
-		if( nRandom > 94 ) nRandom = 90 + ( Random(20) / 4 );
+		if( nRandom > 94 ) nRandom = 90 + Random(5);
 		int nRoll = nRandom + GetGlobalNumber("000_RareItemChance");
 		// Determine item template & quantity
 		string sItem;
@@ -3826,7 +3825,7 @@ for( i = 1; i <= numberOfItems; i++ ) {
 	if( nItemType > 0 && nItemType < 900 && nRandom < 90 ) nRandom = 90;
 	// Rare item chance
 	// Base score of 90-94 + the current global value vs DC 100
-	if( nRandom > 94 ) nRandom = 90 + ( Random(20) / 4 );
+	if( nRandom > 94 ) nRandom = 90 + Random(5);
 	int nRoll = nRandom + GetGlobalNumber("000_RareItemChance");
 	// Determine item template & quantity
 	string sItem;
