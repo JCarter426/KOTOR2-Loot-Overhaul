@@ -3014,7 +3014,7 @@ switch( nItemType ) {
 	case 421: return "a_medium_";
 	case 431: return "a_heavy_";
 	case 441: return "a_robe_";
-	case 511: return "d_utility_";
+	case 511: return "d_tool_";
 	case 521: return "d_interface_";
 	case 531: return "d_armor_";
 	case 541: return "d_shield_";
