@@ -2387,7 +2387,7 @@ if( nItemType != LOOT_SHIELD_ENERGY &&
 	nItemType = LOOT_GetShieldSubtype();
 	}
 // If the item tier isn't known, randomly generate it
-if( nItemTier < 1 && nItemTier > 4 ) {
+if( nItemTier < 1 || nItemTier > 4 ) {
 	nItemTier = LOOT_GetShieldTier(nItemLevel);
 	}
 
