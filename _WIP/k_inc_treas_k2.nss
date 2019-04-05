@@ -3608,6 +3608,9 @@ else {
 				case 970:
 					nResult = LOOT_GetGrenadeSubtype(nItemLevel);
 					break;
+				case 980:
+					nRange = 3;
+					break;
 				// Everything else has only 1 thing per thing
 				default:
 					nResult = 1;
