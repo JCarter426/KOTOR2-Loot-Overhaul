@@ -774,6 +774,24 @@ if( nGlobal < 0 ) nGlobal = nGlobal + 256;
 // Mod operation will tell us if our item ID is in there
 int nRemainder = nGlobal % ( nItemID * 2 );
 // Check if item has been found
+if( nRemainder >= nItemID ) return TRUE;
+return FALSE;
+
+}
+
+
+/* Deprecated code - needed to streamline and this wasn't helping much anyway:
+
+int LOOT_GetUniqueFound(int nItemType, int nItemNum) {
+
+int nItemID = LOOT_UniqueItemID(nItemType, nItemNum);
+int nGlobal = GetGlobalNumber(LOOT_UniqueGlobal(nItemType, nItemID));
+// 128 is stored as -128 for reasons, so the global has to be converted first if
+// it has a negative value
+if( nGlobal < 0 ) nGlobal = nGlobal + 256;
+// Mod operation will tell us if our item ID is in there
+int nRemainder = nGlobal % ( nItemID * 2 );
+// Check if item has been found
 int nOutput;
 // First, check the global
 if( nRemainder >= nItemID ) {
@@ -800,6 +818,7 @@ else {
 return nOutput;
 
 }
+*/
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -3045,7 +3064,7 @@ int nRange = 1;
 int nRoll = 0;
 int nResult = 0;
 string sTemplate = "";
-// If we're outside the specific outside range, reset the item type
+// If we're outside the specific treasure range, reset the item type
 if( nItemType < 0 || nItemType >= 900 ) nItemType = 0;
 // If the item class isn't known, we randomly generate it
 if( nItemType == 0 ) {
