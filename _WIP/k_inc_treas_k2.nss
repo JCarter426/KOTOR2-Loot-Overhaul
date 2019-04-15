@@ -762,7 +762,7 @@ return FALSE;
 	- nItemType: Item type (LOOT_* item classifications)
 	- nItemID: Unique item ID (LOOT_U_*)
 	
-	JC 2019-02-24                                                             */
+	JC 2019-04-14                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetUniqueFound(int nItemType, int nItemNum) {
 

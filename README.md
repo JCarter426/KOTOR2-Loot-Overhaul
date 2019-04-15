@@ -4,7 +4,7 @@ An effort to improve the random loot system in _Star Wars: Knights of the Old Re
 Changes:
 - Most random number rolls have been replaced with a new dice mechanic. The roll is still skewed based on the player's level, but it should now result in a wider variety of items.
 - Each type of item has been given a custom script function. The specifics vary, tailored to each item type, but generally they adjust the probabilities to distribute items more logically (e.g. standard lightsabers are more common than double-bladed lightsabers) and replace items with higher-quality ones when they are available (e.g. the Watchman Blaster is replaced by the Elite Watchman Blaster if the player's level is high enough).
-- Many robes were left out of random loot. It was not possible to roll any higher than 17 (Jedi Master Robe) so most of the higher-quality robes could not be found anywhere in the game.
+- Many robes were left out of random loot. It was not possible to roll any higher than 15, so it was nearly impossible to find most of the higher-quality robes anywhere in the game.
 - The rare item roll gave a 95% chance of rolling the highest possible value. I'm not sure what the intent was, but I doubt that was it. You're still guaranteed to find a rare item for every fifth item found, but now it will likely be that fifth item instead of the third.
 - When rolling a rare item, it was possible to roll *too* high and receive no item at all.
 - Strength Gauntlets have been restored. Previously there was no 3rd glove variation, so random loot would give nothing in its place.
