@@ -3990,3 +3990,29 @@ else {
 	}
 
 }
+
+
+////////////////////////////////////////////////////////////////////////////////
+/*	Code copied from TSLRCM for legacy support	
+	                                                                          */
+////////////////////////////////////////////////////////////////////////////////
+void PlaceHKFactoryTreasure(object oContainer = OBJECT_SELF, int numberOfItems = 1, int nItemType = 0)
+{
+
+int nRoll = Random(100);
+
+if(nRoll > 70)
+{
+// Shield
+PlaceTreasure(oContainer, numberOfItems, 541);
+}
+else if(nRoll > 40)
+{
+// Special Weaponry
+PlaceTreasure(oContainer, numberOfItems, 551);
+}
+else
+{
+PlaceTreasureDisposable(oContainer, numberOfItems, 942);
+}
+}
