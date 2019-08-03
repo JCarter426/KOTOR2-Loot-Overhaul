@@ -9,7 +9,7 @@
 // Sets how many saber colors to add to the base amount. This is here to add
 // support for the cut bronze color, but it will work for more if they stick to
 // the naming scheme.
-int nExtraSaberColors = 0;
+int EXTRA_SABER_COLORS = 0;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -148,22 +148,22 @@ Weapons & Armor - LOOT_U_ARMS
 *  64 Melee - Freyyr
 
 Equipment - LOOT_U_EQUIP
-*   1 - Belt - Qel-Droma
-*   2 - Armband - Vao
-*   4 - Glove - Ossuk
-*   8 - Headgear - Saresh
-*  16 - Headgear - Bindo
-*  32 - Crystal - Solari
+*   1 Belt - Qel-Droma
+*   2 Armband - Vao
+*   4 Glove - Ossuk
+*   8 Headgear - Saresh
+*  16 Headgear - Bindo
+*  32 Crystal - Solari
 
 Robes - LOOT_U_ROBES
-*   1 - Robe - Arca
-*   2 - Robe - Aleema
-*   4 - Robe - Sylvar
-*   8 - Robe - Malak
-*  16 - Robe - Jolee
-*  32 - Robe - Thon
-*  64 - Robe - Crado
-* 128 - Robe - Nomi
+*   1 Robe - Arca
+*   2 Robe - Aleema
+*   4 Robe - Sylvar
+*   8 Robe - Malak
+*  16 Robe - Jolee
+*  32 Robe - Thon
+*  64 Robe - Crado
+* 128 Robe - Nomi
 
 *******************************************************************************/
 
@@ -172,9 +172,73 @@ Robes - LOOT_U_ROBES
 //	PROTOTYPES
 ////////////////////////////////////////////////////////////////////////////////
 
+int LOOT_DicePool(int nNumDice, int nDiceSize);
+int LOOT_DiceResult(int nItemLevel, int nDiceType);
+string LOOT_Suffix(int nItemNum);
+int LOOT_IsLateGame();
+int LOOT_GetAreaAlignment();
+int LOOT_UniqueItemID(int nItemType, int nItemNum);
+string LOOT_UniqueItemTag(int nItemType, int nItemNum);
+string LOOT_UniqueGlobal(int nItemType);
+int LOOT_FindBinaryTerm(int nBitmask, int nPowerOf2);
 int LOOT_GetUniqueFound(int nItemType, int nItemNum);
 void LOOT_SetUniqueFound(int nItemType, int nItemNum, int nState);
+int LOOT_GetPistolNum(int nItemLevel);
+int LOOT_GetRifleNum(int nItemLevel);
+int LOOT_GetMeleeNum(int nItemLevel);
+int LOOT_GetSaberSubtype();
+int LOOT_GetSaberColor(int nItemLevel, int nColorType = 0);
+int LOOT_HasUpgradeSaber();
+int LOOT_GetPeragusWeapon();
+int LOOT_GetUpgradeType(int nFilter = 0);
+int LOOT_GetUpgradeSubtype(int nItemType, int nFilter = 0);
+int LOOT_ColorCrystalNum(int nInput);
+int LOOT_GetPowerCrystalNum(int nItemLevel);
+int LOOT_GetUpgradeNum(int nItemLevel, int nItemType, int nItemTier = 0);
+int LOOT_GetBeltNum(int nItemLevel);
+int LOOT_GetGloveNum(int nItemLevel);
+int LOOT_GetHeadgearNum(int nItemLevel);
+int LOOT_GetImplantTier(int nItemLevel);
+int LOOT_GetImplantNum(int nItemLevel);
+int LOOT_GetLightArmorNum(int nItemLevel);
+int LOOT_GetMediumArmorNum(int nItemLevel);
+int LOOT_GetHeavyArmorNum(int nItemLevel);
+int LOOT_GetRobeNum(int nItemLevel);
+string LOOT_AlignmentRobe(string sItemName, int nAlignment);
+int LOOT_GetDroidItemType();
+int LOOT_GetDroidInterfaceNum(int nItemLevel);
+int LOOT_GetDroidUtilityNum(int nItemLevel);
+int LOOT_GetDroidArmorNum(int nItemLevel);
+int LOOT_GetDroidShieldSubtype();
+int LOOT_GetDroidShieldTier(int nItemLevel);
+int LOOT_GetDroidShieldNum(int nItemLevel, int nItemType = 0, int nItemTier = 0);
+int LOOT_GetDroidDeviceNum(int nItemLevel);
+int LOOT_GetShieldSubtype();
+int LOOT_GetShieldTier(int nItemLevel);
+int LOOT_GetShieldNum(int nItemLevel, int nItemType = 0, int nItemTier = 0);
+int LOOT_GetShieldQuantity(int nItemLevel, int nItemType, int nItemTier = 0);
+int LOOT_GetMedpacTier(int nItemLevel);
+int LOOT_GetStimSubtype(int nFilter);
+int LOOT_GetStimTier(int nItemLevel);
+int LOOT_GetStimNum(int nItemLevel, int nItemType = 0, int nItemTier = 0);
+int LOOT_GetGrenadeSubtype(int nItemLevel);
+int LOOT_GetGrenadeQuantity(int nItemLevel, int nItemType);
+int LOOT_GetSecSpikeTier(int nItemLevel);
+int LOOT_GetRocketNum(int nItemLevel);
+int LOOT_GetDisposableLateGame(int nItemLevel);
 string GetItemPrefix(int nItemType);
+string GetTreasureSpecific(int nItemLevel, int nItemType = 0);
+string GetBundlePrefix(int nItemLevel, int nItemType);
+string GetTreasureBundle(int nItemLevel, int nItemType = 0);
+string GetTreasureNormal(int nItemLevel, int nItemType = 0);
+string GetTreasureRare(int nItemLevel, int nItemType = 0);
+void PlaceTreasureDisposable(object oContainer = OBJECT_SELF, int numberOfItems = 1, int nItemType = 900);
+void PlaceTreasure(object oContainer = OBJECT_SELF, int numberOfItems = 1, int nItemType = 0);
+void PlaceCritterTreasure(object oContainer = OBJECT_SELF, int numberOfItems = 1, int nItemType = 0);
+void PlaceTreasureJedi(object oContainer = OBJECT_SELF, int numberOfItems = 1);
+void PlaceTreasureDroid(object oContainer = OBJECT_SELF, int numberOfItems = 1, int nItemType = 0);
+void PlaceTreasurePeragus(object oContainer = OBJECT_SELF, int numberOfItems = 1, int nItemType = 0);
+void PlaceHKFactoryTreasure(object oContainer = OBJECT_SELF, int numberOfItems = 1, int nItemType = 0);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -249,8 +313,8 @@ return nScore;
 	here, a less extreme distribution may be more appropriate.
 	
 	- nItemLevel: Item level determining the quality of the items we can get
-	- nDiceType: What sort of dice to roll, determining probability distribution
-				 (0 to 3)
+	- nDiceType:  What sort of dice to roll, determining probability distribution
+				  (0 to 3)
 	
 	JC 2019-07-31                                                             */
 ////////////////////////////////////////////////////////////////////////////////
@@ -1033,7 +1097,7 @@ else
 	The colors are grouped into two categories:
 	* COMMON (blue, red, green, yellow, violet)
 	* RARE (cyan, silver, orange, viridian, and any additional colors added with
-	       nExtraSaberColors)
+	       EXTRA_SABER_COLORS)
 	Additionally, violet is considered semi-rare and is always half as likely
 	as the other common colors.
 	
@@ -1062,11 +1126,15 @@ else
 	weird rules. 12 = extra color #2, etc.
 	
 	- nItemLevel: Item level determining the quality of the items we can get
-	- nColorType: Which color algorithm to use (LOOT_L_COLOR_*)
+	- nColorType: Which color algorithm to use
+	  * -1: ANY
+	  *  0: WEIGHTED
+	  *  1: COMMON
+	  2  2: RARE
 	
 	JC 2019-08-02                                                             */
 ////////////////////////////////////////////////////////////////////////////////
-int LOOT_GetSaberColor(int nItemLevel, int nColorType = 0) {
+int LOOT_GetSaberColor(int nItemLevel, int nColorType) {
 
 if( nItemLevel > 20 )
 	nItemLevel = 20; // caps the die at d100
@@ -1086,15 +1154,15 @@ if( nColorType == 1 )
 	nColor = ( Random(9) + 1 ) / 2;
 // Roll for rare colors
 else if( nColorType == 2 )
-	nColor = Random(4 + nExtraSaberColors) + 6;
+	nColor = Random(4 + EXTRA_SABER_COLORS) + 6;
 // Roll for even odds
 else
-	nColor = Random(9 + nExtraSaberColors) + 1;
+	nColor = Random(9 + EXTRA_SABER_COLORS) + 1;
 
 // Get the real number
 // No #6 (Malak's saber). No #7 (bronze) if no extra saber colors are used.
 if( nColor >= 6 ) {
-	if( nExtraSaberColors < 1 )
+	if( EXTRA_SABER_COLORS < 1 )
 		return nColor + 2;
 	else
 		return nColor +1;
@@ -1195,7 +1263,7 @@ return 151;
 	
 	JC 2019-08-03                                                             */
 ////////////////////////////////////////////////////////////////////////////////
-int LOOT_GetUpgradeType(int nFilter = 0) {
+int LOOT_GetUpgradeType(int nFilter) {
 
 int nRoll;
 
@@ -1266,7 +1334,7 @@ return 210;
 	
 	JC 2019-08-03                                                             */
 ////////////////////////////////////////////////////////////////////////////////
-int LOOT_GetUpgradeSubtype(int nItemType, int nFilter = 0) {
+int LOOT_GetUpgradeSubtype(int nItemType, int nFilter) {
 
 int nRoll;
 
@@ -1436,7 +1504,7 @@ return nRoll;
 	
 	JC 2019-08-02                                                             */
 ////////////////////////////////////////////////////////////////////////////////
-int LOOT_GetUpgradeNum(int nItemLevel, int nItemType, int nItemTier = 0) {
+int LOOT_GetUpgradeNum(int nItemLevel, int nItemType, int nItemTier) {
 
 int nNumTiers;
 int nItemsPerTier;
@@ -2619,7 +2687,7 @@ else
 	
 	JC 2019-07-31                                                             */
 ////////////////////////////////////////////////////////////////////////////////
-int LOOT_GetDroidShieldNum(int nItemLevel, int nItemType = 0, int nItemTier = 0) {
+int LOOT_GetDroidShieldNum(int nItemLevel, int nItemType, int nItemTier) {
 
 // If shield subtype isn't known, randomly generate it
 if( nItemType != 541 &&
@@ -2800,7 +2868,7 @@ else
 	
 	JC 2019-07-31                                                             */
 ////////////////////////////////////////////////////////////////////////////////
-int LOOT_GetShieldNum(int nItemLevel, int nItemType = 0, int nItemTier = 0) {
+int LOOT_GetShieldNum(int nItemLevel, int nItemType, int nItemTier) {
 
 // If the item type isn't known, randomly generate it
 if( nItemType != 931 &&
@@ -2873,7 +2941,7 @@ return 1;
 	
 	JC 2019-08-02                                                             */
 ////////////////////////////////////////////////////////////////////////////////
-int LOOT_GetShieldQuantity(int nItemLevel, int nItemType, int nItemTier = 0) {
+int LOOT_GetShieldQuantity(int nItemLevel, int nItemType, int nItemTier) {
 
 // If the item tier isn't known, randomly generate it
 if( nItemTier < 1 && nItemTier > 4 )
@@ -2928,8 +2996,7 @@ else
 	- nFilter: Used to exlude certain results if desired
 	  * 0: Everything
 	  * 1: Stimulants only, no medpacs
-	  * 2: STR, DEX, and CON stimulants only, no battle
-								 stimulants or medpacs
+	  * 2: STR, DEX, and CON stimulants only, no battle stimulants or medpacs
 	
 	JC 2019-08-02                                                             */
 ////////////////////////////////////////////////////////////////////////////////
@@ -2989,7 +3056,7 @@ else
 	
 	JC 2019-08-02                                                             */
 ////////////////////////////////////////////////////////////////////////////////
-int LOOT_GetStimNum(int nItemLevel, int nItemType = 0, int nItemTier = 0) {
+int LOOT_GetStimNum(int nItemLevel, int nItemType, int nItemTier) {
 
 // If the item type isn't known, randomly generate it
 if( !(nItemType >= 951 && nItemType >= 953) && nItemType != 955 )
@@ -3427,7 +3494,7 @@ return "";
 	
 	JC 2019-08-01                                                             */
 ////////////////////////////////////////////////////////////////////////////////
-string GetTreasureSpecific(int nItemLevel, int nItemType = 0) {
+string GetTreasureSpecific(int nItemLevel, int nItemType) {
 
 // Cap the item level to avoid incidents
 if( nItemLevel > 30 )
@@ -3817,7 +3884,7 @@ return sTemplate + SWTR_GetQuantity(nItemQuantity);
 	
 	JC 2019-08-01                                                             */
 ////////////////////////////////////////////////////////////////////////////////
-string GetTreasureBundle(int nItemLevel, int nItemType = 0) {
+string GetTreasureBundle(int nItemLevel, int nItemType) {
 
 // Cap the item level to avoid incidents
 if( nItemLevel > 30 )
@@ -3916,7 +3983,7 @@ return sTemplate;
 	
 	JC 2019-08-01                                                             */
 ////////////////////////////////////////////////////////////////////////////////
-string GetTreasureNormal(int nItemLevel, int nItemType = 0) {
+string GetTreasureNormal(int nItemLevel, int nItemType) {
 
 return GetTreasureSpecific(nItemLevel, nItemType);
 
@@ -3934,7 +4001,7 @@ return GetTreasureSpecific(nItemLevel, nItemType);
 	
 	JC 2019-08-01                                                             */
 ////////////////////////////////////////////////////////////////////////////////
-string GetTreasureRare(int nItemLevel, int nItemType = 0) {
+string GetTreasureRare(int nItemLevel, int nItemType) {
 
 return GetTreasureSpecific(nItemLevel + 5, nItemType);
 
@@ -3956,7 +4023,7 @@ return GetTreasureSpecific(nItemLevel + 5, nItemType);
 	
 	JC 2019-08-01                                                             */
 ////////////////////////////////////////////////////////////////////////////////
-void PlaceTreasureDisposable(object oContainer = OBJECT_SELF, int numberOfItems = 1, int nItemType = 900) {
+void PlaceTreasureDisposable(object oContainer, int numberOfItems, int nItemType) {
 
 if( !GetLocalBoolean(oContainer, 57) ) {
 	SetLocalBoolean(OBJECT_SELF, 57, TRUE);
@@ -4007,7 +4074,7 @@ if( !GetLocalBoolean(oContainer, 57) ) {
 	
 	JC 2019-08-01                                                             */
 ////////////////////////////////////////////////////////////////////////////////
-void PlaceTreasure(object oContainer = OBJECT_SELF, int numberOfItems = 1, int nItemType = 0) {
+void PlaceTreasure(object oContainer, int numberOfItems, int nItemType) {
 
 if( !GetLocalBoolean(oContainer, 57) ) {
 	SetLocalBoolean(OBJECT_SELF, 57, TRUE);
@@ -4096,7 +4163,7 @@ if( !GetLocalBoolean(oContainer, 57) ) {
 	
 	JC 2019-08-01                                                             */
 ////////////////////////////////////////////////////////////////////////////////
-void PlaceCritterTreasure(object oContainer = OBJECT_SELF, int numberOfItems = 1, int nItemType = 0) {
+void PlaceCritterTreasure(object oContainer, int numberOfItems, int nItemType) {
 
 object oContainer = OBJECT_SELF;
 int nPCLevel = GetGlobalNumber("G_PC_LEVEL");
@@ -4185,7 +4252,7 @@ for( i = 1; i <= numberOfItems; i++ ) {
 	
 	JC 2019-08-01                                                             */
 ////////////////////////////////////////////////////////////////////////////////
-void PlaceTreasureJedi(object oContainer = OBJECT_SELF, int numberOfItems = 1) {
+void PlaceTreasureJedi(object oContainer, int numberOfItems) {
 
 int nRoll;
 int nItemType;
@@ -4228,7 +4295,7 @@ for ( i = 1; i <= numberOfItems; i++ ) {
 	
 	JC 2019-02-19                                                             */
 ////////////////////////////////////////////////////////////////////////////////
-void PlaceTreasureDroid(object oContainer = OBJECT_SELF, int numberOfItems = 1, int nItemType = 0) {
+void PlaceTreasureDroid(object oContainer, int numberOfItems, int nItemType) {
 
 PlaceTreasure(oContainer, numberOfItems, 500);
 
@@ -4251,7 +4318,7 @@ PlaceTreasure(oContainer, numberOfItems, 500);
 	
 	JC 2019-02-19                                                             */
 ////////////////////////////////////////////////////////////////////////////////
-void PlaceTreasurePeragus(object oContainer = OBJECT_SELF, int numberOfItems = 1, int nItemType = 0) {
+void PlaceTreasurePeragus(object oContainer, int numberOfItems, int nItemType) {
 
 int nRoll = Random(100) + GetGlobalNumber("000_RareItemChance");
 
@@ -4279,7 +4346,7 @@ else {
 /*	Code copied from TSLRCM for legacy support
 	                                                                          */
 ////////////////////////////////////////////////////////////////////////////////
-void PlaceHKFactoryTreasure(object oContainer = OBJECT_SELF, int numberOfItems = 1, int nItemType = 0)
+void PlaceHKFactoryTreasure(object oContainer, int numberOfItems, int nItemType)
 {
 
 int nRoll = Random(100);
