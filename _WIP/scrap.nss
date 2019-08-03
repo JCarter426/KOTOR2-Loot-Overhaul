@@ -24,6 +24,107 @@ return -1;
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
+/*	LOOT_CountItemsEquipped()
+
+	Checks if an item is in any of the specified creature's equipment slots and
+	returns how many are found.
+	
+	- oCreature: Creature to check
+	- sItem: Tag of the item to look for
+	
+	JC 2019-08-01                                                             */
+////////////////////////////////////////////////////////////////////////////////
+int LOOT_CountItemsEquipped(object oCreature, string sItem) {
+
+int i;
+int j = 0;
+object oItem;
+string sTag;
+
+for( i = 0; i <= 19; i++ ) {
+	oItem = GetItemInSlot(i, oCreature);
+	if( GetIsObjectValid(oItem) )
+		sTag = GetTag(oItem);
+	else
+		sTag = "";
+	if( sTag == sItem )
+		j++;
+	}
+
+return j;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/*	LOOT_HasEnoughItems()
+
+	Counts how many of a given item are possessed by the party. Checks the
+	individual party members' equipment slots as well as their shared inventory.
+	
+	- oCreature: Creature to check
+	- sItem: Tag of the item to look for
+	
+	JC 2019-08-01                                                             */
+////////////////////////////////////////////////////////////////////////////////
+int LOOT_HasEnoughItems(string sItem, int nAmount) {
+
+object oPC = GetFirstPC();
+object oPM1 = OBJECT_INVALID;
+object oPM2 = OBJECT_INVALID;
+object oItem;
+int nCount;
+int i = 1;
+int j = FALSE;
+int k = 0;
+
+while( j == FALSE ) {
+	object oNearest = GetNearestObject(OBJECT_TYPE_CREATURE, oPC, i);
+	if( GetIsObjectValid(oNearest) ){
+		if( IsObjectPartyMember(oNearest) ) {
+			if( oPM1 == OBJECT_INVALID )
+				oPM1 = oNearest;
+			else {
+				oPM2 = oNearest;
+				j = TRUE;
+				}
+			}
+		i++;
+		}
+	else j = TRUE;
+	}
+nCount = LOOT_CountItemsEquipped(GetFirstPC(), sItem);
+while( nCount < nAmount && k <= 3 ) {
+	switch( k ) {
+		case 0:
+			if( GetIsObjectValid(oPM1) )
+				nCount += LOOT_CountItemsEquipped(oPM1, sItem);
+			break;
+		case 1:
+			if( GetIsObjectValid(oPM2) )
+				nCount += LOOT_CountItemsEquipped(oPM2, sItem);
+			break;
+		case 2:
+			oItem = GetItemPossessedBy(GetFirstPC(), sItem);
+			if( GetIsObjectValid(oItem) )
+				nCount += GetItemStackSize(oItem);
+			break;
+		case 3:
+			oItem = GetItemPossessedBy(OBJECT_SELF, sItem);
+			if( GetIsObjectValid(oItem) )
+				nCount += GetItemStackSize(oItem);
+			break;
+		}
+	k++;
+	}
+if( nCount >= nAmount )
+	return TRUE;
+return FALSE;
+
+}
+
+
 int LOOT_GetUniqueFound(int nItemType, int nItemNum) {
 
 int nItemID = LOOT_UniqueItemID(nItemType, nItemNum);
