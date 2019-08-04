@@ -141,7 +141,7 @@ int EXTRA_SABER_COLORS = 0;
 Weapons & Armor - LOOT_U_ARMS
 *   1 Armor - Qel-Droma
 *   2 Armor - Exar Kun
-*   4 Armor - Jamoh Horgra
+*   4 Armor - Jamoh Hogra
 *   8 Blaster - Onasi
 *  16 Blaster - Onasi II
 *  32 Blaster - Nadd
@@ -739,7 +739,7 @@ int nItemID = LOOT_UniqueItemID(nItemType, nItemNum);
 // 2 Onasi Blasters are permitted, so we have to switch IDs for the second
 if( (nItemType == 111 && nItemID == 8) &&
 	LOOT_GetUniqueFound(111, 22) == TRUE )
-	nItemID = nItemID * 2;
+	nItemID *= 2;
 
 if( nState == TRUE )
 	SetGlobalNumber(sGlobal, nGlobal + nItemID);
@@ -1342,9 +1342,8 @@ int nRoll;
 if( nItemType != 210 &&
 	nItemType != 220 &&
 	nItemType != 230 &&
-	nItemType != 240 ) {
+	nItemType != 240 )
 	nItemType = LOOT_GetUpgradeType();
-	}
 // Different upgrades have different rules
 switch( nItemType) {
 	// Ranged
@@ -1459,7 +1458,7 @@ return nInput;
 	
 	- nItemLevel: Item level determining the quality of the items we can get
 	
-	JC 2019-08-02                                                             */
+	JC 2019-08-03                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetPowerCrystalNum(int nItemLevel) {
 
@@ -1471,13 +1470,13 @@ int nRoll = LOOT_DiceResult(nItemLevel, 1);
 
 // Replace the Solari Crystal if it's been found before
 if( nRoll == 21 ) {
-	if( LOOT_GetUniqueFound(244, nRoll) == TRUE ) {
+	if( LOOT_GetUniqueFound(244, 21) == TRUE ) {
 		nRoll = LOOT_DiceResult(nItemLevel - 1, 1);
 		if( nRoll >= 21 )
 			nRoll += 1;
 		}
 	else
-		LOOT_SetUniqueFound(244, nRoll, TRUE);
+		LOOT_SetUniqueFound(244, 21, TRUE);
 	}
 
 return nRoll;
@@ -1836,7 +1835,7 @@ return nRoll;
 	
 	- nItemLevel: Item level determining the quality of the items we can get
 	
-	JC 2019-07-31                                                             */
+	JC 2019-08-03                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetHeadgearNum(int nItemLevel) {
 
@@ -1853,7 +1852,7 @@ switch( nRoll ) {
 		if( GetModuleName() == "105PER" ) {
 			nRoll = LOOT_DiceResult(nItemLevel - 1, 2);
 			if( nRoll >= 2 )
-				nRoll = nRoll + 1;
+				nRoll += 1;
 			}
 		break;
 	
@@ -1891,8 +1890,10 @@ switch( nRoll ) {
 		// If it was found before, replace it
 		if( LOOT_GetUniqueFound(331, 25) == TRUE ) {
 			// Bindo's Band if that hasn't been found
-			if( LOOT_GetUniqueFound(331, 26) == FALSE )
+			if( LOOT_GetUniqueFound(331, 26) == FALSE ) {
+				LOOT_SetUniqueFound(331, 26, TRUE);
 				nRoll = 26;
+				}
 			// Matukai Meditation Band
 			else if( Random(2) == 0 )
 				nRoll = 23;
@@ -1908,8 +1909,10 @@ switch( nRoll ) {
 		// If it was found before, replace it
 		if( LOOT_GetUniqueFound(331, 26) == TRUE ) {
 			// Circlet of Saresh if that hasn't been found
-			if( LOOT_GetUniqueFound(331, 25) == FALSE )
+			if( LOOT_GetUniqueFound(331, 25) == FALSE ) {
+				LOOT_SetUniqueFound(331, 25, TRUE);
 				nRoll = 25;
+				}
 			// Matukai Meditation Band
 			else if( Random(2) == 0 )
 				nRoll = 23;
@@ -2131,7 +2134,7 @@ switch( nRoll ) {
 		// Replace with Verpine Fiber Ultramesh based on item level OR
 		// if it was found before
 		if( nItemScale >= 13 ||	LOOT_GetUniqueFound(421, 11) == TRUE )
-				nRoll = 13;
+			nRoll = 13;
 		else
 			LOOT_SetUniqueFound(421, 11, TRUE);
 		break;
@@ -2276,6 +2279,7 @@ switch( nRoll ) {
 	}
 	
 // If we rolled a unique item, we have to check if we found it before
+
 if( nRoll >= 23 ) {
 	// If we found it before, replace it
 	if( LOOT_GetUniqueFound(441, nRoll) == TRUE ) {
@@ -3492,7 +3496,7 @@ return "";
 	- nItemLevel: Item level determining the quality of the items we can get
 	- nItemType: Type of item (item classifications)
 	
-	JC 2019-08-01                                                             */
+	JC 2019-08-03                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 string GetTreasureSpecific(int nItemLevel, int nItemType) {
 
@@ -3546,13 +3550,7 @@ else {
 					nResult = LOOT_GetUpgradeType(0);
 				break;
 			case 300: // Equipment
-				// If the Vao Armband hasn't been found, there's a chance to
-				// roll for armbands
-				if( LOOT_GetUniqueFound(351, 0) == FALSE )
-					nRange = 5;
-				// Otherwise, armbands aren't included in random loot
-				else
-					nRange = 4;
+				nRange = 5;
 				break;
 			case 400: // Armor
 				// No Jedi robes on Peragus
@@ -3600,10 +3598,13 @@ else {
 				case 350: // Armband
 					// If the Vao Armband has already been found, redirect to
 					// another equipment item
-					if( LOOT_GetUniqueFound(351, 0) == TRUE )
-						nResult = 300 + (10 * Random(4));
-					else
+					if( LOOT_GetUniqueFound(351, 0) == TRUE ) {
+						nResult = 300 + (10 * (Random(4) + 1));
+						}
+					else {
+						LOOT_SetUniqueFound(351, 0, TRUE);
 						nResult = 1;
+						}
 					break;
 				case 540: // Droid Shield
 					nResult = LOOT_GetDroidShieldSubtype();
