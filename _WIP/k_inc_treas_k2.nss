@@ -4102,6 +4102,7 @@ if( !GetLocalBoolean(oContainer, 57) ) {
 		nPCLevel = 2; // Increases variety of items found at level 1
 	int nRandom;
 	int nRoll;
+	int nRareChance;
 	string sItem;
 	string sItemName;
 	int nItemLevel;
@@ -4111,27 +4112,24 @@ if( !GetLocalBoolean(oContainer, 57) ) {
 	int j;
 	
 	for( i = 1; i <= numberOfItems; i++ ) {
+		nRareChance = GetGlobalNumber("000_RareItemChance");
+		
 		// Item level is based on the player's current level
 		nItemLevel = nPCLevel + Random(8) - 5;
 		if( nItemLevel < 1 )
 			nItemLevel = 1;
 		
 		// Random number determines chance of getting a rare or disposable item
-		nRandom = Random(100);
-		// If an item type was specified, roll at least a 90
-		// (this excludes disposable items later)
-		if( nItemType > 0 && nItemType < 900 && nRandom < 90 )
-			nRandom = 90;
+		nRandom = Random(95) + GetGlobalNumber("000_RareItemChance");
 		
-		// Rare item chance
-		// Base score of 90-94 + the current global value vs DC 100
-		if( nRandom > 94 )
-			nRandom = 90 + Random(5);
-		nRoll = nRandom + GetGlobalNumber("000_RareItemChance");
+		// If an item type was specified, roll at least a 95
+		// (this excludes disposable items later)
+		if( nItemType > 0 && nItemType < 900 && nRandom < 91 )
+			nRandom = 95;
 		
 		// Determine item template & quantity
 		nItemQuantity = 1;
-		if( nRoll >= 100 ) {
+		if( nRoll > 100 ) {
 			// We found a rare item!
 			sItem = GetTreasureRare(nItemLevel, nItemType);
 			// Reset the probability for next time
@@ -4141,8 +4139,8 @@ if( !GetLocalBoolean(oContainer, 57) ) {
 			// We didn't roll a rare item
 			// Increase the chance of getting one next time
 			IncrementGlobalNumber("000_RareItemChance", 3);
-			// 90% chance of getting a disposable item (if applicable)
-			if( nRoll < 90 )
+			// Chance of getting a disposable item (if applicable)
+			if( nRoll <= 85 )
 				sItem = GetTreasureBundle(nItemLevel, nItemType);
 			// Otherwise, we get a normal item
 			else
@@ -4203,21 +4201,16 @@ for( i = 1; i <= numberOfItems; i++ ) {
 		nItemLevel = 1;
 	
 	// Random number determines chance of getting a rare or disposable item
-	nRandom = Random(100);
-	// If an item type was specified, roll at least a 90
-	// (this excludes disposable items later)
-	if( nItemType > 0 && nItemType < 900 && nRandom < 90 )
-		nRandom = 90;
+	nRandom = Random(95) + GetGlobalNumber("000_RareItemChance");
 	
-	// Rare item chance
-	// Base score of 90-94 + the current global value vs DC 100
-	if( nRandom > 94 )
-		nRandom = 90 + Random(5);
-	nRoll = nRandom + GetGlobalNumber("000_RareItemChance");
+	// If an item type was specified, roll at least a 95
+	// (this excludes disposable items later)
+	if( nItemType > 0 && nItemType < 900 && nRandom < 91 )
+		nRandom = 95;
 	
 	// Determine item template & quantity
 	nItemQuantity = 1;
-	if( nRoll >= 100 ) {
+	if( nRoll > 100 ) {
 		// We found a rare item!
 		sItem = GetTreasureRare(nItemLevel, nItemType);
 		// Reset the probability for next time
@@ -4227,8 +4220,8 @@ for( i = 1; i <= numberOfItems; i++ ) {
 		// We didn't roll a rare item
 		// Increase the chance of getting one next time
 		IncrementGlobalNumber("000_RareItemChance", 3);
-		// 90% chance of getting a disposable item (if applicable)
-		if( nRoll < 90 )
+		// Chance of getting a disposable item (if applicable)
+		if( nRoll <= 85 )
 			sItem = GetTreasureBundle(nItemLevel, nItemType);
 		// Otherwise, we get a normal item
 		else
