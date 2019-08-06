@@ -21,7 +21,7 @@ Changes:
 - Pergaus items have had their stats unified across all areas. They will also now stack in the inventory menu.
 - It is no longer possible to find a Breath Mask in the Peragus dormitories via random loot. There is one placed there manually already, so it didn't make sense with the design.
 - It is no longer possible to find robes on Peragus through random loot. The level scale for robes has been adjusted to account for this, so once you do start finding robes, the lower-numbered items won't be skipped.
-- Blaster and melee upgrades have been removed from Peragus loot; upgradeable weapons were unlikely in the original loot system and impossible in the new one. Armor overlays have also been removed, as they cannot be installed in the miner uniform and other armor is excluded early on. In their place, the probability of equipment items has been increased and Peragus weapons have been added.
+- Blaster and melee upgrades have been removed from Peragus loot; upgradeable weapons were unlikely in the original loot system and are impossible in the new one. Armor overlays have also been removed, as they cannot be installed in the miner uniform and other armor is excluded early on. In their place, the probability of equipment items has been increased and Peragus weapons have been added.
 - Light armor has been removed from Jedi loot and replaced with power crystals.
 - Components and Chemicals have been removed from random loot found late in the game, as there are few workbenches and no lab stations available at that point. Stimulants are no longer excluded.
 

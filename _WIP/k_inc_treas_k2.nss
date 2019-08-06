@@ -180,6 +180,7 @@ int LOOT_GetAreaAlignment();
 int LOOT_UniqueItemID(int nItemType, int nItemNum);
 string LOOT_UniqueItemTag(int nItemType, int nItemNum);
 string LOOT_UniqueGlobal(int nItemType);
+int LOOT_GetUniqueGlobalState(int nItemType);
 int LOOT_FindBinaryTerm(int nBitmask, int nPowerOf2);
 int LOOT_GetUniqueFound(int nItemType, int nItemNum);
 void LOOT_SetUniqueFound(int nItemType, int nItemNum, int nState);
@@ -672,6 +673,27 @@ return "";
 
 
 ////////////////////////////////////////////////////////////////////////////////
+/*	LOOT_GetUniqueGlobalState()
+
+	Returns the corrected value for a unique item global.
+	
+	- nItemType: Item type (item classifications)
+	
+	JC 2019-08-06                                                             */
+////////////////////////////////////////////////////////////////////////////////
+int LOOT_GetUniqueGlobalState(int nItemType) {
+
+// 128 is stored as -128 for reasons, so the global has to be converted first if
+// it has a negative value
+int nGlobal = GetGlobalNumber(LOOT_UniqueGlobal(nItemType));
+if( nGlobal < 0 )
+	nGlobal += 256;
+return nGlobal;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 /*	LOOT_FindBinaryTerm()
 
 	Determines if a given power of 2 can be found in a bitmask (decimal
@@ -699,16 +721,11 @@ return FALSE;
 	- nItemType: Item type (item classifications)
 	- nItemID: Unique item ID (unique item index)
 	
-	JC 2019-08-03                                                             */
+	JC 2019-08-06                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetUniqueFound(int nItemType, int nItemNum) {
 
-int nGlobal = GetGlobalNumber(LOOT_UniqueGlobal(nItemType));
-
-// 128 is stored as -128 for reasons, so the global has to be converted first if
-// it has a negative value
-if( nGlobal < 0 )
-	nGlobal += 256;
+int nGlobal = LOOT_GetUniqueGlobalState(nItemType);
 
 // Check if item has been found
 return LOOT_FindBinaryTerm(nGlobal, LOOT_UniqueItemID(nItemType, nItemNum));
@@ -2200,7 +2217,7 @@ return nRoll;
 	
 	- nItemLevel: Item level determining the quality of the items we can get
 	
-	JC 2019-07-31                                                             */
+	JC 2019-08-06                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetRobeNum(int nItemLevel) {
 
@@ -2279,13 +2296,12 @@ switch( nRoll ) {
 	}
 	
 // If we rolled a unique item, we have to check if we found it before
-
 if( nRoll >= 23 ) {
+	int nGlobal = LOOT_GetUniqueGlobalState(441);
+	
 	// If we found it before, replace it
-	if( LOOT_GetUniqueFound(441, nRoll) == TRUE ) {
-		int nGlobal = GetGlobalNumber(LOOT_UniqueGlobal(441));
-		
-		if( nGlobal == -1 )
+	if( LOOT_FindBinaryTerm(nGlobal, LOOT_UniqueItemID(441, nRoll)) == TRUE ) {
+		if( nGlobal == 255 )
 			nRoll = 0;
 		else {
 			int i = nRoll - 1;
@@ -3526,10 +3542,11 @@ if( nItemType == 0 ) {
 	// Equipment more common, upgrades less common
 	if( nResult == 200 & Random(2) == 1 )
 		nResult = 300;
+		
 	// Now that the item class is known, return to top
 	sTemplate = GetTreasureSpecific(nItemLevel, nResult);
 	}
-	
+
 else {
 	// Item class is known, but the item type isn't
 	if( nItemType % 100 == 0 ) {
