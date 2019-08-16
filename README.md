@@ -17,7 +17,7 @@ Changes:
 - Random loot would only give Security Tunnelers and never the higher-quality Security Spike Tunnelers. There is now a chance of receiving them at higher levels.
 - It is no longer possible to receive Clothing (a_robe_01) through random loot. When rolled, it is replaced with a robe item that has actual value.
 - It is no longer possible to find blasters on Peragus through random loot, what with the ban on them. All weapons there have been replaced by a selection of Peragus-specific items (Mining Laser, Advanced Mining Laser, and the restored Vibrocutter and Guidon Beacon)
-- Pergaus items have had their stats unified across all areas. They will also now stack in the inventory menu.
+- Peragus items have had their stats unified across all areas. They will also now stack in the inventory menu.
 - It is no longer possible to find a Breath Mask in the Peragus dormitories via random loot. There is one placed there manually already, so it didn't make sense with the design.
 - It is no longer possible to find robes on Peragus through random loot. The level scale for robes has been adjusted to account for this, so once you do start finding robes, the lower-numbered items won't be skipped.
 - Blaster and melee upgrades have been removed from Peragus loot; upgradeable weapons were unlikely in the original loot system and are impossible in the new one. Armor overlays have also been removed, as they cannot be installed in the miner uniform and other armor is excluded early on. In their place, the probability of equipment items has been increased and Peragus weapons have been added.
