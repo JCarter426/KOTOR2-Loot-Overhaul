@@ -4401,10 +4401,13 @@ void PlaceTreasureJedi(object oContainer, int numberOfItems) {
 			break;
 		case 2:
 			nItemType = 441; // Robes
+			break;
 		case 3:
 			nItemType = 300; // Equipment
+			break;
 		default:
 			nItemType = 900; // Disposables
+			break;
 		}
 		
 		// Place the Treasure
