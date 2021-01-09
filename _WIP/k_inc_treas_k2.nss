@@ -5,7 +5,7 @@
 
 	Header file for random loot.
 
-	JC 2021-01-03                                                             */
+	JC 2021-01-09                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "k_inc_q_crystal"
@@ -87,7 +87,7 @@ int EXTRA_SABER_COLORS = 0;
 	420 ARMOR TYPE: MEDIUM
 		* 421 Medium Armor
 	430 ARMOR TYPE: HEAVY
-		* 431 Heavy ARmor
+		* 431 Heavy Armor
 	440 ARMOR TYPE: ROBES
 		* 441 Robes
 
@@ -424,12 +424,10 @@ string LOOT_Suffix(int nItemNum) {
 
 	Checks whether it's late in the game (after boarding the Ravager).
 
-	JC 2019-09-07                                                             */
+	JC 2021-01-09                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_IsLateGame() {
-	int nModPrefix = StringToInt(GetStringLeft(GetModuleName(), 2));
-	
-	return nModPrefix >= 85;
+	return StringToInt(GetStringLeft(GetModuleName(), 2)) >= 85;
 }
 
 
@@ -4459,9 +4457,10 @@ void PlaceTreasurePeragus(object oContainer, int numberOfItems, int nItemType) {
 	// Otherwise, roll for item type
 	else {
 		nRoll = Random(100) + GetGlobalNumber("000_RareItemChance");
-		if( nRoll >= 88 )
+		if( nRoll >= 88 ) {
 			nItemType = 300;
 			PlaceTreasure(oContainer, numberOfItems, 300);
+		}
 		else if( nRoll >= 83 )
 			PlaceTreasure(oContainer, numberOfItems, 150);
 		else if( nRoll >= 80 )
