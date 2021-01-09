@@ -4443,10 +4443,10 @@ void PlaceTreasureDroid(object oContainer, int numberOfItems, int nItemType) {
 	- numberOfItems: Number of items to place
 	- nItemType: Type of item (item classifications)
 
-	JC 2019-02-19                                                             */
+	JC 2021-01-09                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 void PlaceTreasurePeragus(object oContainer, int numberOfItems, int nItemType) {
-	int nRoll = Random(100) + GetGlobalNumber("000_RareItemChance");
+	int nRoll;
 	
 	// If the input item type is valid, use it
 	if( nItemType / 100 == 3 ||
@@ -4454,15 +4454,19 @@ void PlaceTreasurePeragus(object oContainer, int numberOfItems, int nItemType) {
 		nItemType == 232 )
 		PlaceTreasure(oContainer, numberOfItems, nItemType);
 	// Otherwise, roll for item type
-	else if( nRoll >= 88 )
-		PlaceTreasure(oContainer, numberOfItems, 300);
-	else if( nRoll >= 83 )
-		PlaceTreasure(oContainer, numberOfItems, 150);
-	else if( nRoll >= 80 )
-		PlaceTreasure(oContainer, numberOfItems, 232);
 	else {
-		IncrementGlobalNumber("000_RareItemChance", 3);
-		PlaceTreasureDisposable(oContainer, numberOfItems);
+		nRoll = Random(100) + GetGlobalNumber("000_RareItemChance");
+		if( nRoll >= 88 )
+			nItemType = 300;
+			PlaceTreasure(oContainer, numberOfItems, 300);
+		else if( nRoll >= 83 )
+			PlaceTreasure(oContainer, numberOfItems, 150);
+		else if( nRoll >= 80 )
+			PlaceTreasure(oContainer, numberOfItems, 232);
+		else {
+			IncrementGlobalNumber("000_RareItemChance", 3);
+			PlaceTreasureDisposable(oContainer, numberOfItems);
+		}
 	}
 }
 
