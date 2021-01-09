@@ -1,5 +1,5 @@
 # KOTOR2-Loot-Overhaul
-An effort to improve the random loot system in _Star Wars: Knights of the Old Republic II - The Sith Lords_
+An effort to improve the random loot system in _Star Wars: Knights of the Old Republic II – The Sith Lords_
 
 Changes:
 - Most random number rolls have been replaced with a new dice mechanic. The roll is still skewed based on the player's level, but it should now result in a wider variety of items.
@@ -23,10 +23,3 @@ Changes:
 - Blaster and melee upgrades have been removed from Peragus loot; upgradeable weapons were unlikely in the original loot system and are impossible in the new one. Armor overlays have also been removed, as they cannot be installed in the miner uniform and other armor is excluded early on. In their place, the probability of equipment items has been increased and Peragus weapons have been added.
 - Light armor has been removed from Jedi loot and replaced with power crystals.
 - Components and Chemicals have been removed from random loot found late in the game, as there are few workbenches and no lab stations available at that point. Stimulants are no longer excluded.
-
-To Do:
-- [x] Clean up code
-- [x] Re-read 3500+ lines of code to double-check everything
-- [x] Provision for unique items that doesn't rely on globals
-- [x] Alignment restrictions for Jedi robes
-- [ ] Merchant & spawn script support (won't decompile currently)

@@ -5,7 +5,7 @@
 
 	Header file for random loot.
 
-	JC 2020-09-07                                                             */
+	JC 2021-01-03                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "k_inc_q_crystal"
@@ -324,7 +324,7 @@ int LOOT_DicePool(int nNumDice, int nDiceSize) {
 	- nDiceType:  What sort of dice to roll, determining probability distribution
 				  (0 to 3)
 
-	JC 2019-07-31                                                             */
+	JC 2021-01-03                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_DiceResult(int nItemLevel, int nDiceType) {
 	if( nItemLevel < 1 )
@@ -332,12 +332,11 @@ int LOOT_DiceResult(int nItemLevel, int nDiceType) {
 
 	int nNumDice;
 	int nDiceSize;
-	int nRange;
 	int nDicePool;
-	int nHalfPool;
-	int nMid;
+	int nRange;
 	int nOffset;
 	int nMin;
+	int nMid;
 	int nMax;
 	int nRoll;
 	int nResult;
@@ -369,9 +368,8 @@ int LOOT_DiceResult(int nItemLevel, int nDiceType) {
 	if( nNumDice > 1 ) {
 		// Target range is (a little more than) half the size of the dice pool
 		nDicePool = nNumDice * nDiceSize;
-		nHalfPool = nDicePool / 2;
-		if( nRange > nHalfPool )
-			nRange = nHalfPool;
+		if( nRange > nDicePool / 2 )
+			nRange = nDicePool / 2;
 		// The midpoint is rounded up for odd dice pool sizes so we stay positive
 		// after subtracting the offset.
 		nMid = ((nDicePool + nNumDice) / 2) + (nNumDice % 2);
@@ -380,14 +378,14 @@ int LOOT_DiceResult(int nItemLevel, int nDiceType) {
 		if( nOffset > nMid - nNumDice )
 			nOffset = nMid - nNumDice;
 		nMin = nMid + 1 - nOffset;
-		nMax = nMid + nHalfPool - nOffset;
+		nMax = nMid + (nDicePool / 2) - nOffset;
 		// Initial dice pool
 		nRoll = LOOT_DicePool(nNumDice, nDiceSize);
 		nResult = nRoll - nMin + 1;
 		// We ignore any roll outside the target range and do a roll with even odds
 		// that will definitely fall inside our target range if necessary
 		if( nRoll < nMin || nRoll > nMax || nResult > nRange )
-			return Random(nRange) + 1;
+			nResult = Random(nRange) + 1;
 		return nResult;
 	}
 	// No dice pool, even odds
@@ -731,117 +729,155 @@ void LOOT_SetUniqueFound(int nItemType, int nItemNum, int nState) {
 
 	- nItemLevel: Item level determining the quality of the items we can get
 
-	JC 2019-07-31                                                             */
+	JC 2021-01-03                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetPistolNum(int nItemLevel) {
+	// Pistols have 30 variations
+	if( nItemLevel > 30 )
+		nItemLevel = 30;
 	int nRoll = LOOT_DiceResult(nItemLevel, 3);
 	
+	int nItemNum = 0;
+	
 	// Replacement table for if a better version of what we rolled is available
-	switch( nRoll ) {
-	case 1: // Blaster Pistol --> Republic Blaster
-		if( nItemLevel >= 9 )
-			nRoll = 9;
-		else
+	do {
+		switch( nRoll ) {
+		case 1: // Blaster Pistol --> Republic Blaster
+			if( nItemLevel >= 9 )
+				nRoll = 9;
+			else
+				nItemNum = nRoll;
 			break;
-	case 9: // Republic Blaster --> Mandalorian Blaster
-		if( nItemLevel >= 12 )
-			nRoll = 12;
-		break;
+		case 9: // Republic Blaster --> Mandalorian Blaster
+			if( nItemLevel >= 12 )
+				nRoll = 12;
+			else
+				nItemNum = nRoll;
+			break;
+		case 12: // Mandalorian Blaster --> Onasi Blaster
+			if( nItemLevel >= 22 )
+				nRoll = 22;
+			else
+				nItemNum = nRoll;
+			break;
+		case 22: // *Onasi Blaster*
+			// Replace with Micro-Pulse Blaster based on item level OR
+			// if two have already been found
+			if( nItemLevel >= 26 || LOOT_GetUniqueFound(111, -1) )
+				nRoll = 26;
+			else {
+				LOOT_SetUniqueFound(111, 22, TRUE);
+				nItemNum = nRoll;
+			}
+			break;
 
-	case 2: // Ion Blaster --> Aratech Droid Oxidizer
-		if( nItemLevel >= 10 )
-			nRoll = 10;
-		else
+		case 2: // Ion Blaster --> Aratech Droid Oxidizer
+			if( nItemLevel >= 10 )
+				nRoll = 10;
+			else
+				nItemNum = nRoll;
 			break;
-	case 10: // Aratech Droid Oxidizer --> Aratech Ionmaster
-		if( nItemLevel >= 21 )
-			nRoll = 21;
-		break;
+		case 10: // Aratech Droid Oxidizer --> Aratech Ionmaster
+			if( nItemLevel >= 21 )
+				nRoll = 21;
+			else
+				nItemNum = nRoll;
+			break;
 
-	case 3: // Field Survival Pistol --> Scout Enforcer
-		if( nItemLevel >= 7 )
-			nRoll = 7;
-		else
+		case 3: // Field Survival Pistol --> Scout Enforcer
+			if( nItemLevel >= 7 )
+				nRoll = 7;
+			else
+				nItemNum = nRoll;
 			break;
-	case 7: // Scout Enforcer --> Watchman Blaster
-		if( nItemLevel >= 18 )
-			nRoll = 18;
-		else
+		case 7: // Scout Enforcer --> Watchman Blaster
+			if( nItemLevel >= 18 )
+				nRoll = 18;
+			else
+				nItemNum = nRoll;
 			break;
-	case 18: // Watchman Blaster --> Elite Watchman Blaster
-		if( nItemLevel >= 27 )
-			nRoll = 27;
-		break;
+		case 18: // Watchman Blaster --> Elite Watchman Blaster
+			if( nItemLevel >= 27 )
+				nRoll = 27;
+			else
+				nItemNum = nRoll;
+			break;
 
-	case 4: // Sonic Pistol --> Systech Aural Blaster
-		if( nItemLevel >= 8 )
-			nRoll = 8;
-		else
+		case 4: // Sonic Pistol --> Systech Aural Blaster
+			if( nItemLevel >= 8 )
+				nRoll = 8;
+			else
+				nItemNum = nRoll;
 			break;
-	case 8: // Systech Aural Blaster --> Arkanian Sonic Blaster
-		if( nItemLevel >= 14 )
-			nRoll = 14;
-		break;
-
-	case 5: // Disruptor Pistol --> Sith Disruptor
-		if( nItemLevel >= 15 )
-			nRoll = 15;
-		else
+		case 8: // Systech Aural Blaster --> Arkanian Sonic Blaster
+			if( nItemLevel >= 14 )
+				nRoll = 14;
+			else
+				nItemNum = nRoll;
 			break;
-	case 15: // Sith Disruptor --> Mandalorian Ripper
-		if( nItemLevel >= 20 )
-			nRoll = 20;
-		else
+
+		case 5: // Disruptor Pistol --> Sith Disruptor
+			if( nItemLevel >= 15 )
+				nRoll = 15;
+			else
+				nItemNum = nRoll;
 			break;
-	case 20: // Mandalorian Ripper --> Mandalorian Disintegrator
-		if( nItemLevel >= 28 )
-			nRoll = 28;
-		break;
-
-	case 6: // Heavy Blaster Pistol --> Arkanian Heavy Pistol
-		if( nItemLevel >= 11 )
-			nRoll = 11;
-		else
+		case 15: // Sith Disruptor --> Mandalorian Ripper
+			if( nItemLevel >= 20 )
+				nRoll = 20;
+			else
+				nItemNum = nRoll;
 			break;
-	case 11: // Arkanian Heavy Pistol --> Mandalorian Heavy Blaster
-		if( nItemLevel >= 16 )
-			nRoll = 16;
-		else
+		case 20: // Mandalorian Ripper --> Mandalorian Disintegrator
+			if( nItemLevel >= 28 )
+				nRoll = 28;
+			else
+				nItemNum = nRoll;
 			break;
-	case 16: // Mandalorian Heavy Blaster --> Zabrak Heavy Blaster
-		if( nItemLevel >= 24 )
-			nRoll = 24;
-		break;
 
-	case 12: // Mandalorian Blaster --> Onasi Blaster
-		if( nItemLevel >= 22 )
-			nRoll = 22;
-		else
+		case 6: // Heavy Blaster Pistol --> Arkanian Heavy Pistol
+			if( nItemLevel >= 11 )
+				nRoll = 11;
+			else
+				nItemNum = nRoll;
 			break;
-	case 22: // *Onasi Blaster*
-		// Replace with Micro-Pulse Blaster based on item level OR
-		// if two have already been found
-		if( nItemLevel >= 26 || LOOT_GetUniqueFound(111, -1) )
-			nRoll = 26;
-		else
-			LOOT_SetUniqueFound(111, 22, TRUE);
-		break;
+		case 11: // Arkanian Heavy Pistol --> Mandalorian Heavy Blaster
+			if( nItemLevel >= 16 )
+				nRoll = 16;
+			else
+				nItemNum = nRoll;
+			break;
+		case 16: // Mandalorian Heavy Blaster --> Zabrak Heavy Blaster
+			if( nItemLevel >= 24 )
+				nRoll = 24;
+			else
+				nItemNum = nRoll;
+			break;
 
-	case 13: // Systech Static Blaster --> Systech Electric Blaster
-		if( nItemLevel >= 25 )
-			nRoll = 25;
-		break;
+		case 13: // Systech Static Blaster --> Systech Electric Blaster
+			if( nItemLevel >= 25 )
+				nRoll = 25;
+			else
+				nItemNum = nRoll;
+			break;
 
-	case 30: // *Freedon Nadd's Blaster*
-		// If it was found before, replace with a random high level item
-		if( LOOT_GetUniqueFound(111, nRoll) )
-			nRoll = Random(6) + 24;
-		else
-			LOOT_SetUniqueFound(111, 30, TRUE);
-		break;
-	}
+		case 30: // *Freedon Nadd's Blaster*
+			// If it was found before, replace with a random high level item
+			if( LOOT_GetUniqueFound(111, nRoll) )
+				nRoll = Random(6) + 24;
+			else {
+				LOOT_SetUniqueFound(111, 30, TRUE);
+				nItemNum = nRoll;
+			}
+			break;
+		
+		default:
+			nItemNum = nRoll;
+			break;
+		}
+	} while( nItemNum <= 0 );
 
-	return nRoll;
+	return nItemNum;
 }
 
 
@@ -854,85 +890,118 @@ int LOOT_GetPistolNum(int nItemLevel) {
 
 	- nItemLevel: Item level determining the quality of the items we can get
 
-	JC 2019-07-31                                                             */
+	JC 2021-01-03                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetRifleNum(int nItemLevel) {
+	// Rifles have 30 variations
+	if( nItemLevel > 30 )
+		nItemLevel = 30;
 	int nRoll = LOOT_DiceResult(nItemLevel, 3);
+	
+	int nItemNum = 0;
 
-// Replacement table for if a better version of what we rolled is available
-	switch( nRoll ) {
-	case 1: // Blaster Carbine --> Repeating Blaster Carbine
-		if( nItemLevel >= 6 )
-			nRoll = 6;
-		else
+	// Replacement table for if a better version of what we rolled is available
+	do {
+		switch( nRoll ) {
+		case 1: // Blaster Carbine --> Repeating Blaster Carbine
+			if( nItemLevel >= 6 )
+				nRoll = 6;
+			else
+				nItemNum = nRoll;
 			break;
-	case 6: // Repeating Blaster Carbine --> Heavy Repeating Blaster Carbine
-		if( nItemLevel >= 17 )
-			nRoll = 17;
-		break;
-
-	case 2: // Ion Carbine --> Ion Rifle
-		if( nItemLevel >= 7 )
-			nRoll = 7;
-		else
+		case 6: // Repeating Blaster Carbine --> Heavy Repeating Blaster Carbine
+			if( nItemLevel >= 17 )
+				nRoll = 17;
+			else
+				nItemNum = nRoll;
 			break;
-	case 7: // Ion Rifle --> Bothan Droid Disruptor
-		if( nItemLevel >= 15 )
-			nRoll = 15;
-		else
+
+		case 2: // Ion Carbine --> Ion Rifle
+			if( nItemLevel >= 7 )
+				nRoll = 7;
+			else
+				nItemNum = nRoll;
 			break;
-	case 15: // Bothan Droid Disruptor --> Verpine Droid Disruptor
-		if( nItemLevel >= 20 )
-			nRoll = 20;
-		else
+		case 7: // Ion Rifle --> Bothan Droid Disruptor
+			if( nItemLevel >= 15 )
+				nRoll = 15;
+			else
+				nItemNum = nRoll;
 			break;
-	case 20: // Verpine Droid Disruptor --> Verpine Droid Disintegrator
-		if( nItemLevel >= 29 )
-			nRoll = 29;
-		break;
-
-	case 3: // Sonic Carbine --> Sonic Rifle
-		if( nItemLevel >= 9 )
-			nRoll = 9;
-		else
+		case 15: // Bothan Droid Disruptor --> Verpine Droid Disruptor
+			if( nItemLevel >= 20 )
+				nRoll = 20;
+			else
+				nItemNum = nRoll;
 			break;
-	case 9: // Sonic Rifle --> Sonic Disruptor
-		if( nItemLevel >= 27 )
-			nRoll = 27;
-		break;
-
-	case 4: // Blaster Rifle --> Arkanian Blaster Rifle
-		if( nItemLevel >= 12 )
-			nRoll = 12;
-		break;
-
-	case 5: // Bowcaster --> War Bowcaster
-		if( nItemLevel >= 11 )
-			nRoll = 11;
-		break;
-
-	case 8: // Disruptor Carbine --> Disruptor Rifle
-		if( nItemLevel >= 13 )
-			nRoll = 13;
-		break;
-
-	case 10: // Repeating Blaster Rifle --> Heavy Repeating Rifle
-		if( nItemLevel >= 22 )
-			nRoll = 22;
-		else
+		case 20: // Verpine Droid Disruptor --> Verpine Droid Disintegrator
+			if( nItemLevel >= 29 )
+				nRoll = 29;
+			else
+				nItemNum = nRoll;
 			break;
-	case 22: // Heavy Repeating Rifle --> Mandalorian Heavy Repeater
-		if( nItemLevel >= 26 )
-			nRoll = 26;
-		break;
 
-	case 14: // Argazdan Riot Buster --> Slavemaster Stun Carbine
-		if( nItemLevel >= 25 )
-			nRoll = 25;
-		break;
-	}
+		case 3: // Sonic Carbine --> Sonic Rifle
+			if( nItemLevel >= 9 )
+				nRoll = 9;
+			else
+				nItemNum = nRoll;
+			break;
+		case 9: // Sonic Rifle --> Sonic Disruptor
+			if( nItemLevel >= 27 )
+				nRoll = 27;
+			else
+				nItemNum = nRoll;
+			break;
 
-	return nRoll;
+		case 4: // Blaster Rifle --> Arkanian Blaster Rifle
+			if( nItemLevel >= 12 )
+				nRoll = 12;
+			else
+				nItemNum = nRoll;
+			break;
+
+		case 5: // Bowcaster --> War Bowcaster
+			if( nItemLevel >= 11 )
+				nRoll = 11;
+			else
+				nItemNum = nRoll;
+			break;
+
+		case 8: // Disruptor Carbine --> Disruptor Rifle
+			if( nItemLevel >= 13 )
+				nRoll = 13;
+			else
+				nItemNum = nRoll;
+			break;
+
+		case 10: // Repeating Blaster Rifle --> Heavy Repeating Rifle
+			if( nItemLevel >= 22 )
+				nRoll = 22;
+			else
+				nItemNum = nRoll;
+			break;
+		case 22: // Heavy Repeating Rifle --> Mandalorian Heavy Repeater
+			if( nItemLevel >= 26 )
+				nRoll = 26;
+			else
+				nItemNum = nRoll;
+			break;
+
+		case 14: // Argazdan Riot Buster --> Slavemaster Stun Carbine
+			if( nItemLevel >= 25 )
+				nRoll = 25;
+			else
+				nItemNum = nRoll;
+			break;
+		
+		default:
+			nItemNum = nRoll;
+			break;
+		}
+	} while( nItemNum <= 0 );
+
+	return nItemNum;
 }
 
 
@@ -946,83 +1015,115 @@ int LOOT_GetRifleNum(int nItemLevel) {
 
 	- nItemLevel: Item level determining the quality of the items we can get
 
-	JC 2019-07-31                                                             */
+	JC 2021-01-03                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetMeleeNum(int nItemLevel) {
+	// Melee weapons have 30 variations
+	if( nItemLevel > 30 )
+		nItemLevel = 30;
 	int nRoll = LOOT_DiceResult(nItemLevel, 3);
+	
+	int nItemNum = 0;
 
-// Replacement table for if a better version of what we rolled is available
-	switch( nRoll ) {
-	case 1: // Short Sword --> Vibroblade
-		if( nItemLevel >= 5 )
-			nRoll = 5;
-		else
+	// Replacement table for if a better version of what we rolled is available
+	do {
+		switch( nRoll ) {
+		case 1: // Short Sword --> Vibroblade
+			if( nItemLevel >= 5 )
+				nRoll = 5;
+			else
+				nItemNum = nRoll;
 			break;
-	case 5: // Vibroblade --> Zabrak Vibroblade
-		if( nItemLevel >= 10 )
-			nRoll = 10;
-		break;
-
-	case 2: // Long Sword --> Vibrosword
-		if( nItemLevel >= 6 )
-			nRoll = 6;
-		else
+		case 5: // Vibroblade --> Zabrak Vibroblade
+			if( nItemLevel >= 10 )
+				nRoll = 10;
+			else
+				nItemNum = nRoll;
 			break;
-	case 6: // Vibrosword --> Echani Vibrosword
-		if( nItemLevel >= 21 )
-			nRoll = 21;
-		break;
 
-	case 3: // Energy Baton --> Exchange Negotiator
-		if( nItemLevel >= 8 )
-			nRoll = 8;
-		else
+		case 2: // Long Sword --> Vibrosword
+			if( nItemLevel >= 6 )
+				nRoll = 6;
+			else
+				nItemNum = nRoll;
 			break;
-	case 8: // Exchange Negotiator --> Gand Silencer
-		if( nItemLevel >= 18 )
-			nRoll = 18;
-		else
+		case 6: // Vibrosword --> Echani Vibrosword
+			if( nItemLevel >= 21 )
+				nRoll = 21;
+			else
+				nItemNum = nRoll;
 			break;
-	case 18: // Gand Silencer --> Gand Discharger
-		if( nItemLevel >= 29 )
-			nRoll = 29;
-		break;
 
-	case 4: // Quarterstaff --> Force Pike
-		if( nItemLevel >= 14 )
-			nRoll = 14;
-		else
+		case 3: // Energy Baton --> Exchange Negotiator
+			if( nItemLevel >= 8 )
+				nRoll = 8;
+			else
+				nItemNum = nRoll;
 			break;
-	case 14: // Force Pike --> Gand Shockstaff
-		if( nItemLevel >= 23 )
-			nRoll = 23;
-		break;
+		case 8: // Exchange Negotiator --> Gand Silencer
+			if( nItemLevel >= 18 )
+				nRoll = 18;
+			else
+				nItemNum = nRoll;
+			break;
+		case 18: // Gand Silencer --> Gand Discharger
+			if( nItemLevel >= 29 )
+				nRoll = 29;
+			else
+				nItemNum = nRoll;
+			break;
 
-	case 7: // Double-Bladed Sword --> Vibro Double-Blade
-		if( nItemLevel >= 15 )
-			nRoll = 15;
-		break;
+		case 4: // Quarterstaff --> Force Pike
+			if( nItemLevel >= 14 )
+				nRoll = 14;
+			else
+				nItemNum = nRoll;
+			break;
+		case 14: // Force Pike --> Gand Shockstaff
+			if( nItemLevel >= 23 )
+				nRoll = 23;
+			else
+				nItemNum = nRoll;
+			break;
 
-	case 11: // Rodian Blade --> Rodian Death Blade
-		if( nItemLevel >= 17 )
-			nRoll = 17;
-		break;
+		case 7: // Double-Bladed Sword --> Vibro Double-Blade
+			if( nItemLevel >= 15 )
+				nRoll = 15;
+			else
+				nItemNum = nRoll;
+			break;
 
-	case 12: // Sith War Sword --> Sith Tremor Sword
-		if( nItemLevel >= 22 )
-			nRoll = 22;
-		break;
+		case 11: // Rodian Blade --> Rodian Death Blade
+			if( nItemLevel >= 17 )
+				nRoll = 17;
+			else
+				nItemNum = nRoll;
+			break;
 
-	case 30: // *Freyyr's Warblade*
-		// If it was found before, replace with a random high level item
-		if( LOOT_GetUniqueFound(131, nRoll) )
-			nRoll = Random(10) + 20;
-		else
-			LOOT_SetUniqueFound(131, 30, TRUE);
-		break;
-	}
+		case 12: // Sith War Sword --> Sith Tremor Sword
+			if( nItemLevel >= 22 )
+				nRoll = 22;
+			else
+				nItemNum = nRoll;
+			break;
 
-	return nRoll;
+		case 30: // *Freyyr's Warblade*
+			// If it was found before, replace with a random high level item
+			if( LOOT_GetUniqueFound(131, nRoll) )
+				nRoll = Random(10) + 20;
+			else {
+				LOOT_SetUniqueFound(131, 30, TRUE);
+				nItemNum = nRoll;
+			}
+			break;
+		
+		default:
+			nItemNum = nRoll;
+			break;
+		}
+	} while( nItemNum <= 0 );
+
+	return nItemNum;
 }
 
 
@@ -1132,26 +1233,24 @@ int LOOT_GetSaberColor(int nItemLevel, int nColorType) {
 /*	LOOT_HasUpgradeSaber()
 
 	Returns true if the player has completed the "Crafting a Lightsaber" quest
-	with Bao-Dur, or if they have a lightsaber in their inventory.
+	with Bao-Dur, or if they have an upgradeable lightsaber in their inventory.
 
 	Visas Marr's Lightsaber and Freedon Nadd's Short Lightsaber are excluded
 	from the check,	as they cannot be upgraded.
 
-	JC 2019-08-02                                                             */
+	JC 2021-01-03                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_HasUpgradeSaber() {
-	int nOutput = FALSE;
-	object oItem;
-
 	if( GetJournalEntry("LightsaberQuest") >= 50 )
 		return TRUE;
-	oItem = GetFirstItemInInventory(GetFirstPC());
+	
+	object oItem = GetFirstItemInInventory(GetFirstPC());
 	while( oItem != OBJECT_INVALID ) {
-		if( (GetBaseItemType(oItem) == BASE_ITEM_LIGHTSABER ||
-			GetBaseItemType(oItem) == BASE_ITEM_SHORT_LIGHTSABER ||
-			GetBaseItemType(oItem) == BASE_ITEM_LIGHTSABER) &&
-			GetTag(oItem) != "w_ls_x01" &&
-			GetTag(oItem) != "w_sls_x02" )
+		if( (GetBaseItemType(oItem) == BASE_ITEM_LIGHTSABER &&
+			 GetTag(oItem) != "w_ls_x01") ||
+			(GetBaseItemType(oItem) == BASE_ITEM_SHORT_LIGHTSABER &&
+			 GetTag(oItem) != "w_sls_x02")||
+			GetBaseItemType(oItem) == BASE_ITEM_DOUBLE_BLADED_LIGHTSABER )
 			return TRUE;
 		oItem = GetNextItemInInventory(GetFirstPC());
 	}
@@ -1405,7 +1504,6 @@ int LOOT_GetPowerCrystalNum(int nItemLevel) {
 	// Power crystals have 25 variations
 	if( nItemLevel > 25 )
 		nItemLevel = 25;
-
 	int nRoll = LOOT_DiceResult(nItemLevel, 1);
 	
 	// Replace the Solari Crystal if it's been found before
@@ -1440,14 +1538,15 @@ int LOOT_GetPowerCrystalNum(int nItemLevel) {
 	- nItemType: Item type (item classifications, upgrades only)
 	- nItemTier: Optional number to specify an item tier
 
-	JC 2019-08-02                                                             */
+	JC 2021-01-03                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetUpgradeNum(int nItemLevel, int nItemType, int nItemTier) {
+	if( nItemLevel > 30 )
+		nItemLevel = 30;
 	int nNumTiers;
 	int nItemsPerTier;
 	int nItemID;
 	int nNumItems;
-	int nItemScale;
 	
 	// Different upgrade types have their items grouped in different amounts
 	switch( nItemType ) {
@@ -1500,17 +1599,14 @@ int LOOT_GetUpgradeNum(int nItemLevel, int nItemType, int nItemTier) {
 	// Determine tier based on player level if it isn't known
 	if( nItemTier < 1 || nItemTier > nNumTiers ) {
 		// Item level scales to match the total number of items
-
 		nNumItems = nNumTiers * nItemsPerTier;
-		if( nNumItems == 30 )
-			nItemScale = nItemLevel;
-		else if( 30 % nNumItems == 0 )
-			nItemScale = (nItemLevel + (30 / nNumItems) - 1) / (30 / nNumItems);
+		if( 30 % nNumItems == 0 )
+			nItemLevel = (nItemLevel + (30 / nNumItems) - 1) / (30 / nNumItems);
 		else if( nNumItems < 30 )
-			nItemScale = ((nItemLevel * nNumItems) + 30 - nNumItems) / 30;
+			nItemLevel = ((nItemLevel * nNumItems) + 30 - nNumItems) / 30;
 		else
-			nItemScale = (nItemLevel * nNumItems) / 30;
-		nItemTier = (nItemScale + nItemsPerTier - 1) / nItemsPerTier;
+			nItemLevel = (nItemLevel * nNumItems) / 30;
+		nItemTier = (nItemLevel + nItemsPerTier - 1) / nItemsPerTier;
 	}
 	
 	// Roll to get a 2-digit item ID
@@ -1580,90 +1676,121 @@ int LOOT_GetUpgradeNum(int nItemLevel, int nItemType, int nItemTier) {
 
 	- nItemLevel: Item level determining the quality of the items we can get
 
-	JC 2019-07-31                                                             */
+	JC 2021-01-03                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetBeltNum(int nItemLevel) {
+	// Belts have 30 variations
+	if( nItemLevel > 30 )
+		nItemLevel = 30;
 	int nRoll = LOOT_DiceResult(nItemLevel, 3);
 	
+	int nItemNum = 0;
+	
 	// Replacement table for if a better version of what we rolled is available
-	switch( nRoll ) {
-	case 1: // Adrenaline Amplifier --> Avanced Adrenaline Amplifier
-		if( nItemLevel >= 5 )
-			nRoll = 5;
-		else
-			break;
-	case 5: // Advanced Adrenaline Amplifier --> Hyper Adrenaline Amplifier
-		if( nItemLevel >= 9 )
-			nRoll = 9;
-		break;
-
-	case 2: // Cardio-Regulator --> Systech Cardio-Regulator
-		if( nItemLevel >= 8 )
-			nRoll = 8;
-		else
-			break;
-	case 8: // Systech Cardio-Regulator --> Aratech Cardio-Regulator
-		if( nItemLevel >= 25 )
-			nRoll = 25;
-		break;
-
-	case 3: // Stealth Field Generator
-		if( nItemLevel >= 6 ) {
-			// Stealth Field Generator --> Exchange Shadow Caster
-			if( nItemLevel >= 10 && Random(2) == 0 )
-				nRoll = 10;
-			// Stealth Field Generator --> Aratech SD Belt
+	do {
+		switch( nRoll ) {
+		case 1: // Adrenaline Amplifier --> Avanced Adrenaline Amplifier
+			if( nItemLevel >= 5 )
+				nRoll = 5;
 			else
-				nRoll = 6;
-		}
-		break;
-
-	case 4: // Czerka Utility Belt --> Tech Specialist Belt
-		if( nItemLevel >= 24 )
-			nRoll = 24;
-		break;
-
-	case 7: // Strength Enhancer
-		if( nItemLevel >= 15 ) {
-			// Strength Enhancer --> GNS Strength Enhancer
-			if( nItemLevel >= 26 && Random(2) == 0 )
-				nRoll = 26;
-			// Strength Enhancer --> CNS Strength Enhancer
-			else
-				nRoll = 15;
-		}
-		break;
-
-	case 9: // Hyper Adrenaline Amplifier --> Adrenaline Stimulator
-		if( nItemLevel >= 18 )
-			nRoll = 18;
-		break;
-
-	case 14: // Eriadu Stealth Unit --> Defel Mimicker
-		if( nItemLevel >= 22 )
-			nRoll = 22;
-		else
+				nItemNum = nRoll;
 			break;
-	case 22: // Defel Mimicker --> Aratech Echo Belt
-		if( nItemLevel >= 29 )
-			nRoll = 29;
-		break;
+		case 5: // Advanced Adrenaline Amplifier --> Hyper Adrenaline Amplifier
+			if( nItemLevel >= 9 )
+				nRoll = 9;
+			else
+				nItemNum = nRoll;
+			break;
 
-	case 20: // Jal Shey Belt --> Jal Shey Mentor Belt
-		if( nItemLevel >= 30 )
-			nRoll = 30;
-		break;
+		case 2: // Cardio-Regulator --> Systech Cardio-Regulator
+			if( nItemLevel >= 8 )
+				nRoll = 8;
+			else
+				nItemNum = nRoll;
+			break;
+		case 8: // Systech Cardio-Regulator --> Aratech Cardio-Regulator
+			if( nItemLevel >= 25 )
+				nRoll = 25;
+			else
+				nItemNum = nRoll;
+			break;
 
-	case 27: // *Qel-Droma Belt*
-		// If it was found before, replace with Jal Shey Mentor Belt
-		if( LOOT_GetUniqueFound(311, nRoll) )
-			nRoll = 30;
-		else
-			LOOT_SetUniqueFound(311, 27, TRUE);
-		break;
-	}
+		case 3: // Stealth Field Generator
+			if( nItemLevel >= 6 ) {
+				// Stealth Field Generator --> Exchange Shadow Caster
+				if( nItemLevel >= 10 && Random(2) == 0 )
+					nRoll = 10;
+				// Stealth Field Generator --> Aratech SD Belt
+				else
+					nRoll = 6;
+			}
+			else
+				nItemNum = nRoll;
+			break;
 
-	return nRoll;
+		case 4: // Czerka Utility Belt --> Tech Specialist Belt
+			if( nItemLevel >= 24 )
+				nRoll = 24;
+			else
+				nItemNum = nRoll;
+			break;
+
+		case 7: // Strength Enhancer
+			if( nItemLevel >= 15 ) {
+				// Strength Enhancer --> GNS Strength Enhancer
+				if( nItemLevel >= 26 && Random(2) == 0 )
+					nRoll = 26;
+				// Strength Enhancer --> CNS Strength Enhancer
+				else
+					nRoll = 15;
+			}
+			else
+				nItemNum = nRoll;
+			break;
+		case 9: // Hyper Adrenaline Amplifier --> Adrenaline Stimulator
+			if( nItemLevel >= 18 )
+				nRoll = 18;
+			else
+				nItemNum = nRoll;
+			break;
+
+		case 14: // Eriadu Stealth Unit --> Defel Mimicker
+			if( nItemLevel >= 22 )
+				nRoll = 22;
+			else
+				nItemNum = nRoll;
+			break;
+		case 22: // Defel Mimicker --> Aratech Echo Belt
+			if( nItemLevel >= 29 )
+				nRoll = 29;
+			else
+				nItemNum = nRoll;
+			break;
+
+		case 20: // Jal Shey Belt --> Jal Shey Mentor Belt
+			if( nItemLevel >= 30 )
+				nRoll = 30;
+			else
+				nItemNum = nRoll;
+			break;
+
+		case 27: // *Qel-Droma Belt*
+			// If it was found before, replace with Jal Shey Mentor Belt
+			if( LOOT_GetUniqueFound(311, nRoll) )
+				nRoll = 30;
+			else {
+				LOOT_SetUniqueFound(311, 27, TRUE);
+				nItemNum = nRoll;
+			}
+			break;
+		
+		default:
+			nItemNum = nRoll;
+			break;
+		}
+	} while( nItemNum <= 0 );
+
+	return nItemNum;
 }
 
 
@@ -1677,66 +1804,93 @@ int LOOT_GetBeltNum(int nItemLevel) {
 
 	- nItemLevel: Item level determining the quality of the items we can get
 
-	JC 2019-07-31                                                             */
+	JC 2021-01-03                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetGloveNum(int nItemLevel) {
+	// Gloves have 30 variations
+	if( nItemLevel > 30 )
+		nItemLevel = 30;
 	int nRoll = LOOT_DiceResult(nItemLevel, 2);
 	
+	int nItemNum = 0;
+	
 	// Replacement table for if a better version of what we rolled is available
-	switch( nRoll ) {
-	case 2: // Exchange Casual Gloves --> Exchange Work Gloves
-		if( nItemLevel >= 7 )
-			nRoll = 7;
-		break;
-
-	case 3: // Strength Gauntlets --> Eriadu Strength Amplifier
-		if( nItemLevel >= 14 )
-			nRoll = 14;
-		else
+	do {
+		switch( nRoll ) {
+		case 2: // Exchange Casual Gloves --> Exchange Work Gloves
+			if( nItemLevel >= 7 )
+				nRoll = 7;
+			else
+				nItemNum = nRoll;
 			break;
-	case 14: // Eriadu Strength Amplifier --> Sith Power Gauntlets
-		if( nItemLevel >= 17 )
-			nRoll = 17;
-		else
+
+		case 3: // Strength Gauntlets --> Eriadu Strength Amplifier
+			if( nItemLevel >= 14 )
+				nRoll = 14;
+			else
+				nItemNum = nRoll;
 			break;
-	case 17: // Sith Power Gauntlets --> Dominator Gloves
-		if( nItemLevel >= 25 )
-			nRoll = 25;
-		break;
+		case 14: // Eriadu Strength Amplifier --> Sith Power Gauntlets
+			if( nItemLevel >= 17 )
+				nRoll = 17;
+			else
+				nItemNum = nRoll;
+			break;
+		case 17: // Sith Power Gauntlets --> Dominator Gloves
+			if( nItemLevel >= 25 )
+				nRoll = 25;
+			else
+				nItemNum = nRoll;
+			break;
 
-	case 4: // Taris Survival Gloves --> Karakan Gauntlets
-		if( nItemLevel >= 15 )
-			nRoll = 15;
-		break;
+		case 4: // Taris Survival Gloves --> Karakan Gauntlets
+			if( nItemLevel >= 15 )
+				nRoll = 15;
+			else
+				nItemNum = nRoll;
+			break;
 
-	case 9: // Detonator Gloves --> Bothan Precision Gloves
-		if( nItemLevel >= 16 )
-			nRoll = 16;
-		break;
+		case 9: // Detonator Gloves --> Bothan Precision Gloves
+			if( nItemLevel >= 16 )
+				nRoll = 16;
+			else
+				nItemNum = nRoll;
+			break;
 
-	case 12: // Jal Shey Perception Gloves --> Jal Shey Meditation Gloves
-		if( nItemLevel >= 22 )
-			nRoll = 22;
-		break;
+		case 12: // Jal Shey Perception Gloves --> Jal Shey Meditation Gloves
+			if( nItemLevel >= 22 )
+				nRoll = 22;
+			else
+				nItemNum = nRoll;
+			break;
 
-	case 21: // Automation Gloves --> Improved Automation Gloves
-		if( nItemLevel >= 29 )
-			nRoll = 29;
-		break;
+		case 21: // Automation Gloves --> Improved Automation Gloves
+			if( nItemLevel >= 29 )
+				nRoll = 29;
+			else
+				nItemNum = nRoll;
+			break;
 
-	case 27: // *Ossluk's Gloves*
-		// If it was found before, replace with a random high level item
-		if( LOOT_GetUniqueFound(321, nRoll) ) {
-			nRoll = Random(8) + 22;
-			if( nRoll == 27 )
-				nRoll = 30;
+		case 27: // *Ossluk's Gloves*
+			// If it was found before, replace with a random high level item
+			if( LOOT_GetUniqueFound(321, nRoll) ) {
+				nRoll = Random(8) + 22;
+				if( nRoll == 27 )
+					nRoll = 30;
+			}
+			else {
+				LOOT_SetUniqueFound(321, 27, TRUE);
+				nItemNum = nRoll;
+			}
+			break;
+		
+		default:
+			nItemNum = nRoll;
+			break;
 		}
-		else
-			LOOT_SetUniqueFound(321, 27, TRUE);
-		break;
-	}
+	} while( nItemNum <= 0 );
 
-	return nRoll;
+	return nItemNum;
 }
 
 
@@ -1750,96 +1904,124 @@ int LOOT_GetGloveNum(int nItemLevel) {
 
 	- nItemLevel: Item level determining the quality of the items we can get
 
-	JC 2019-08-03                                                             */
+	JC 2021-01-03                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetHeadgearNum(int nItemLevel) {
+	// Headgear have 30 variations
+	if( nItemLevel > 30 )
+		nItemLevel = 30;
 	int nRoll = LOOT_DiceResult(nItemLevel, 2);
 	
+	int nItemNum = 0;
+	
 	// Replacement table for if a better version of what we rolled is available
-	switch( nRoll ) {
-	case 1: // Neural Band --> Matukai Meditation Band
-		if( nItemLevel >= 23 )
-			nRoll = 23;
-		break;
-
-	case 2: // No Breath Mask in Peragus dormitories
-		if( GetModuleName() == "105PER" ) {
-			nRoll = LOOT_DiceResult(nItemLevel - 1, 2);
-			if( nRoll >= 2 )
-				nRoll += 1;
-		}
-		break;
-
-	case 3: // Rakatan Band --> Meditation Band
-		if( nItemLevel >= 12 )
-			nRoll = 12;
-		else
+	do {
+		switch( nRoll ) {
+		case 1: // Neural Band --> Matukai Meditation Band
+			if( nItemLevel >= 23 )
+				nRoll = 23;
+			else
+				nItemNum = nRoll;
 			break;
-	case 12: // Meditation Band --> Matukai Meditation Band
-		if( nItemLevel >= 23 )
-			nRoll = 23;
-		break;
 
-	case 5: // Bothan Perception Visor --> Bothan Sensory Visor
-		if( nItemLevel >= 13 )
-			nRoll = 13;
-		break;
-
-	case 6: // Sonic Nullifiers --> Absorbtion Visor
-		if( nItemLevel >= 29 )
-			nRoll = 29;
-		break;
-
-	case 9: // Shielding Visor --> Enhanced Shielding Visor
-		if( nItemLevel >= 27 )
-			nRoll = 27;
-		break;
-
-	case 10: // Spacer's Sensor --> Combat Sensor
-		if( nItemLevel >= 15 )
-			nRoll = 15;
-		break;
-
-	case 25: // *Circlet of Saresh*
-		// If it was found before, replace it
-		if( LOOT_GetUniqueFound(331, 25) ) {
-			// Bindo's Band if that hasn't been found
-			if( !LOOT_GetUniqueFound(331, 26) ) {
-				LOOT_SetUniqueFound(331, 26, TRUE);
-				nRoll = 26;
+		case 2: // No Breath Mask in Peragus dormitories
+			if( GetModuleName() == "105PER" ) {
+				nRoll = LOOT_DiceResult(nItemLevel - 1, 2);
+				if( nRoll >= 2 )
+					++nRoll;
 			}
-			// Matukai Meditation Band
-			else if( Random(2) == 0 )
-				nRoll = 23;
-			// Force Focusing Visor
-			else
-				nRoll = 30;
-		}
-		else
-			LOOT_SetUniqueFound(331, 25, TRUE);
-		break;
+			break;
 
-	case 26: // *Bindo's Band*
-		// If it was found before, replace it
-		if( LOOT_GetUniqueFound(331, 26) ) {
-			// Circlet of Saresh if that hasn't been found
-			if( !LOOT_GetUniqueFound(331, 25) ) {
+		case 3: // Rakatan Band --> Meditation Band
+			if( nItemLevel >= 12 )
+				nRoll = 12;
+			else
+				nItemNum = nRoll;
+			break;
+		case 12: // Meditation Band --> Matukai Meditation Band
+			if( nItemLevel >= 23 )
+				nRoll = 23;
+			else
+				nItemNum = nRoll;
+			break;
+
+		case 5: // Bothan Perception Visor --> Bothan Sensory Visor
+			if( nItemLevel >= 13 )
+				nRoll = 13;
+			else
+				nItemNum = nRoll;
+			break;
+
+		case 6: // Sonic Nullifiers --> Absorbtion Visor
+			if( nItemLevel >= 29 )
+				nRoll = 29;
+			else
+				nItemNum = nRoll;
+			break;
+
+		case 9: // Shielding Visor --> Enhanced Shielding Visor
+			if( nItemLevel >= 27 )
+				nRoll = 27;
+			else
+				nItemNum = nRoll;
+			break;
+
+		case 10: // Spacer's Sensor --> Combat Sensor
+			if( nItemLevel >= 15 )
+				nRoll = 15;
+			else
+				nItemNum = nRoll;
+			break;
+
+		case 25: // *Circlet of Saresh*
+			// If it was found before, replace it
+			if( LOOT_GetUniqueFound(331, 25) ) {
+				// Bindo's Band if that hasn't been found
+				if( !LOOT_GetUniqueFound(331, 26) ) {
+					LOOT_SetUniqueFound(331, 26, TRUE);
+					nItemNum = 26;
+				}
+				// Matukai Meditation Band
+				else if( Random(2) == 0 )
+					nRoll = 23;
+				// Force Focusing Visor
+				else
+					nRoll = 30;
+			}
+			else {
 				LOOT_SetUniqueFound(331, 25, TRUE);
-				nRoll = 25;
+				nItemNum = nRoll;
 			}
-			// Matukai Meditation Band
-			else if( Random(2) == 0 )
-				nRoll = 23;
-			// Force Focusing Visor
-			else
-				nRoll = 30;
-		}
-		else
-			LOOT_SetUniqueFound(331, 26, TRUE);
-		break;
-	}
+			break;
 
-	return nRoll;
+		case 26: // *Bindo's Band*
+			// If it was found before, replace it
+			if( LOOT_GetUniqueFound(331, 26) ) {
+				// Circlet of Saresh if that hasn't been found
+				if( !LOOT_GetUniqueFound(331, 25) ) {
+					LOOT_SetUniqueFound(331, 25, TRUE);
+					nItemNum = 25;
+				}
+				// Matukai Meditation Band
+				else if( Random(2) == 0 )
+					nRoll = 23;
+				// Force Focusing Visor
+				else
+					nRoll = 30;
+			}
+			else {
+				LOOT_SetUniqueFound(331, 26, TRUE);
+				nItemNum = nRoll;
+			}
+			break;
+		
+		default:
+			nItemNum = 0;
+			break;
+		}
+	} while( nItemNum <= 0 );
+
+	return nItemNum;
 }
 
 
@@ -1879,10 +2061,8 @@ int LOOT_GetHeadgearNum(int nItemLevel) {
 	JC 2019-07-31                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetImplantTier(int nItemLevel) {
-	if( nItemLevel > 30 )
-		nItemLevel = 30;
-	int nCON = GetAbilityModifier(ABILITY_CONSTITUTION, GetFirstPC());
 	int nRoll = Random(95 + nItemLevel);
+	int nCON = GetAbilityModifier(ABILITY_CONSTITUTION, GetFirstPC());
 
 	if( nCON <= 1 ) {
 		if( nRoll < 60 )
@@ -1952,44 +2132,60 @@ int LOOT_GetImplantNum(int nItemLevel) {
 
 	- nItemLevel: Item level determining the quality of the items we can get
 
-	JC 2019-07-31                                                             */
+	JC 2021-01-03                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetLightArmorNum(int nItemLevel) {
 	// Armors have 15 variations
 	int nRoll = (LOOT_DiceResult(nItemLevel, 2) + 1) / 2;
-	int nItemScale = (nItemLevel + 1) / 2;
-	if( nItemScale > 15 )
-		nItemScale = 15;
+	nItemLevel = (nItemLevel + 1) / 2;
+	if( nItemLevel > 15 )
+		nItemLevel = 15;
+	
+	int nItemNum = 0;
 	
 	// Replacement table for if a better version of what we rolled is available
-	if( nRoll <= 3 && nItemScale > 5 ) // Light Combat Suit, Combat Suit, & Heavy Combat Suit
-		nRoll = Random(nItemScale - 4) + 5;
-	switch( nRoll ) {
-	case 4: // Mandalorian Combat Suit --> Mandalorian Heavy Suit
-		if( nItemScale >= 9 )
-			nRoll = 9;
-		break;
+	if( nRoll <= 3 && nItemLevel > 5 ) // Light Combat Suit, Combat Suit, & Heavy Combat Suit
+		nRoll = Random(nItemLevel - 4) + 5;
+	do {
+		switch( nRoll ) {
+		case 4: // Mandalorian Combat Suit --> Mandalorian Heavy Suit
+			if( nItemLevel >= 9 )
+				nRoll = 9;
+			else
+				nItemNum = nRoll;
+			break;
 
-	case 10: // Zabrak Battle Armor --> Zabrak Field Armor
-		if( nItemScale >= 14 )
-			nRoll = 14;
-		break;
+		case 10: // Zabrak Battle Armor --> Zabrak Field Armor
+			if( nItemLevel >= 14 )
+				nRoll = 14;
+			else
+				nItemNum = nRoll;
+			break;
 
-	case 13: // Reinforced Fiber Mesh --> Zabrak Field Armor
-		if( nItemScale >= 14 )
-			nRoll = 14;
-		break;
+		case 13: // Reinforced Fiber Mesh --> Zabrak Field Armor
+			if( nItemLevel >= 14 )
+				nRoll = 14;
+			else
+				nItemNum = nRoll;
+			break;
 
-	case 15: // *Ulic Qel-Droma's Mesh Suit*
-		// If it was found before, replace with a random high level item
-		if( LOOT_GetUniqueFound(411, 15) )
-			nRoll = 14 - Random(6);
-		else
-			LOOT_SetUniqueFound(411, 15, TRUE);
-		break;
-	}
+		case 15: // *Ulic Qel-Droma's Mesh Suit*
+			// If it was found before, replace with a random high level item
+			if( LOOT_GetUniqueFound(411, 15) )
+				nRoll = 14 - Random(6);
+			else {
+				LOOT_SetUniqueFound(411, 15, TRUE);
+				nItemNum = nRoll;
+			}
+			break;
+		
+		default:
+			nItemNum = nRoll;
+			break;
+		}
+	} while( nItemNum <= 0 );
 
-	return nRoll;
+	return nItemNum;
 }
 
 
@@ -2003,58 +2199,77 @@ int LOOT_GetLightArmorNum(int nItemLevel) {
 
 	- nItemLevel: Item level determining the quality of the items we can get
 
-	JC 2019-07-31                                                             */
+	JC 2021-01-03                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetMediumArmorNum(int nItemLevel) {
-// Armors have 15 variations
+	// Armors have 15 variations
 	int nRoll = (LOOT_DiceResult(nItemLevel, 2) + 1) / 2;
-	int nItemScale = (nItemLevel + 1) / 2;
-	if( nItemScale > 15 )
-		nItemScale = 15;
+	nItemLevel = (nItemLevel + 1) / 2;
+	if( nItemLevel > 15 )
+		nItemLevel = 15;
+	
+	int nItemNum = 0;
 	
 	// Replacement table for if a better version of what we rolled is available
-	if( nRoll <= 3 && nItemScale > 5 ) // Military Suit, Light Battle Armor, & Echani Battle Armor
-		nRoll = Random(nItemScale - 4) + 5;
-	switch( nRoll ) {
-	case 4: // Cinnagar War Suit --> Heavy Cinnagar War Suit
-		if( nItemScale >= 12 )
-			nRoll = 12;
-		break;
-
-	case 6: // Bronzium Light Battle Armor --> Powered Light Battle Armor
-		if( nItemScale >= 9 )
-			nRoll = 9;
-		break;
-
-	case 7: // Verpine Fiber Mesh --> Exar Kun's Light Battle Suit
-		if( nItemScale >= 11 )
-			nRoll = 11;
-		else
+	if( nRoll <= 3 && nItemLevel > 5 ) // Military Suit, Light Battle Armor, & Echani Battle Armor
+		nRoll = Random(nItemLevel - 4) + 5;
+	do {
+		switch( nRoll ) {
+		case 4: // Cinnagar War Suit --> Heavy Cinnagar War Suit
+			if( nItemLevel >= 12 )
+				nRoll = 12;
+			else
+				nItemNum = nRoll;
 			break;
-	case 11: // *Exar Kun's Light Battle Suit*
-		// Replace with Verpine Fiber Ultramesh based on item level OR
-		// if it was found before
-		if( nItemScale >= 13 || LOOT_GetUniqueFound(421, 11) )
-			nRoll = 13;
-		else
-			LOOT_SetUniqueFound(421, 11, TRUE);
-		break;
 
-	case 8: // Krath Heavy Armor --> Krath Holy Battle Suit
-		if( nItemScale >= 10 )
-			nRoll = 10;
-		break;
+		case 6: // Bronzium Light Battle Armor --> Powered Light Battle Armor
+			if( nItemLevel >= 9 )
+				nRoll = 9;
+			else
+				nItemNum = nRoll;
+			break;
 
-	case 15: // *Jamoh Hogra's Battle Armor*
-		// If it was found before, replace with Powered Light Batle Armor
-		if( LOOT_GetUniqueFound(421, 15) )
-			nRoll = 9;
-		else
-			LOOT_SetUniqueFound(421, 15, TRUE);
-		break;
-	}
+		case 7: // Verpine Fiber Mesh --> Exar Kun's Light Battle Suit
+			if( nItemLevel >= 11 )
+				nRoll = 11;
+			else
+				nItemNum = nRoll;
+			break;
+		case 11: // *Exar Kun's Light Battle Suit*
+			// Replace with Verpine Fiber Ultramesh based on item level OR
+			// if it was found before
+			if( nItemLevel >= 13 || LOOT_GetUniqueFound(421, 11) )
+				nRoll = 13;
+			else {
+				LOOT_SetUniqueFound(421, 11, TRUE);
+				nItemNum = nRoll;
+			}
+			break;
 
-	return nRoll;
+		case 8: // Krath Heavy Armor --> Krath Holy Battle Suit
+			if( nItemLevel >= 10 )
+				nRoll = 10;
+			else
+				nItemNum = nRoll;
+			break;
+
+		case 15: // *Jamoh Hogra's Battle Armor*
+			// If it was found before, replace with Powered Light Batle Armor
+			if( LOOT_GetUniqueFound(421, 15) )
+				nRoll = 9;
+			else {
+				LOOT_SetUniqueFound(421, 15, TRUE);
+				nItemNum = nRoll;
+			}
+			break;
+		
+		default:
+			nItemNum = nRoll;
+			break;
+		}
+	} while( nItemNum <= 0 );
+
+	return nItemNum;
 }
 
 
@@ -2067,21 +2282,21 @@ int LOOT_GetMediumArmorNum(int nItemLevel) {
 
 	- nItemLevel: Item level determining the quality of the items we can get
 
-	JC 2019-07-31                                                             */
+	JC 2021-01-03                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetHeavyArmorNum(int nItemLevel) {
 	// Armors have 15 variations
 	int nRoll = (LOOT_DiceResult(nItemLevel, 2) + 1) / 2;
-	int nItemScale = (nItemLevel + 1) / 2;
-	if( nItemScale > 15 )
-		nItemScale = 15;
+	nItemLevel = (nItemLevel + 1) / 2;
+	if( nItemLevel > 15 )
+		nItemLevel = 15;
 	
 	// Replacement table for if a better version of what we rolled is available
-	if( nRoll <= 2 && nItemScale > 5 )
-		nRoll = Random(nItemScale - 2) + 3; // Battle Armor & Heavy Battle Armor
-	if( nRoll >= 3 && nRoll <= 4 && nItemScale >= 7 )
-		nRoll = Random(nItemScale - 4) + 5; // Echani Heavy Armor & Durasteel Heavy Armor
-	if( nRoll == 5 && nItemScale >= 11 )
+	if( nRoll <= 2 && nItemLevel > 5 )
+		nRoll = Random(nItemLevel - 2) + 3; // Battle Armor & Heavy Battle Armor
+	if( nRoll >= 3 && nRoll <= 4 && nItemLevel >= 7 )
+		nRoll = Random(nItemLevel - 4) + 5; // Echani Heavy Armor & Durasteel Heavy Armor
+	if( nRoll == 5 && nItemLevel >= 11 )
 		nRoll = 11; // Powered Battle Armor --> Corellian Powersuit
 
 	return nRoll;
@@ -2098,105 +2313,132 @@ int LOOT_GetHeavyArmorNum(int nItemLevel) {
 
 	- nItemLevel: Item level determining the quality of the items we can get
 
-	JC 2019-08-06                                                             */
+	JC 2021-01-03                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetRobeNum(int nItemLevel) {
 	// Item level is reduced because the scaling for robes has to be slowed
 	// down on account of how you can't roll for robes at all until after
 	// Peragus.
-	int nItemScale = nItemLevel - 2;
-	if( nItemScale < 1 )
-		nItemScale = 1;
+	nItemLevel = nItemLevel - 2;
+	if( nItemLevel < 1 )
+		nItemLevel = 1;
+	// Robes have 30 variations
+	else if( nItemLevel > 30 )
+		nItemLevel = 30;
+	int nRoll = LOOT_DiceResult(nItemLevel, 3);
+	
+	int nItemNum = 0;
 	int nGlobal;
 	int i;
 	int j;
-	// Robes have 30 variations
-	int nRoll = LOOT_DiceResult(nItemScale, 3);
 	
 	// Replacement table for if a better version of what we rolled is available
-	switch( nRoll ) {
-	case 1: // No clothing ever
-		nRoll = 2;
-	case 2: // Padawan --> Jedi
-		if( nItemScale >= 8 )
-			nRoll = 8;
-		else
-			break;
-	case 8: // Jedi --> Jedi Knight
-		if( nItemScale >= 13 )
-			nRoll = 13;
-		else
-			break;
-	case 13: // Jedi Knight --> Jedi Master
-		if( nItemScale >= 17 )
-			nRoll = 17;
-		break;
-
-	case 3: // Dark Padawan --> Dark Jedi
-		if( nItemScale >= 9 )
-			nRoll = 9;
-		else
-			break;
-	case 9: // Dark Jedi --> Dark Jedi Knight
-		if( nItemScale >= 14 )
-			nRoll = 14;
-		else
-			break;
-	case 14: // Dark Jedi Knight --> Dark Jedi Master
-		if( nItemScale >= 18 )
-			nRoll = 18;
-		break;
-
-	case 4: // Baran Do Novice
-		if( nItemScale >= 10 ) {
-			// Baran Do Novice --> Baran Do Sage
-			if( nItemScale >= 19 )
-				nRoll = 19;
-			// Baran Do Novice --> Baran Do Advisor
+	do {
+		switch( nRoll ) {
+		case 1: // No clothing ever
+			nRoll = 2;
+		case 2: // Padawan --> Jedi
+			if( nItemLevel >= 8 )
+				nRoll = 8;
 			else
-				nRoll = 10;
-		}
-		break;
-
-	case 5: // Matukai Apprentice --> Matukai Adept
-		if( nItemScale >= 15 )
-			nRoll = 15;
-		break;
-
-	case 6: // Zeison Sha Initiate --> Zeison Sha Warrior
-		if( nItemScale >= 16 )
-			nRoll = 16;
-		break;
-
-	case 7: // Jal Shey Neophyte --> Jal Shey Advisor
-		if( nItemScale >= 11 )
-			nRoll = 11;
-		else
+				nItemNum = nRoll;
 			break;
-	case 11: // Jal Shey Advisor --> Jal Shey Mentor
-		if( nItemScale >= 20 )
-			nRoll = 20;
-		break;
-	}
+		case 8: // Jedi --> Jedi Knight
+			if( nItemLevel >= 13 )
+				nRoll = 13;
+			else
+				nItemNum = nRoll;
+			break;
+		case 13: // Jedi Knight --> Jedi Master
+			if( nItemLevel >= 17 )
+				nRoll = 17;
+			else
+				nItemNum = nRoll;
+			break;
+
+		case 3: // Dark Padawan --> Dark Jedi
+			if( nItemLevel >= 9 )
+				nRoll = 9;
+			else
+				nItemNum = nRoll;
+			break;
+		case 9: // Dark Jedi --> Dark Jedi Knight
+			if( nItemLevel >= 14 )
+				nRoll = 14;
+			else
+				nItemNum = nRoll;
+			break;
+		case 14: // Dark Jedi Knight --> Dark Jedi Master
+			if( nItemLevel >= 18 )
+				nRoll = 18;
+			else
+				nItemNum = nRoll;
+			break;
+
+		case 4: // Baran Do Novice
+			if( nItemLevel >= 10 ) {
+				// Baran Do Novice --> Baran Do Sage
+				if( nItemLevel >= 19 )
+					nRoll = 19;
+				// Baran Do Novice --> Baran Do Advisor
+				else
+					nRoll = 10;
+			}
+			else
+				nItemNum = nRoll;
+			break;
+
+		case 5: // Matukai Apprentice --> Matukai Adept
+			if( nItemLevel >= 15 )
+				nRoll = 15;
+			else
+				nItemNum = nRoll;
+			break;
+
+		case 6: // Zeison Sha Initiate --> Zeison Sha Warrior
+			if( nItemLevel >= 16 )
+				nRoll = 16;
+			else
+				nItemNum = nRoll;
+			break;
+
+		case 7: // Jal Shey Neophyte --> Jal Shey Advisor
+			if( nItemLevel >= 11 )
+				nRoll = 11;
+			else
+				nItemNum = nRoll;
+			break;
+		case 11: // Jal Shey Advisor --> Jal Shey Mentor
+			if( nItemLevel >= 20 )
+				nRoll = 20;
+			else
+				nItemNum = nRoll;
+			break;
+		
+		default:
+			nItemNum = nRoll;
+			break;
+		}
+	} while( nItemNum <= 0 );
 	
 	// If we rolled a unique item, we have to check if we found it before
-	if( nRoll >= 23 ) {
+	if( nItemNum >= 23 ) {
 		nGlobal = LOOT_GetUniqueGlobalState(441);
 		
 		// If we found it before, replace it
-		if( nGlobal >> LOOT_UniqueItemID(441, nRoll) ) {
+		if( nGlobal >> LOOT_UniqueItemID(441, nItemNum) ) {
 			if( nGlobal == 255 )
-				nRoll = 0;
+				nItemNum = 0;
 			else {
 				i = nRoll - 1;
 				j = nRoll + 1;
 
-				nRoll = 0;
+				nItemNum = 0;
 				// Start with numbers less than what we rolled and look for a
 				// unique item we haven't found yet
 				while( i >= 23 ) {
 					if( !(nGlobal >> LOOT_UniqueItemID(441, i)) ) {
-						nRoll = i;
+						nItemNum = i;
 						i = 0;
 					}
 					else
@@ -2205,7 +2447,7 @@ int LOOT_GetRobeNum(int nItemLevel) {
 				// If none were found, increase the number until we find one
 				while( i > 0 && j <= 30 ) {
 					if( !(nGlobal >> LOOT_UniqueItemID(441, j)) ) {
-						nRoll = j;
+						nItemNum = j;
 						i = 0;
 					}
 					else
@@ -2214,18 +2456,18 @@ int LOOT_GetRobeNum(int nItemLevel) {
 			}
 			// If all unique items have been found, roll for a non-unique item
 			// (outputs a value of 15-22)
-			if( nRoll < 23 )
-				nRoll = 22 - Random(8);
+			if( nItemNum < 23 )
+				nItemNum = 22 - Random(8);
 			// Otherwise, set that whatever we got was found
 			else
-				LOOT_SetUniqueFound(441, nRoll, TRUE);
+				LOOT_SetUniqueFound(441, nItemNum, TRUE);
 		}
 		// Otherwise, it's a new item, so set that we found it 
 		else
-			LOOT_SetUniqueFound(441, nRoll, TRUE);
+			LOOT_SetUniqueFound(441, nItemNum, TRUE);
 	}
 
-	return nRoll;
+	return nItemNum;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2331,45 +2573,60 @@ int LOOT_GetDroidItemType() {
 
 	- nItemLevel: Item level determining the quality of the items we can get
 
-	JC 2019-07-31                                                             */
+	JC 2021-01-03                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetDroidInterfaceNum(int nItemLevel) {
 	// Droid interfaces have 15 variations
 	int nRoll = (LOOT_DiceResult(nItemLevel, 1) + 1) / 2;
-	// Rescale item level
-	int nItemScale = (nItemLevel + 1) / 2;
-	if( nItemScale > 15 )
-		nItemScale = 15;
+	nItemLevel = (nItemLevel + 1) / 2;
+	if( nItemLevel > 15 )
+		nItemLevel = 15;
+	
+	int nItemNum = 0;
 	
 	// Replacement table for if a better version of what we rolled is available
-	switch( nRoll ) {
-	case 1: // Droid Optimized Interface --> Droid Lockout Bypass
-		if( nItemScale >= 4 )
-			nRoll = 4;
-		else
-			break;
-	case 4: // Droid Lockout Bypass --> Droid Exchange Interface
-		if( nItemScale >= 10 )
-			nRoll = 10;
-		break;
+	do {
+		switch( nRoll ) {
+		case 1: // Droid Optimized Interface --> Droid Lockout Bypass
+			if( nItemLevel >= 4 )
+				nRoll = 4;
+			else
+				nItemNum = nRoll;
+				break;
+		case 4: // Droid Lockout Bypass --> Droid Exchange Interface
+			if( nItemLevel >= 10 )
+				nRoll = 10;
+			else
+				nItemNum = nRoll;
+				break;
 
-	case 3: // Droid Machine Interface --> Droid Scavenger Upgrade
-		if( nItemScale >= 13 )
-			nRoll = 13;
-		break;
+		case 3: // Droid Machine Interface --> Droid Scavenger Upgrade
+			if( nItemLevel >= 13 )
+				nRoll = 13;
+			else
+				nItemNum = nRoll;
+				break;
 
-	case 5: // Droid Parabolic Guides --> Droid Agility Upgrade
-		if( nItemScale >= 8 )
-			nRoll = 8;
-		break;
+		case 5: // Droid Parabolic Guides --> Droid Agility Upgrade
+			if( nItemLevel >= 8 )
+				nRoll = 8;
+			else
+				nItemNum = nRoll;
+				break;
 
-	case 7: // Droid Durability Upgrade --> Droid Scavenger Upgrade
-		if( nItemScale >= 13 )
-			nRoll = 13;
-		break;
-	}
+		case 7: // Droid Durability Upgrade --> Droid Scavenger Upgrade
+			if( nItemLevel >= 13 )
+				nRoll = 13;
+			else
+				nItemNum = nRoll;
+				break;
+		
+		default:
+			nItemNum = nRoll;
+		}
+	} while( nItemNum <= 0);
 
-	return nRoll;
+	return nItemNum;
 }
 
 
@@ -2382,47 +2639,62 @@ int LOOT_GetDroidInterfaceNum(int nItemLevel) {
 
 	- nItemLevel: Item level determining the quality of the items we can get
 
-	JC 2019-07-31                                                             */
+	JC 2021-01-03                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetDroidUtilityNum(int nItemLevel) {
 	// Droid utilities have 15 variations
 	int nRoll = (LOOT_DiceResult(nItemLevel, 1) + 1) / 2;
-	int nItemScale = (nItemLevel + 1) / 2;
-	if( nItemScale > 15 )
-		nItemScale = 15;
+	nItemLevel = (nItemLevel + 1) / 2;
+	if( nItemLevel > 15 )
+		nItemLevel = 15;
+	
+	int nItemNum = 0;
 	
 	// Replacement table for if a better version of what we rolled is available
-	switch( nRoll ) {
-	case 1: // Droid Motion Tracker --> Droid Perception Sensors
-		if( nItemScale >= 8 )
-			nRoll = 8;
-		break;
-
-	case 2: // Droid Upgrade Slot isn't needed after level 7
-		if( nItemScale >= 7 ) {
-			nRoll = Random(nItemScale - 1) + 1;
-			if( nRoll == 2 )
-				nRoll = nItemScale;
-		}
-		if( nRoll != 4 )
+	do {
+		switch( nRoll ) {
+		case 1: // Droid Motion Tracker --> Droid Perception Sensors
+			if( nItemLevel >= 8 )
+				nRoll = 8;
+			else
+				nItemNum = nRoll;
 			break;
-	case 4: // Droid Advanced Upgrade Slot isn't needed after level 13
-		if( nItemScale >= 13 ) {
-			nRoll = Random(nItemScale - 2) + 1;
-			if( nRoll == 2 )
-				nRoll = nItemScale - 1;
-			if( nRoll == 4 )
-				nRoll = nItemScale;
+		
+		case 2: // Droid Upgrade Slot isn't needed after level 7
+			if( nItemLevel >= 7 ) {
+				nRoll = Random(nItemLevel - 1) + 1;
+				if( nRoll == 2 )
+					nRoll = nItemLevel;
+			}
+			else
+				nItemNum = nRoll;
+			break;
+		case 4: // Droid Advanced Upgrade Slot isn't needed after level 13
+			if( nItemLevel >= 13 ) {
+				nRoll = Random(nItemLevel - 2) + 1;
+				if( nRoll == 2 )
+					nRoll = nItemLevel - 1;
+				else if( nRoll == 4 )
+					nRoll = nItemLevel;
+			}
+			else
+				nItemNum = nRoll;
+			break;
+
+		case 10: // Droid Warfare Upgrade --> Droid Battle Upgrade
+			if( nItemLevel >= 11 )
+				nRoll = 11;
+			else
+				nItemNum = nRoll;
+			break;
+		
+		default:
+			nItemNum = nRoll;
+			break;
 		}
-		break;
+	} while( nItemNum <= 0 );
 
-	case 10: // Droid Warfare Upgrade --> Droid Battle Upgrade
-		if( nItemScale >= 11 )
-			nRoll = 11;
-		break;
-	}
-
-	return nRoll;
+	return nItemNum;
 }
 
 
@@ -2435,15 +2707,16 @@ int LOOT_GetDroidUtilityNum(int nItemLevel) {
 
 	- nItemLevel: Item level determining the quality of the items we can get
 
-	JC 2019-07-31                                                             */
+	JC 2021-01-03                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetDroidArmorNum(int nItemLevel) {
 	// Droid armors have 15 variations
 	int nRoll = (LOOT_DiceResult(nItemLevel, 1) + 1) / 2;
-	// Rescale item level
-	int nItemScale = (nItemLevel + 1) / 2;
-	if( nItemScale > 15 )
-		nItemScale = 15;
+	nItemLevel = (nItemLevel + 1) / 2;
+	if( nItemLevel > 15 )
+		nItemLevel = 15;
+	
+	int nItemNum = 0;
 	
 	// Reroll 14 & 15 for variety since the last three are all Energized Armor
 	if( nRoll == 14 || nRoll == 15 ) {
@@ -2451,72 +2724,91 @@ int LOOT_GetDroidArmorNum(int nItemLevel) {
 	}
 	
 	// Modular Plating III replaced at higher levels
-	if( nRoll == 7 && nItemScale >= 14 )
-		nRoll = Random(nItemScale - 10) + 8;
+	if( nRoll == 7 && nItemLevel >= 14 )
+		nRoll = Random(nItemLevel - 10) + 8;
 	
 	// Replacement table for if a better version of what we rolled is available
-	switch( nRoll ) {
-	case 1: // Impact Armor I --> Impact Armor II
-		if( nItemScale >= 4 ) {
-			if( nItemScale >= 7 || Random(2) == 0 )
-				nRoll = 3;
-			else
-				break;
-		}
-		else
-			break;
-	case 3: // Impact Armor II --> Impact Armor III
-		if( nItemScale >= 5 ) {
-			if( nItemScale >= 13 || Random(2) == 0 )
-				nRoll = 5;
-			else
-				break;
-		}
-		else
-			break;
-	case 5: // Impact Armor III --> Modular Plating II
-		if( nItemScale >= 10 && nItemScale < 13 )
-			nRoll = 6;
-		else
-			break;
-	case 2: // Modular Plating I --> Modular Plating II
-		if( nRoll != 6 ) { // if we didn't fall through from case 5
-			if( nItemScale >= 6 ) {
-				if( nItemScale >= 7 || Random(2) == 1 )
-					nRoll = 6;
+	do {
+		switch( nRoll ) {
+		case 1: // Impact Armor I --> Impact Armor II
+			if( nItemLevel >= 4 ) {
+				if( nItemLevel >= 7 || Random(2) == 0 )
+					nRoll = 3;
 				else
-					break;
+					nItemNum = nRoll;
 			}
 			else
-				break;
-		}
-	case 6: // Modular Plating II --> Modular Plating III
-		if( nItemScale >= 7 ) {
-			if( nItemScale >= 13 || Random(2) == 0 )
-				nRoll = 7;
+				nItemNum = nRoll;
+			break;
+		case 3: // Impact Armor II --> Impact Armor III
+			if( nItemLevel >= 5 ) {
+				if( nItemLevel >= 13 || Random(2) == 0 )
+					nRoll = 5;
+				else
+					nItemNum = nRoll;
+			}
 			else
-				break;
-		}
-		break;
-
-	case 9: // Dura Plating I --> Dura Plating II
-		if( nItemScale >= 20 )
-			nRoll = 11;
-		break;
-
-	case 13: // Energized Armor I --> Energized Armor II
-		if( nItemScale >= 26 )
-			nRoll = 14;
-		else
+				nItemNum = nRoll;
+			break;
+		case 5: // Impact Armor III --> Modular Plating II
+			if( nItemLevel >= 10 && nItemLevel < 13 )
+				nRoll = 6;
+			else
+				nItemNum = nRoll;
+			break;
+		case 2: // Modular Plating I --> Modular Plating II
+			if( nRoll != 6 ) { // if we didn't fall through from case 5
+				if( nItemLevel >= 6 ) {
+					if( nItemLevel >= 7 || Random(2) == 1 )
+						nRoll = 6;
+					else
+						nItemNum = nRoll;
+				}
+				else
+					nItemNum = nRoll;
+			}
+			else
+				nItemNum = nRoll;
+			break;
+		case 6: // Modular Plating II --> Modular Plating III
+			if( nItemLevel >= 7 ) {
+				if( nItemLevel >= 13 || Random(2) == 0 )
+					nRoll = 7;
+				else
+					nItemNum = nRoll;
+			}
+			else
+				nItemNum = nRoll;
 			break;
 
-	case 14: // Energized Armor II --> Energized Armor III
-		if( nItemScale >= 28 )
-			nRoll = 15;
-		break;
-	}
+		case 9: // Dura Plating I --> Dura Plating II
+			if( nItemLevel >= 20 )
+				nRoll = 11;
+			else
+				nItemNum = nRoll;
+			break;
 
-	return nRoll;
+		case 13: // Energized Armor I --> Energized Armor II
+			if( nItemLevel >= 26 )
+				nRoll = 14;
+			else
+				nItemNum = nRoll;
+			break;
+		
+		case 14: // Energized Armor II --> Energized Armor III
+			if( nItemLevel >= 28 )
+				nRoll = 15;
+			else
+				nItemNum = nRoll;
+			break;
+		
+		default:
+			nItemNum = nRoll;
+			break;
+		}
+	} while( nItemNum <= 0 );
+
+	return nItemNum;
 }
 
 
@@ -2622,61 +2914,81 @@ int LOOT_GetDroidShieldNum(int nItemLevel, int nItemType, int nItemTier) {
 
 	- nItemLevel: Item level determining the quality of the items we can get
 
-	JC 2019-07-31                                                             */
+	JC 2021-01-03                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetDroidDeviceNum(int nItemLevel) {
 	// Droid devices have 15 variations
 	int nRoll = (LOOT_DiceResult(nItemLevel, 1) + 1) / 2;
-	// Rescale item level
-	int nItemScale = (nItemLevel + 1) / 2;
-	if( nItemScale > 15 )
-		nItemScale = 15;
+	nItemLevel = (nItemLevel + 1) / 2;
+	if( nItemLevel > 15 )
+		nItemLevel = 15;
+	
+	int nItemNum = 0;
 	
 	// Replace 14 for variety, since there are three Ion Blasts
-	if( nRoll == 14 && nItemScale < 15 )
+	if( nRoll == 14 && nItemLevel < 15 )
 		nRoll = Random(13) + 1; // Reroll
-	else if( nItemScale >= 15 )
+	else if( nItemLevel >= 15 )
 		nRoll = 15; // Ion Blast Mark III --> Multi-Spectral Emitter
 	
 	// Replacement table for if a better version of what we rolled is available
-	switch( nRoll ) {
-	case 1: // Neural Pacifier --> Neural Scrambler
-		if( nItemScale >= 5 )
-			nRoll = 5;
-		break;
-
-	case 3: // Flame Thrower --> Molten Cannon
-		if( nItemScale >= 7 )
-			nRoll = 7;
-		break;
-
-	case 4: // Toxin Emitter --> Bio-Assault Spray
-		if( nItemScale >= 10 )
-			nRoll = 10;
-		break;
-
-	case 6: // Ion Striker --> Plasma Thrower
-		if( nItemScale >= 9 )
-			nRoll = 9;
-		break;
-
-	case 8: // Carbonite Projector --> Carbonite Emitter
-		if( nItemScale >= 11 )
-			nRoll = 11;
-		break;
-
-	case 12: // Ion Blast Mark I --> Ion Blast Mark II
-		if( nItemScale >= 13 )
-			nRoll = 13;
-		else
+	do {
+		switch( nRoll ) {
+		case 1: // Neural Pacifier --> Neural Scrambler
+			if( nItemLevel >= 5 )
+				nRoll = 5;
+			else
+				nItemNum = nRoll;
 			break;
-	case 13: // Ion Blast Mark II --> Ion Blast Mark III
-		if( nItemScale >= 14 )
-			nRoll = 14;
-		break;
-	}
 
-	return nRoll;
+		case 3: // Flame Thrower --> Molten Cannon
+			if( nItemLevel >= 7 )
+				nRoll = 7;
+			else
+				nItemNum = nRoll;
+			break;
+
+		case 4: // Toxin Emitter --> Bio-Assault Spray
+			if( nItemLevel >= 10 )
+				nRoll = 10;
+			else
+				nItemNum = nRoll;
+			break;
+
+		case 6: // Ion Striker --> Plasma Thrower
+			if( nItemLevel >= 9 )
+				nRoll = 9;
+			else
+				nItemNum = nRoll;
+			break;
+
+		case 8: // Carbonite Projector --> Carbonite Emitter
+			if( nItemLevel >= 11 )
+				nRoll = 11;
+			else
+				nItemNum = nRoll;
+			break;
+
+		case 12: // Ion Blast Mark I --> Ion Blast Mark II
+			if( nItemLevel >= 13 )
+				nRoll = 13;
+			else
+				nItemNum = nRoll;
+			break;
+		case 13: // Ion Blast Mark II --> Ion Blast Mark III
+			if( nItemLevel >= 14 )
+				nRoll = 14;
+			else
+				nItemNum = nRoll;
+			break;
+		
+		default:
+			nItemNum = nRoll;
+			break;
+		}
+	} while( nItemNum <= 0 );
+
+	return nItemNum;
 }
 
 
@@ -3235,9 +3547,9 @@ int LOOT_GetRocketNum(int nItemLevel) {
 	if( nItemLevel >= 10 ) {
 		if( nItemNum == 2 ) // Tranquilizer Dart --> Paralysis Dart
 			nItemNum = 9;
-		if( nItemNum == 6 ) // Poison Dart --> Kyber Dart
+		else if( nItemNum == 6 ) // Poison Dart --> Kyber Dart
 			nItemNum = 4;
-		if( nItemNum == 8 ) // Piercing Dart --> Buster Rocket
+		else if( nItemNum == 8 ) // Piercing Dart --> Buster Rocket
 			nItemNum = 3;
 	}
 
