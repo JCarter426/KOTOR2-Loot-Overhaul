@@ -4454,7 +4454,7 @@ void PlaceTreasurePeragus(object oContainer, int numberOfItems, int nItemType) {
 		nItemType == 232 )
 		PlaceTreasure(oContainer, numberOfItems, nItemType);
 	// Otherwise, roll for item type
-	if( nRoll >= 88 )
+	else if( nRoll >= 88 )
 		PlaceTreasure(oContainer, numberOfItems, 300);
 	else if( nRoll >= 83 )
 		PlaceTreasure(oContainer, numberOfItems, 150);
