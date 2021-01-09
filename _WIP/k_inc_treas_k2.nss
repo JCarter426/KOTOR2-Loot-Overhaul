@@ -316,7 +316,7 @@ int LOOT_DicePool(int nNumDice, int nDiceSize) {
 	This allows for different types of items to have probability distributions
 	that suit them. For some types, the higher-numbered items are definitely
 	better,	so we want an extreme distribution that favors items of our level.
-	n other	cases, though, the lower-numbered items may not be so bad, or there
+	In other cases, though, the lower-numbered items may not be so bad, or there
 	may be an advantage to having a variety of items rather than copies of one;
 	here, a less extreme distribution may be more appropriate.
 
@@ -1188,7 +1188,7 @@ int LOOT_GetSaberSubtype() {
 	  * -1: ANY
 	  *  0: WEIGHTED
 	  *  1: COMMON
-	  2  2: RARE
+	  *  2: RARE
 
 	JC 2019-08-02                                                             */
 ////////////////////////////////////////////////////////////////////////////////
