@@ -5,7 +5,7 @@
 	
 	Quest reward script.
 	
-	Edited to fix an issue with the reward item level potentiallye exceeding 30.
+	Edited to fix an issue with the reward item level potentially exceeding 30.
 
 	JC 2019-08-16                                                             */
 ////////////////////////////////////////////////////////////////////////////////
