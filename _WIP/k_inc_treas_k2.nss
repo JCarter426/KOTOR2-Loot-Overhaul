@@ -4451,17 +4451,18 @@ void PlaceTreasurePeragus(object oContainer, int numberOfItems, int nItemType) {
 	// Otherwise, roll for item type
 	else {
 		nRoll = Random(100) + GetGlobalNumber("000_RareItemChance");
+		
 		if( nRoll >= 88 ) {
-			nItemType = 300;
-			PlaceTreasure(oContainer, numberOfItems, 300);
+			PlaceTreasure(oContainer, numberOfItems, 300); // Equipment
 		}
 		else if( nRoll >= 83 )
-			PlaceTreasure(oContainer, numberOfItems, 150);
+			PlaceTreasure(oContainer, numberOfItems, 150); // Peragus weapons
 		else if( nRoll >= 80 )
-			PlaceTreasure(oContainer, numberOfItems, 232);
+			PlaceTreasure(oContainer, numberOfItems, 232); // Underlays
+		// Disposables
 		else {
 			IncrementGlobalNumber("000_RareItemChance", 3);
-			PlaceTreasureDisposable(oContainer, numberOfItems);
+			PlaceTreasureDisposable(oContainer, numberOfItems); // Disposables
 		}
 	}
 }
