@@ -4077,6 +4077,7 @@ string GetTreasureBundle(int nItemLevel, int nItemType) {
 			// All access
 			else
 				nRange = 9;
+			
 			nResult = nItemType + (10 * (Random(nRange) + 1));
 			
 			// Now item type is known, return to top
@@ -4247,15 +4248,10 @@ void PlaceTreasure(object oContainer, int numberOfItems, int nItemType) {
 			nItemLevel = nPCLevel + Random(8) - 5;
 			if( nItemLevel < 1 )
 				nItemLevel = 1;
-			
-			// Random number determines chance of getting a rare or
-			// disposable item
-			nRandom = Random(95) + GetGlobalNumber("000_RareItemChance");
-			
-			// If an item type was specified, roll at least a 95
-			// (this excludes disposable items later)
-			if( nItemType > 0 && nItemType < 900 && nRandom < 91 )
-				nRandom = 95;
+		
+			// Random number determines chance of getting a rare or disposable
+			// item
+			nRoll = Random(95) + GetGlobalNumber("000_RareItemChance");
 			
 			// Determine item template & quantity
 			nItemQuantity = 1;
@@ -4270,7 +4266,7 @@ void PlaceTreasure(object oContainer, int numberOfItems, int nItemType) {
 				// Increase the chance of getting one next time
 				IncrementGlobalNumber("000_RareItemChance", 3);
 				// Chance of getting a disposable item (if applicable)
-				if( nRoll <= 85 )
+				if( nRoll <= 85 && !(nItemType > 0 && nItemType < 900) )
 					sItem = GetTreasureBundle(nItemLevel, nItemType);
 				// Otherwise, we get a normal item
 				else
@@ -4312,7 +4308,6 @@ void PlaceCritterTreasure(object oContainer, int numberOfItems, int nItemType) {
 	int nPCLevel = GetGlobalNumber("G_PC_LEVEL");
 	if( nPCLevel == 1 )
 		nPCLevel = 2; // Increases variety of items found at level 1
-	int nRandom;
 	int nRoll;
 	string sItem;
 	int nItemLevel;
@@ -4327,12 +4322,7 @@ void PlaceCritterTreasure(object oContainer, int numberOfItems, int nItemType) {
 			nItemLevel = 1;
 		
 		// Random number determines chance of getting a rare or disposable item
-		nRandom = Random(95) + GetGlobalNumber("000_RareItemChance");
-		
-		// If an item type was specified, roll at least a 95
-		// (this excludes disposable items later)
-		if( nItemType > 0 && nItemType < 900 && nRandom < 91 )
-			nRandom = 95;
+		nRoll = Random(95) + GetGlobalNumber("000_RareItemChance");
 		
 		// Determine item template & quantity
 		nItemQuantity = 1;
@@ -4347,7 +4337,7 @@ void PlaceCritterTreasure(object oContainer, int numberOfItems, int nItemType) {
 			// Increase the chance of getting one next time
 			IncrementGlobalNumber("000_RareItemChance", 3);
 			// Chance of getting a disposable item (if applicable)
-			if( nRoll <= 85 )
+			if( nRoll <= 85 && !(nItemType > 0 && nItemType < 900) )
 				sItem = GetTreasureBundle(nItemLevel, nItemType);
 			// Otherwise, we get a normal item
 			else
