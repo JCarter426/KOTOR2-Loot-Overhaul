@@ -4181,7 +4181,6 @@ void PlaceTreasureDisposable(object oContainer, int numberOfItems, int nItemType
 	int nItemLevel;
 	int nItemQuantity;
 	string sItem;
-	string sItemName;
 	int i;
 	int j;
 		
@@ -4203,12 +4202,11 @@ void PlaceTreasureDisposable(object oContainer, int numberOfItems, int nItemType
 			j = FindSubString(sItem, "[");
 			if( j >= 0 ) {
 				nItemQuantity = StringToInt(GetSubString(sItem, j + 1, 4));
-				sItemName = GetSubString(sItem, 0, j);
+				sItem = GetSubString(sItem, 0, j);
 			}
-			else sItemName = sItem;
 			
 			//Place the item in the container
-			CreateItemOnObject(sItemName, oContainer, nItemQuantity);
+			CreateItemOnObject(sItem, oContainer, nItemQuantity);
 		}
 	}
 }
@@ -4233,7 +4231,6 @@ void PlaceTreasure(object oContainer, int numberOfItems, int nItemType) {
 	int nRoll;
 	int nRareChance;
 	string sItem;
-	string sItemName;
 	int nItemLevel;
 	int nItemQuantity;
 	int nAlignment;
@@ -4283,18 +4280,17 @@ void PlaceTreasure(object oContainer, int numberOfItems, int nItemType) {
 			j = FindSubString(sItem, "[");
 			if( j >= 0 ) {
 				nItemQuantity = StringToInt(GetSubString(sItem, j + 1, 4));
-				sItemName = GetSubString(sItem, 0, j);
+				sItem = GetSubString(sItem, 0, j);
 			}
-			else sItemName = sItem;
 			
 			// Make sure robes match the area's alignment
 			nAlignment = LOOT_GetAreaAlignment();
 			if( nAlignment != 50 &&
-				GetSubString(sItemName, 0, GetStringLength(sItemName) - 2) == GetItemPrefix(441) )
-				sItemName = LOOT_AlignmentRobe(sItemName, nAlignment);
+				GetSubString(sItem, 0, GetStringLength(sItem) - 2) == GetItemPrefix(441) )
+				sItem = LOOT_AlignmentRobe(sItem, nAlignment);
 			
 			// Place the item in the container
-			CreateItemOnObject(sItemName, oContainer, nItemQuantity);
+			CreateItemOnObject(sItem, oContainer, nItemQuantity);
 		}
 	}
 }
@@ -4362,17 +4358,16 @@ void PlaceCritterTreasure(object oContainer, int numberOfItems, int nItemType) {
 		j = FindSubString(sItem, "[");
 		if( j >= 0 ) {
 			nItemQuantity = StringToInt(GetSubString(sItem, j + 1, 4));
-			sItemName = GetSubString(sItem, 0, j);
+			sItem = GetSubString(sItem, 0, j);
 		}
-		else sItemName = sItem;
 		
 		// Make sure robes match a creature's alignment
 		if( GetObjectType(oContainer) == OBJECT_TYPE_CREATURE &&
-			GetSubString(sItemName, 0, GetStringLength(sItemName) - 2) == GetItemPrefix(441) )
-			sItemName = LOOT_AlignmentRobe(sItemName, GetGoodEvilValue(oContainer));
+			GetSubString(sItem, 0, GetStringLength(sItem) - 2) == GetItemPrefix(441) )
+			sItem = LOOT_AlignmentRobe(sItem, GetGoodEvilValue(oContainer));
 		
 		// Place the item in the container
-		CreateItemOnObject(sItemName, oContainer, nItemQuantity);
+		CreateItemOnObject(sItem, oContainer, nItemQuantity);
 	}
 }
 
