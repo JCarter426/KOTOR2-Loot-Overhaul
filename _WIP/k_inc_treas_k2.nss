@@ -4047,7 +4047,7 @@ string GetBundlePrefix(int nItemLevel, int nItemType) {
 	- nItemLevel: Item level determining the quality of the items we can get
 	- nItemType: Type of item (item classifications, disposables only)
 
-	JC 2019-08-01                                                             */
+	JC 2021-01-14                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 string GetTreasureBundle(int nItemLevel, int nItemType) {
 	// Cap the item level to avoid incidents
@@ -4296,7 +4296,7 @@ void PlaceTreasure(object oContainer, int numberOfItems, int nItemType) {
 	- numberOfItems: Number of items to place
 	- nItemType: Type of item (item classifications)
 
-	JC 2019-08-01                                                             */
+	JC 2021-01-14                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 void PlaceCritterTreasure(object oContainer, int numberOfItems, int nItemType) {
 	object oContainer = OBJECT_SELF;
@@ -4437,7 +4437,7 @@ void PlaceTreasureDroid(object oContainer, int numberOfItems, int nItemType) {
 	- numberOfItems: Number of items to place
 	- nItemType: Type of item (item classifications)
 
-	JC 2021-01-09                                                             */
+	JC 2021-01-14                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 void PlaceTreasurePeragus(object oContainer, int numberOfItems, int nItemType) {
 	int nRoll;
