@@ -4228,7 +4228,6 @@ void PlaceTreasure(object oContainer, int numberOfItems, int nItemType) {
 	int nPCLevel = GetGlobalNumber("G_PC_LEVEL");
 	if( nPCLevel == 1 )
 		nPCLevel = 2; // Increases variety of items found at level 1
-	int nRandom;
 	int nRoll;
 	string sItem;
 	int nItemLevel;
