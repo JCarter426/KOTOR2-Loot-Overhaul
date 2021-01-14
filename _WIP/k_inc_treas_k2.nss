@@ -341,7 +341,7 @@ int LOOT_DiceResult(int nItemLevel, int nDiceType) {
 	int nRoll;
 	int nResult;
 
-// Dice mechanic definitions
+	// Dice mechanic definitions
 	switch( nDiceType ) {
 	case 1: // Mild dice pool
 		nNumDice = 3;
@@ -437,11 +437,12 @@ int LOOT_IsLateGame() {
 	Returns the alignment of the area we're in.
 	(0 = EVIL, 50 = NEUTRAL, 100 = GOOD)
 
-	JC 2019-07-31                                                             */
+	JC 2021-01-14                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetAreaAlignment() {
 	int nModPrefix = StringToInt(GetStringLeft(GetModuleName(), 3));
-
+	
+	// By module
 	switch( nModPrefix ) {
 	// Light areas
 	case 204:
@@ -452,12 +453,14 @@ int LOOT_GetAreaAlignment() {
 	case 605:
 	case 610:
 	case 650:
+	case 950:
 		return 100;
 	// Dark areas
 	case 410:
 	case 411:
 	case 701:
 	case 702:
+	case 710:
 	case 711:
 	case 851:
 	case 852:
@@ -469,6 +472,18 @@ int LOOT_GetAreaAlignment() {
 	case 906:
 		return 0;
 	}
+	
+	// By planet - future-proofing for Dantooine, Korriban, and Malachor
+	switch( nModPrefix / 100 ) {
+	// Light areas
+	case 6: // Dantooine
+		return 100;
+	// Dark areas
+	case 7: // Korriban
+	case 9: // Malachor
+		return 0;
+	}
+	
 	// Neutral
 	return 50;
 }
@@ -523,7 +538,7 @@ int LOOT_UniqueItemID(int nItemType, int nItemNum) {
 	case 131: // Freyyr
 		nItemID = 6;
 		break;
-// Armband
+	// Armband
 	case 351: // Vao
 		// The Vao Armband doesn't have a proper item number, but since it's the
 		// only armband in random loot, this should be ok
@@ -3506,7 +3521,7 @@ int LOOT_GetSecSpikeTier(int nItemLevel) {
 	JC 2019-08-01                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetRocketNum(int nItemLevel) {
-// AOE rockets are only available at higher levels
+	// AOE rockets are only available at higher levels
 	int nRange;
 	if( nItemLevel < 10 )
 		nRange = 4;
@@ -3541,7 +3556,7 @@ int LOOT_GetRocketNum(int nItemLevel) {
 		break;
 	}
 
-// Replacement table for if a better version of what we rolled is available
+	// Replacement table for if a better version of what we rolled is available
 	if( nItemLevel >= 10 ) {
 		if( nItemNum == 2 ) // Tranquilizer Dart --> Paralysis Dart
 			nItemNum = 9;
@@ -3649,7 +3664,7 @@ string GetItemPrefix(int nItemType) {
 	- nItemLevel: Item level determining the quality of the items we can get
 	- nItemType: Type of item (item classifications)
 
-	JC 2019-08-03                                                             */
+	JC 2021-01-14                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 string GetTreasureSpecific(int nItemLevel, int nItemType) {
 	// Cap the item level to avoid incidents
@@ -3707,12 +3722,11 @@ string GetTreasureSpecific(int nItemLevel, int nItemType) {
 				break;
 			case 400: // Armor
 				// No Jedi robes on Peragus
-				if( GetStringRight(GetModuleName(), 3) == "PER" ) {
+				string sMod = GetStringRight(GetModuleName(), 3);
+				if(  sMod == "PER" || sMod == "HAR" )
 					nRange = 3;
-				}
-				else {
+				else
 					nRange = 4;
-				}
 				break;
 			case 500: // Droid
 				nResult = LOOT_GetDroidItemType();
