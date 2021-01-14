@@ -4315,7 +4315,6 @@ void PlaceCritterTreasure(object oContainer, int numberOfItems, int nItemType) {
 	int nRandom;
 	int nRoll;
 	string sItem;
-	string sItemName;
 	int nItemLevel;
 	int nItemQuantity;
 	int i;
