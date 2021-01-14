@@ -4265,8 +4265,8 @@ void PlaceTreasure(object oContainer, int numberOfItems, int nItemType) {
 				// We didn't roll a rare item
 				// Increase the chance of getting one next time
 				IncrementGlobalNumber("000_RareItemChance", 3);
-			// We rolled a normal item, or item type was specified
-				if( nRoll > 85 || (nItemType > 0 && nItemType < 900 ) )
+				// We rolled a normal item, or item type was specified
+				if( nRoll > 85 || (nItemType > 0 && nItemType < 900) )
 					sItem = GetTreasureNormal(nItemLevel, nItemType);
 				// Otherwise, we rolled a disposable item
 				else
@@ -4337,7 +4337,7 @@ void PlaceCritterTreasure(object oContainer, int numberOfItems, int nItemType) {
 			// Increase the chance of getting one next time
 			IncrementGlobalNumber("000_RareItemChance", 3);
 			// We rolled a normal item, or item type was specified
-			if( nRoll > 85 || (nItemType > 0 && nItemType < 900 ) )
+			if( nRoll > 85 || (nItemType > 0 && nItemType < 900) )
 				sItem = GetTreasureNormal(nItemLevel, nItemType);
 			// Otherwise, we rolled a disposable item
 			else
