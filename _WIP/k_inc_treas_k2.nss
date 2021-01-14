@@ -4230,7 +4230,6 @@ void PlaceTreasure(object oContainer, int numberOfItems, int nItemType) {
 		nPCLevel = 2; // Increases variety of items found at level 1
 	int nRandom;
 	int nRoll;
-	int nRareChance;
 	string sItem;
 	int nItemLevel;
 	int nItemQuantity;
@@ -4242,8 +4241,6 @@ void PlaceTreasure(object oContainer, int numberOfItems, int nItemType) {
 		SetLocalBoolean(OBJECT_SELF, 57, TRUE);
 
 		for( i = 1; i <= numberOfItems; ++i ) {
-			nRareChance = GetGlobalNumber("000_RareItemChance");
-			
 			// Item level is based on the player's current level
 			nItemLevel = nPCLevel + Random(8) - 5;
 			if( nItemLevel < 1 )
