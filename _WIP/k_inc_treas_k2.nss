@@ -4221,7 +4221,7 @@ void PlaceTreasureDisposable(object oContainer, int numberOfItems, int nItemType
 	- numberOfItems: Number of items to place
 	- nItemType: Type of item (item classifications)
 
-	JC 2019-08-01                                                             */
+	JC 2021-01-14                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 void PlaceTreasure(object oContainer, int numberOfItems, int nItemType) {
 	int nPCLevel = GetGlobalNumber("G_PC_LEVEL");
