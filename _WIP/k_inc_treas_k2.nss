@@ -4265,12 +4265,12 @@ void PlaceTreasure(object oContainer, int numberOfItems, int nItemType) {
 				// We didn't roll a rare item
 				// Increase the chance of getting one next time
 				IncrementGlobalNumber("000_RareItemChance", 3);
-				// Chance of getting a disposable item (if applicable)
-				if( nRoll <= 85 && !(nItemType > 0 && nItemType < 900) )
-					sItem = GetTreasureBundle(nItemLevel, nItemType);
-				// Otherwise, we get a normal item
-				else
+			// We rolled a normal item, or item type was specified
+				if( nRoll > 85 || (nItemType > 0 && nItemType < 900 ) )
 					sItem = GetTreasureNormal(nItemLevel, nItemType);
+				// Otherwise, we rolled a disposable item
+				else
+					sItem = GetTreasureBundle(nItemLevel, nItemType);
 			}
 			// Parse the treasure blob to separate the template and quantity
 			j = FindSubString(sItem, "[");
@@ -4336,12 +4336,12 @@ void PlaceCritterTreasure(object oContainer, int numberOfItems, int nItemType) {
 			// We didn't roll a rare item
 			// Increase the chance of getting one next time
 			IncrementGlobalNumber("000_RareItemChance", 3);
-			// Chance of getting a disposable item (if applicable)
-			if( nRoll <= 85 && !(nItemType > 0 && nItemType < 900) )
-				sItem = GetTreasureBundle(nItemLevel, nItemType);
-			// Otherwise, we get a normal item
-			else
+			// We rolled a normal item, or item type was specified
+			if( nRoll > 85 || (nItemType > 0 && nItemType < 900 ) )
 				sItem = GetTreasureNormal(nItemLevel, nItemType);
+			// Otherwise, we rolled a disposable item
+			else
+				sItem = GetTreasureBundle(nItemLevel, nItemType);
 		}
 		// Parse the treasure blob to separate the template and quantity
 		j = FindSubString(sItem, "[");
