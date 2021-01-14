@@ -4174,19 +4174,19 @@ string GetTreasureRare(int nItemLevel, int nItemType) {
 	- numberOfItems: Number of items to place
 	- nItemType: Type of item (item classifications, disposables only)
 
-	JC 2019-08-01                                                             */
+	JC 2021-01-14                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 void PlaceTreasureDisposable(object oContainer, int numberOfItems, int nItemType) {
+	int nPCLevel = GetGlobalNumber("G_PC_LEVEL");
+	int nItemLevel;
+	int nItemQuantity;
+	string sItem;
+	string sItemName;
+	int i;
+	int j;
+		
 	if( !GetLocalBoolean(oContainer, 57) ) {
 		SetLocalBoolean(OBJECT_SELF, 57, TRUE);
-
-		int nPCLevel = GetGlobalNumber("G_PC_LEVEL");
-		int nItemLevel;
-		int nItemQuantity;
-		string sItem;
-		string sItemName;
-		int i;
-		int j;
 		
 		// If we're not in the disposable range, reset the item type
 		if( nItemType < 900 || nItemType >= 1000 )
@@ -4226,22 +4226,22 @@ void PlaceTreasureDisposable(object oContainer, int numberOfItems, int nItemType
 	JC 2019-08-01                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 void PlaceTreasure(object oContainer, int numberOfItems, int nItemType) {
+	int nPCLevel = GetGlobalNumber("G_PC_LEVEL");
+	if( nPCLevel == 1 )
+		nPCLevel = 2; // Increases variety of items found at level 1
+	int nRandom;
+	int nRoll;
+	int nRareChance;
+	string sItem;
+	string sItemName;
+	int nItemLevel;
+	int nItemQuantity;
+	int nAlignment;
+	int i;
+	int j;
+		
 	if( !GetLocalBoolean(oContainer, 57) ) {
 		SetLocalBoolean(OBJECT_SELF, 57, TRUE);
-
-		int nPCLevel = GetGlobalNumber("G_PC_LEVEL");
-		if( nPCLevel == 1 )
-			nPCLevel = 2; // Increases variety of items found at level 1
-		int nRandom;
-		int nRoll;
-		int nRareChance;
-		string sItem;
-		string sItemName;
-		int nItemLevel;
-		int nItemQuantity;
-		int nAlignment;
-		int i;
-		int j;
 
 		for( i = 1; i <= numberOfItems; ++i ) {
 			nRareChance = GetGlobalNumber("000_RareItemChance");
