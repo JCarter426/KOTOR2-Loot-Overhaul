@@ -4058,7 +4058,6 @@ string GetTreasureBundle(int nItemLevel, int nItemType) {
 		nItemType = LOOT_GetDisposableLateGame(nItemLevel);
 
 	int nRange = 1;
-	int nRoll = 0;
 	int nResult = 0;
 	string sTemplate = "";
 	
