@@ -186,7 +186,7 @@ int LOOT_DicePool(int nNumDice, int nDiceSize);
 int LOOT_DiceResult(int nItemLevel, int nDiceType);
 string LOOT_Suffix(int nItemNum);
 int LOOT_IsLateGame();
-int LOOT_GetAreaAlignment();
+int LOOT_GetAreaAlignment(string sModuleName);
 int LOOT_UniqueItemID(int nItemType, int nItemNum);
 string LOOT_UniqueItemTag(int nItemType, int nItemNum);
 string LOOT_UniqueGlobal(int nItemType);
@@ -202,7 +202,7 @@ int LOOT_HasUpgradeSaber();
 int LOOT_GetPeragusWeapon();
 int LOOT_GetUpgradeType(int nFilter = 0);
 int LOOT_GetUpgradeSubtype(int nItemType, int nFilter = 0);
-int LOOT_ColorCrystalNum(int nInput);
+int LOOT_GetColorCrystalNum(int nInput);
 int LOOT_GetPowerCrystalNum(int nItemLevel);
 int LOOT_GetUpgradeNum(int nItemLevel, int nItemType, int nItemTier = 0);
 int LOOT_GetBeltNum(int nItemLevel);
@@ -214,7 +214,10 @@ int LOOT_GetLightArmorNum(int nItemLevel);
 int LOOT_GetMediumArmorNum(int nItemLevel);
 int LOOT_GetHeavyArmorNum(int nItemLevel);
 int LOOT_GetRobeNum(int nItemLevel);
-string LOOT_AlignmentRobe(string sItemName, int nAlignment);
+int LOOT_IsRobe(string sItemName);
+int LOOT_NextLightRobeNum(int nItemNum);
+int LOOT_NextDarkRobeNum(int nItemNum);
+string LOOT_GetAlignmentRobe(string sItemName, int nAlignment);
 int LOOT_GetDroidItemType();
 int LOOT_GetDroidInterfaceNum(int nItemLevel);
 int LOOT_GetDroidUtilityNum(int nItemLevel);
@@ -436,11 +439,13 @@ int LOOT_IsLateGame() {
 
 	Returns the alignment of the area we're in.
 	(0 = EVIL, 50 = NEUTRAL, 100 = GOOD)
+	
+	sModuleName: Module name
 
 	JC 2021-01-14                                                             */
 ////////////////////////////////////////////////////////////////////////////////
-int LOOT_GetAreaAlignment() {
-	int nModPrefix = StringToInt(GetStringLeft(GetModuleName(), 3));
+int LOOT_GetAreaAlignment(string sModuleName) {
+	int nModPrefix = StringToInt(GetStringLeft(sModuleName, 3));
 	
 	// By module
 	switch( nModPrefix ) {
@@ -495,8 +500,8 @@ int LOOT_GetAreaAlignment() {
 	Returns an ID for a unique item so its corresponding global can be set or
 	checked.
 
-	- int nItemType: Item type (item classifications)
-	- int nItemNum: Item variation number
+	- nItemType: Item type (item classifications)
+	- nItemNum: Item variation number
 
 	JC 2020-09-07                                                             */
 ////////////////////////////////////////////////////////////////////////////////
@@ -609,8 +614,8 @@ int LOOT_UniqueItemID(int nItemType, int nItemNum) {
 
 	Returns the tag of a unique item.
 
-	- int nItemType: Item type (item classifications)
-	- int nItemNum: Item variation number
+	- nItemType: Item type (item classifications)
+	- nItemNum: Item variation number
 
 	JC 2019-08-02                                                             */
 ////////////////////////////////////////////////////////////////////////////////
@@ -1458,7 +1463,7 @@ int LOOT_GetUpgradeSubtype(int nItemType, int nFilter) {
 
 
 ////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_ColorCrystalNum()
+/*	LOOT_GetColorCrystalNum()
 
 	Converts a saber color to the matching crystal color because these numbers
 	don't match because who knows why.
@@ -1482,7 +1487,7 @@ int LOOT_GetUpgradeSubtype(int nItemType, int nFilter) {
 
 	JC 2019-07-31                                                             */
 ////////////////////////////////////////////////////////////////////////////////
-int LOOT_ColorCrystalNum(int nInput) {
+int LOOT_GetColorCrystalNum(int nInput) {
 	switch( nInput ) {
 	case 2: // Red
 		return 4;
@@ -2483,8 +2488,112 @@ int LOOT_GetRobeNum(int nItemLevel) {
 	return nItemNum;
 }
 
+
 ////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_AlignmentRobe()
+/*	LOOT_IsRobe()
+
+	Checks if a given item is a robe item.
+
+	- sItemName = Item template
+
+	JC 2021-01-16                                                             */
+////////////////////////////////////////////////////////////////////////////////
+int LOOT_IsRobe(string sItemName) {
+	return GetSubString(sItemName, 0, GetStringLength(sItemName) - 2) == GetItemPrefix(441);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/*	LOOT_NextLightRobeNum()
+
+	Gets the next light-sided robe item number.
+	
+	If there is no valid robe that's higher, instead returns either:
+		Ossus Keeper Robes	(25% chance)
+		Jedi Master Robes	(75% chance)
+
+	- nItemNum: Item number to start on (20-29)
+
+	JC 2021-01-16                                                             */
+////////////////////////////////////////////////////////////////////////////////
+int LOOT_NextLightRobeNum(int nItemNum) {
+	switch( nItemNum ) {
+	case 20:
+	case 21:
+	case 22:
+		nItemNum = 23; // Arca
+		break;
+	case 23:
+	case 24:
+		nItemNum = 25; // Sylvar
+		break;
+	case 25:
+	case 26:
+		nItemNum = 27; // Jolee
+		break;
+	case 27:
+		nItemNum = 28; // Thon
+		break;
+	case 28:
+	case 29:
+		nItemNum = 30; // Nomi
+		break;
+	default:
+		if( Random(4) == 0 )
+			nItemNum = 21; // Ossus Keeper
+		else
+			nItemNum = 17; // Jedi Master
+		break;
+	}
+	
+	return nItemNum;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/*	LOOT_NextDarkRobeNum()
+
+	Gets the next dark-sided robe item number.
+	
+	If there is no valid robe that's higher, instead returns either:
+		Natth Cowling			(25% chance)
+		Dark Jedi Master Robes	(75% chance)
+
+	- nItemNum: Item number to start on (20-29)
+
+	JC 2021-01-16                                                             */
+////////////////////////////////////////////////////////////////////////////////
+int LOOT_NextDarkRobeNum(int nItemNum) {
+	switch( nItemNum ) {
+	case 20:
+	case 21:
+	case 22:
+	case 23:
+		nItemNum = 24; // Aleema
+		break;
+	case 24:
+	case 25:
+		nItemNum = 26; // Malak
+		break;
+	case 26:
+	case 27:
+	case 28:
+		nItemNum = 29;
+		break;
+	default:
+		if( Random(4) == 0 )
+			nItemNum = 22; // Nath Cowling
+		else
+			nItemNum = 18; // Dark Jedi Master
+		break;
+	}
+	
+	return nItemNum;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/*	LOOT_GetAlignmentRobe()
 
 	Changes a robe number to match the specified alignment.
 
@@ -2493,45 +2602,88 @@ int LOOT_GetRobeNum(int nItemLevel) {
 	* Jedi Robe / Dark Jedi Robe
 	* Jedi Knight Robe / Dark Jedi Knight Robe
 	* Jedi Master Robe / Dark Jedi Master Robe
+	* Ossus Keeper Robe / Natth Cowling
+	* Unique robes - see LOOT_NextLightRobeNum() and LOOT_NextDarkRobeNum()
 
 	- sItemName = Item template (a_robe_*)
 	- nAlignment = Alignment score (0 to 99, dark to light)
 
-	JC 2019-08-03                                                             */
+	JC 2021-01-16                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 string LOOT_AlignmentRobe(string sItemName, int nAlignment) {
 	int nItemNum = StringToInt(GetStringRight(sItemName, 2));
-
+	
+	// Light
 	if( nAlignment >= 50 ) {
+		// Unique
+		if( nItemNum >= 23 ) {
 		switch( nItemNum ) {
-		case 3:
-			nItemNum = 2;
-			break;
-		case 9:
-			nItemNum = 8;
-			break;
-		case 14:
-			nItemNum = 13;
-			break;
-		case 18:
-			nItemNum = 17;
-			break;
+			case 24: // Aleema
+			case 26: // Malak
+			case 29: // Crado
+				nItemNum = 20;
+				do {
+					nItemNum = LOOT_NextLightRobeNum(nItemNum);
+				} while( nItemNum >= 23 && LOOT_GetUniqueFound(441, nItemNum) );
+				break;
+			}
+		}
+		// Generic
+		else {
+			switch( nItemNum ) {
+			case 3: // Dark Padawan -> Padawan
+				nItemNum = 2; 
+				break;
+			case 9: // Dark Jedi -> Jedi
+				nItemNum = 8;
+				break;
+			case 14: // Dark Jedi Knight -> Jedi Knight
+				nItemNum = 13;
+				break;
+			case 18: // Dark Jedi Master -> Jedi Master
+				nItemNum = 17;
+				break;
+			case 22: // Natth Cowling -> Ossus Keeper
+				nItemNum = 21;
+				break;
+			}
 		}
 	}
+	// Dark
 	else {
+		// Unique
+		if( nItemNum >= 23 ) {
 		switch( nItemNum ) {
-		case 2:
-			nItemNum = 3;
-			break;
-		case 8:
-			nItemNum = 9;
-			break;
-		case 13:
-			nItemNum = 14;
-			break;
-		case 17:
-			nItemNum = 18;
-			break;
+			case 23: // Arca
+			case 25: // Sylvar
+			case 27: // Jolee
+			case 28: // Thon
+			case 29: // Nomi
+				nItemNum = 20;
+				do {
+					nItemNum = LOOT_NextLightRobeNum(nItemNum);
+				} while( nItemNum >= 23 && LOOT_GetUniqueFound(441, nItemNum) );
+				break;
+			}
+		}
+		// Generic
+		else {
+			switch( nItemNum ) {
+			case 2: // Padawan -> Dark Padawan
+				nItemNum = 3;
+				break;
+			case 8: // Jedi -> Dark Jedi
+				nItemNum = 9;
+				break;
+			case 13: // Jedi Knight -> Dark Jedi Knight
+				nItemNum = 14;
+				break;
+			case 17: // Jedi Master -> Dark Jedi Master
+				nItemNum = 18;
+				break;
+			case 21: // Ossus Keeper -> Natth Cowling
+				nItemNum = 22;
+			}
 		}
 	}
 
@@ -3828,7 +3980,7 @@ string GetTreasureSpecific(int nItemLevel, int nItemType) {
 					nResult = LOOT_GetPowerCrystalNum(nItemLevel);
 					break;
 				case 245: // Upgrade - Lightsaber - Color Crystal
-					nResult = LOOT_ColorCrystalNum(LOOT_GetSaberColor(nItemLevel));
+					nResult = LOOT_GetColorCrystalNum(LOOT_GetSaberColor(nItemLevel));
 					break;
 				case 311: // Belt
 					nResult = LOOT_GetBeltNum(nItemLevel);
@@ -4221,7 +4373,7 @@ void PlaceTreasureDisposable(object oContainer, int numberOfItems, int nItemType
 	- numberOfItems: Number of items to place
 	- nItemType: Type of item (item classifications)
 
-	JC 2021-01-14                                                             */
+	JC 2021-01-16                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 void PlaceTreasure(object oContainer, int numberOfItems, int nItemType) {
 	int nPCLevel = GetGlobalNumber("G_PC_LEVEL");
@@ -4274,11 +4426,9 @@ void PlaceTreasure(object oContainer, int numberOfItems, int nItemType) {
 				sItem = GetSubString(sItem, 0, j);
 			}
 			
-			// Make sure robes match the area's alignment
-			nAlignment = LOOT_GetAreaAlignment();
-			if( nAlignment != 50 &&
-				GetSubString(sItem, 0, GetStringLength(sItem) - 2) == GetItemPrefix(441) )
-				sItem = LOOT_AlignmentRobe(sItem, nAlignment);
+			// Make sure robes match alignment
+			if( LOOT_IsRobe(sItem) )
+				sItem = LOOT_AlignmentRobe(sItem, LOOT_GetAreaAlignment(GetModuleName()));
 			
 			// Place the item in the container
 			CreateItemOnObject(sItem, oContainer, nItemQuantity);
@@ -4296,7 +4446,7 @@ void PlaceTreasure(object oContainer, int numberOfItems, int nItemType) {
 	- numberOfItems: Number of items to place
 	- nItemType: Type of item (item classifications)
 
-	JC 2021-01-14                                                             */
+	JC 2021-01-16                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 void PlaceCritterTreasure(object oContainer, int numberOfItems, int nItemType) {
 	object oContainer = OBJECT_SELF;
@@ -4345,10 +4495,17 @@ void PlaceCritterTreasure(object oContainer, int numberOfItems, int nItemType) {
 			sItem = GetSubString(sItem, 0, j);
 		}
 		
-		// Make sure robes match a creature's alignment
-		if( GetObjectType(oContainer) == OBJECT_TYPE_CREATURE &&
-			GetSubString(sItem, 0, GetStringLength(sItem) - 2) == GetItemPrefix(441) )
-			sItem = LOOT_AlignmentRobe(sItem, GetGoodEvilValue(oContainer));
+		// Make sure robes match alignment
+		if( LOOT_IsRobe(sItem) ) {
+			int nAlignment;
+			
+			if( GetObjectType(oContainer) == OBJECT_TYPE_CREATURE )
+				nAlignment = GetGoodEvilValue(oContainer);
+			else
+				nAlignment = LOOT_GetAreaAlignment(GetModuleName());
+			
+			sItem = LOOT_GetAlignmentRobe(sItem, nAlignment);
+		}
 		
 		// Place the item in the container
 		CreateItemOnObject(sItem, oContainer, nItemQuantity);
