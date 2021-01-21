@@ -12,7 +12,7 @@ Changes:
 - The Baran Do Advisor Robes have been restored via random loot.
 - It was only possible to receive 5 out of 11 of Mira's rockets through random loot.
 - Droid utilities were missing from random loot. The item prefix was incorrect, so it would give no item when they were rolled.
-- It was possible to collect multiple copies of what ought to be unique items (e.g. Exar Kun's Light Battle Suit, Circlet of Saresh). The random loot system will now keep track of which items you've found and won't give duplicates of unique items.
+- It was possible to collect multiple copies of what ought to be unique items (e.g. Exar Kun's Light Battle Suit and Circlet of Saresh). The random loot system will now keep track of which items you've found and won't give duplicates of unique items.
 - It was not possible to receive Battle Stimulants through random loot.
 - Random loot would only give Security Tunnelers and never the higher-quality Security Spike Tunnelers. There is now a chance of receiving them at higher levels.
 - It is no longer possible to receive Clothing (a_robe_01) through random loot. When rolled, it is replaced with a robe item that has actual value.
