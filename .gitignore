@@ -1,0 +1,8 @@
+# Untracked files to ignore/not include in repo. See https://git-scm.com/docs/gitignore
+
+# Script compiler
+**/compile.bat
+**/nwnnsscomp.exe
+
+# Installer
+**Install.exe
