@@ -8,7 +8,7 @@ Changes:
 - When rolling a rare item, it was possible to roll *too* high and receive no item at all.
 - Strength Gauntlets have been restored. Previously there was no 3rd glove variation, so random loot would give nothing in its place.
 - The Vao Armband has been restored via random loot.
-- The Vibrocutter and Guidon Beacon have been restored via random loot.
+- The Heavy Mining Laser, Vibrocutter, and Guidon Beacon have been restored via random loot.
 - The Baran Do Advisor Robes have been restored via random loot.
 - It was only possible to receive 5 out of 11 of Mira's rockets through random loot.
 - Droid utilities were missing from random loot. The item prefix was incorrect, so it would give no item when they were rolled.
@@ -16,10 +16,11 @@ Changes:
 - It was not possible to receive Battle Stimulants through random loot.
 - Random loot would only give Security Tunnelers and never the higher-quality Security Spike Tunnelers. There is now a chance of receiving them at higher levels.
 - It is no longer possible to receive Clothing (a_robe_01) through random loot. When rolled, it is replaced with a robe item that has actual value.
-- It is no longer possible to find blasters on Peragus through random loot, what with the ban on them. All weapons there have been replaced by a selection of Peragus-specific items (Mining Laser, Advanced Mining Laser, and the restored Vibrocutter and Guidon Beacon)
+- It is no longer possible to find blasters on Peragus through random loot, what with the ban on them. All weapons there have been replaced by a selection of Peragus-specific items (Mining Laser, Advanced Mining Laser, and the restored Heavy Mining Laser, Vibrocutter, Guidon Beacon) and other melee weapons.
 - Peragus items have had their stats unified across all areas. They will also now stack in the inventory menu.
-- It is no longer possible to find a Breath Mask in the Peragus dormitories via random loot. There is one placed there manually already, so it didn't make sense with the design.
-- It is no longer possible to find robes on Peragus through random loot. The level scale for robes has been adjusted to account for this, so once you do start finding robes, the lower-numbered items won't be skipped.
-- Blaster and melee upgrades have been removed from Peragus loot; upgradeable weapons were unlikely in the original loot system and are impossible in the new one. Armor overlays have also been removed, as they cannot be installed in the miner uniform and other armor is excluded early on. In their place, the probability of equipment items has been increased and Peragus weapons have been added.
+- It is no longer possible to find a Breath Mask on Peragus via random loot. There is one placed in the Peragus dormitories manually, so it didn't make sense with the design.
+- It is no longer possible to find any stealth field generator on Peragus via random loot. There is one placed in the Peragus administration level manually, so it didn't make sense with the design.
+- It is no longer possible to find robes on Peragus or the Harbinger through random loot. The level scale for robes has been adjusted to account for this, so once you do start finding robes, the lower-numbered items won't be skipped.
+- On Peragus, the probability of receiving blaster or melee upgrades has been reduced, and armor overlays have been eliminated, to reflect the availability of items which can utilize these upgrades. In their place, the probability of equipment items has been increased and Peragus weapons have been added.
 - Light armor has been removed from Jedi loot and replaced with power crystals.
 - Components and Chemicals have been removed from random loot found late in the game, as there are few workbenches and lab stations available at that point. Stimulants are no longer excluded.

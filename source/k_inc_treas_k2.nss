@@ -5,7 +5,7 @@
 
 	Header file for random loot.
 
-	JC 2024-05-16                                                             */
+	JC 2024-05-26                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 #include "k_inc_q_crystal"
 #include "k_inc_treasure"
@@ -41,8 +41,9 @@ int EXTRA_SABER_COLORS = 0;
 	150 WEAPON TYPE: PERAGUS
 		* 151 Mining Laser
 		* 152 Advanced Mining Laser
-		* 153 Vibrocutter
-		* 154 Guidon Beacon
+		* 153 Heavy Mining Laser
+		* 154 Vibrocutter
+		* 155 Guidon Beacon
 
 200 ITEM CLASS: UPGRADES
 	210 UPGRADE TYPE: RANGED
@@ -650,10 +651,12 @@ int LOOT_GetSpecificVariation(int nItemLevel, int nItemType) {
 		return LOOT_GetSaberColor(nItemLevel);
 	case 151: // Mining Laser
 	case 152: // Advanced Mining Laser
-	case 153: // Vibrocutter
-	case 154: // Guidon Beacon
-		// Guidon Beacon has no variation
+	case 153: // Heavy Mining Laser
+	case 154: // Vibrocutter
+	case 155: // Guidon Beacon
 		return 0;
+	case 157:
+		return LOOT_GetMeleeNum(nItemLevel);
 	case 211: // Upgrade - Ranged - Targeting Scope
 	case 212: // Upgrade - Ranged - Firing Chamber
 	case 213: // Upgrade - Ranged - Power Pack
@@ -1226,26 +1229,45 @@ int LOOT_GetSaberColor(int nItemLevel, int nColorType) {
 	Determines weapon type for loot on Peragus.
 
 	Regular weapons are excluded from Peragus lot and only location-specific
-	weapons will drop:
-	* Mining Laser
-	* Advanced Mining Laser
-	* Vibrocutter
-	* Guidon Beacon
+	weapons will drop.
+	
+	25% chance Mining Laser
+	20% chance Advanced Mining Laser
+	5% chance Heavy Mining Laser
+	25% chance Vibrocutter
+	20% chance Guidon Beacon
+	5% chance Other Melee Weapons
 
 	JC 2024-05-18                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetPeragusWeapon() {
-	switch( Random(6) ) {
+	switch( Random(20) ) {
 	case 0:
 	case 1:
-		return 151; // Mining Laser
 	case 2:
 	case 3:
-		return 152; // Advanced Mining Laser
 	case 4:
-		return 153; // Vibrocutter
+		return 151; // Mining Laser
+	case 5:
+	case 6:
+	case 7:
+	case 8:
+		return 152; // Advanced Mining Laser
+	case 9:
+		return 153; // Heavy Mining Laser
+	case 10:
+	case 11:
+	case 12:
+	case 13:
+	case 14:
+		return 154; // Vibrocutter
+	case 15:
+	case 16:
+	case 17:
+	case 18:
+		return 155; // Guidon Beacon
 	}
-	return 154; // Guidon Beacon
+	return 131; // Other Melee Weapons
 }
 
 
@@ -3530,8 +3552,9 @@ string GetItemPrefix(int nItemType) {
 	case 143: return "g_w_dblsbr0";
 	case 151: return "mininglaser";
 	case 152: return "advancedminingla";
-	case 153: return "vibrocutter";
-	case 154: return "guidonbeacon";
+	case 153: return "heavymininglaser";
+	case 154: return "vibrocutter";
+	case 155: return "guidonbeacon";
 	case 211: return "u_r_targ_";
 	case 212: return "u_r_firi_";
 	case 213: return "u_r_powe_";
@@ -4054,13 +4077,15 @@ void PlaceTreasureDroid(object oContainer, int numberOfItems, int nItemType) {
 
 	12% chance equipment
 	5% chance Peragus weapons
-	3% chance armor underlays
+	1% chance ranged upgrades
+	1% chance melee upgrades
+	1% chance armor underlays
 
 	- oContainer: Object to contain the loot
 	- numberOfItems: Number of items to place
 	- nItemType: Type of item (item classifications)
 
-	JC 2021-01-14                                                             */
+	JC 2022-05-26                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 void PlaceTreasurePeragus(object oContainer, int numberOfItems, int nItemType) {
 	int nRoll;	
@@ -4076,6 +4101,10 @@ void PlaceTreasurePeragus(object oContainer, int numberOfItems, int nItemType) {
 			PlaceTreasure(oContainer, numberOfItems, 300); // Equipment
 		else if( nRoll >= 83 )
 			PlaceTreasure(oContainer, numberOfItems, 150); // Peragus weapons
+		else if( nRoll >= 82 )
+			PlaceTreasure(oContainer, numberOfItems, 210); // Ranged upgrades
+		else if( nRoll >= 81 )
+			PlaceTreasure(oContainer, numberOfItems, 220); // Melee upgrades
 		else if( nRoll >= 80 )
 			PlaceTreasure(oContainer, numberOfItems, 232); // Underlays
 		// Disposables
