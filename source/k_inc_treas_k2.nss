@@ -1848,6 +1848,7 @@ int LOOT_GetHeadgearNum(int nItemLevel) {
 	// Headgear have 30 variations
 	int nRoll = LOOT_D(nItemLevel);	
 	int nItemNum = 0;
+	int nLevel;
 	
 	// Replacement table for if a better version of what we rolled is available
 	do {
@@ -1859,8 +1860,8 @@ int LOOT_GetHeadgearNum(int nItemLevel) {
 				nItemNum = nRoll;
 			break;
 
-		case 2: // No Breath Mask in Peragus dormitories
-			if( GetModuleName() == "105PER" ) {
+		case 2: // No Breath Mask on Peragus, to make the one in the dormitory matter
+			if( GetStringRight(GetModuleName(), 3) == "PER" ) {
 				nRoll = LOOT_D(nItemLevel - 1);
 				if( nRoll >= 2 )
 					++nRoll;
