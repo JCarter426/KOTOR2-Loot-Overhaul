@@ -4,5 +4,8 @@
 **/compile.bat
 **/nwnnsscomp.exe
 
+# Compiled source code
+source/*.ncs
+
 # Installer
 **Install.exe
