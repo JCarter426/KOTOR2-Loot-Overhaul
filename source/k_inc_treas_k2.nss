@@ -2841,7 +2841,7 @@ int LOOT_GetDroidShieldNum(int nItemLevel, int nItemType, int nItemTier) {
 
 	- nItemLevel: Item level determining the quality of the items we can get
 
-	JC 2024-05-19                                                             */
+	JC 2024-06-01                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetDroidDeviceNum(int nItemLevel) {
 	// Droid devices have 15 variations
@@ -2849,10 +2849,12 @@ int LOOT_GetDroidDeviceNum(int nItemLevel) {
 	int nItemNum = 0;
 	
 	// Replace 14 for variety, since there are three Ion Blasts
-	if( nRoll == 14 && nItemLevel < 15 )
-		nRoll = Random(13) + 1; // Reroll
-	else if( nItemLevel >= 15 )
-		nRoll = 15; // Ion Blast Mark III --> Multi-Spectral Emitter
+	if( nRoll == 14 ) {
+		if( nItemLevel < 15 )
+			nRoll = Random(13) + 1; // Reroll
+		else if( nItemLevel >= 15 )
+			nRoll = 15; // Ion Blast Mark III --> Multi-Spectral Emitter
+	}
 	
 	// Replacement table for if a better version of what we rolled is available
 	do {
