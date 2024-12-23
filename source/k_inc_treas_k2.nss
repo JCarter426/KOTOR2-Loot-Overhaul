@@ -3936,6 +3936,8 @@ void PlaceTreasure(object oContainer, int numberOfItems, int nItemType) {
 			// Random number determines chance of getting a rare or disposable
 			// item
 			nRoll = Random(95) + GetGlobalNumber("000_RareItemChance");
+			if( nItemType > 0 && nItemType < 900 && nRoll < 91 )
+				nRoll = 95;
 			
 			// Determine item template & quantity
 			nItemQuantity = 1;
