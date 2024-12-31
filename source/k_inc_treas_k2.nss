@@ -183,6 +183,7 @@ Robes - LOOT_U_ROBES
 // Utility Functions
 int LOOT_D(int nItemLevel,);
 string LOOT_Suffix(int nItemNum);
+int LOOT_IsEarlyGame();
 int LOOT_IsLateGame();
 int LOOT_UniqueItemID(int nItemType, int nItemNum);
 string LOOT_UniqueItemTag(int nItemType, int nItemNum);
@@ -309,6 +310,27 @@ string LOOT_Suffix(int nItemNum) {
 	if( nItemNum >=  110 )
 		return "x" + IntToString(nItemNum - 100);
 	return "";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/*	LOOT_IsEarlyGame()
+
+	Checks whether it's early in the game (before escaping Telos).
+
+	JC 2024-12-30                                                             */
+////////////////////////////////////////////////////////////////////////////////
+int LOOT_IsEarlyGame() {
+	int nModule = StringToInt(GetStringLeft(GetModuleName(), 2)) >= 85;
+	// Peragus, Harbinger, Citadel Station (not under attack)
+	if( nModule >= 10 && nModule < 22 )
+		return TRUE;
+	// Telos Restoration Zone
+	if( nModule == 23 )
+		return TRUE;
+	// Telos Polar Academy
+	if( nModule == 26 )
+		return TRUE;
+	return FALSE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1636,17 +1658,17 @@ int LOOT_GetUpgradeNum(int nItemLevel, int nItemType, int nItemTier) {
 
 	Generates item variation number for equipment.
 
-	JC 2024-06-01                                                             */
+	JC 2024-12-30                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetEquipmentType() {
 	int nRoll;
-	if( LOOT_GetUniqueFound(351, 102) ) {
-		nRoll = Random(4) + 1;
+	// 5% Chance of rolling Vao Armband if not already found or too early in game
+	if( !LOOT_GetUniqueFound(351, 102) && !LOOT_IsEarlyGame() && Random(20) == 0 ) {
+		nRoll = 5;
+		LOOT_SetUniqueFound(351, 102, TRUE);
 	}
 	else {
-		nRoll = Random(5) + 1;
-		if( nRoll == 5 )
-			LOOT_SetUniqueFound(351, 102, TRUE);
+		nRoll = Random(4) + 1;
 	}
 	return 300 + 10 * nRoll;
 }
@@ -3999,7 +4021,9 @@ void PlaceCritterTreasure(object oContainer, int numberOfItems, int nItemType) {
 		if( nItemLevel < 1 )
 			nItemLevel = 1;		
 		// Random number determines chance of getting a rare or disposable item
-		nRoll = Random(95) + GetGlobalNumber("000_RareItemChance");		
+		nRoll = Random(95) + GetGlobalNumber("000_RareItemChance");
+		if( nItemType > 0 && nItemType < 900 && nRoll < 91 )
+			nRoll = 95;
 		// Determine item template & quantity
 		nItemQuantity = 1;
 		if( nRoll > 100 ) {
