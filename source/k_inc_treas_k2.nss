@@ -622,7 +622,7 @@ int LOOT_GetSpecificType(int nItemLevel, int nItemClass) {
 		return LOOT_GetWeaponType();
 	case 200: // Upgrades
 		// Restrict lightsaber upgrades
-		if( nItemLevel < 6 )
+		if( LOOT_IsEarlyGame() )
 			return LOOT_GetUpgradeType(1);
 		return LOOT_GetUpgradeType(0);
 	case 300: // Equipment
@@ -3666,7 +3666,7 @@ string GetTreasureSpecific(int nItemLevel, int nItemType) {
 	}
 	int nItemVariation = LOOT_GetSpecificVariation(nItemLevel, nItemType);
 	string sTemplate = GetItemPrefix(nItemType) + LOOT_Suffix(nItemVariation);
-	LOOT_DebugItem(class, type, subtype, nItemVariation, sTemplate);
+	// LOOT_DebugItem(class, type, subtype, nItemVariation, sTemplate);
 	return sTemplate;
 }
 
@@ -3847,7 +3847,7 @@ string GetTreasureBundle(int nItemLevel, int nItemType) {
 		subtype = nItemType;
 	}
 	string sTemplate = GetBundlePrefix(nItemLevel, nItemType);
-	LOOT_DebugItem(class, type, subtype, 0, sTemplate);
+	// LOOT_DebugItem(class, type, subtype, 0, sTemplate);
 	return sTemplate;
 }
 
