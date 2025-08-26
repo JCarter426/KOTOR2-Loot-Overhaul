@@ -11,3 +11,6 @@ source/*.ncs
 Install.exe
 backup
 installlog.*
+
+# Build
+build/*
