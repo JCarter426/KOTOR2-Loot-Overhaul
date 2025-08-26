@@ -211,6 +211,7 @@ int LOOT_GetColorCrystalNum(int nInput);
 int LOOT_GetPowerCrystalNum(int nItemLevel);
 int LOOT_GetUpgradeNum(int nItemLevel, int nItemType, int nItemTier = 0);
 // Equipment
+int LOOT_GetEquipmentType();
 int LOOT_GetBeltNum(int nItemLevel);
 int LOOT_GetGloveNum(int nItemLevel);
 int LOOT_GetHeadgearNum(int nItemLevel);
@@ -372,9 +373,7 @@ int LOOT_UniqueItemID(int nItemType, int nItemNum) {
 		break;
 	// Armband
 	case 351: // Vao
-		// The Vao Armband doesn't have a proper item number, but since it's the
-		// only armband in random loot, this should be ok
-		nItemID = 1;
+		nItemID = 102;
 		break;
 	// Belt
 	case 311: // Qel-Droma
@@ -605,7 +604,7 @@ int LOOT_GetSpecificType(int nItemLevel, int nItemClass) {
 			return LOOT_GetUpgradeType(1);
 		return LOOT_GetUpgradeType(0);
 	case 300: // Equipment
-		return 300 + 10 * (Random(5) + 1);
+		return LOOT_GetEquipmentType();
 	case 400: // Armor
 		return LOOT_GetArmorType();
 	case 500: // Droid
@@ -1631,6 +1630,26 @@ int LOOT_GetUpgradeNum(int nItemLevel, int nItemType, int nItemTier) {
 ////////////////////////////////////////////////////////////////////////////////
 //	EQUIPMENT
 ////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
+/*	LOOT_GetBeltNum()
+
+	Generates item variation number for equipment.
+
+	JC 2024-06-01                                                             */
+////////////////////////////////////////////////////////////////////////////////
+int LOOT_GetEquipmentType() {
+	int nRoll;
+	if( LOOT_GetUniqueFound(351, 102) ) {
+		nRoll = Random(4) + 1;
+	}
+	else {
+		nRoll = Random(5) + 1;
+		if( nRoll == 5 )
+			LOOT_SetUniqueFound(351, 102, TRUE);
+	}
+	return 300 + 10 * nRoll;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 /*	LOOT_GetBeltNum()
