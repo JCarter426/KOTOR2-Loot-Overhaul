@@ -8,4 +8,6 @@
 source/*.ncs
 
 # Installer
-**Install.exe
+Install.exe
+backup
+installlog.*
