@@ -1,3 +1,0 @@
-- remove stealth field generator from spawning in 101PER
-- reduce upgrade item probability on Peragus
-- reconsider heavy mining laser (check item cost too)
