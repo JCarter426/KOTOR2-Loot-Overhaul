@@ -5,7 +5,7 @@
 
 	Header file for random loot.
 
-	JC 2024-05-19                                                             */
+	JC 2024-05-16                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 #include "k_inc_q_crystal"
 #include "k_inc_treasure"
@@ -1620,7 +1620,7 @@ int LOOT_GetUpgradeNum(int nItemLevel, int nItemType, int nItemTier) {
 
 	- nItemLevel: Item level determining the quality of the items we can get
 
-	JC 2024-05-19                                                             */
+	JC 2024-05-26                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetBeltNum(int nItemLevel) {
 	// Belts have 30 variations
@@ -1657,7 +1657,11 @@ int LOOT_GetBeltNum(int nItemLevel) {
 			break;
 
 		case 3: // Stealth Field Generator
-			if( nItemLevel >= 6 ) {
+			// No stealth belts on Peragus, to make the one in the security locker matter
+			if( GetStringRight(GetModuleName(), 3) == "PER" ) {
+				nRoll = Random(2) + 1;
+			}
+			else if( nItemLevel >= 6 ) {
 				// Stealth Field Generator --> Exchange Shadow Caster
 				if( nItemLevel >= 10 && Random(2) == 0 )
 					nRoll = 10;
@@ -1675,7 +1679,16 @@ int LOOT_GetBeltNum(int nItemLevel) {
 			else
 				nItemNum = nRoll;
 			break;
-
+		
+		case 6: // Aratech SD Belt
+			// No stealth belts on Peragus, to make the one in the security locker matter
+			if( GetStringRight(GetModuleName(), 3) == "PER" ) {
+				nRoll = Random(5) + 1;
+				if( nRoll >= 3 )
+					nRoll += 1;
+			}
+			break;
+		
 		case 7: // Strength Enhancer
 			if( nItemLevel >= 15 ) {
 				// Strength Enhancer --> GNS Strength Enhancer
@@ -1694,7 +1707,18 @@ int LOOT_GetBeltNum(int nItemLevel) {
 			else
 				nItemNum = nRoll;
 			break;
-
+		
+		case 10: // Exchange Shadow Caster
+			// No stealth belts on Peragus, to make the one in the security locker matter
+			if( GetStringRight(GetModuleName(), 3) == "PER" ) {
+				nRoll = Random(7) + 1;
+				if( nRoll >= 3 )
+					nRoll += 1;
+				if( nRoll >= 6 )
+					nRoll += 1;
+			}
+			break;
+		
 		case 14: // Eriadu Stealth Unit --> Defel Mimicker
 			if( nItemLevel >= 22 )
 				nRoll = 22;
