@@ -189,13 +189,14 @@ string LOOT_UniqueGlobal(int nItemType);
 int LOOT_GetUniqueGlobalState(int nItemType);
 int LOOT_GetUniqueFound(int nItemType, int nItemNum);
 void LOOT_SetUniqueFound(int nItemType, int nItemNum, int nState);
+void LOOT_DebugItem(int nClass, int nType, int nSubtype, int nVariation, string sTemplate);
 // Specific Items
 int LOOT_GetSpecificClass(int nItemLevel);
 int LOOT_GetSpecificType(int nItemLevel, int nItemClass);
 int LOOT_GetSpecificSubtype(int nItemLevel, int nItemType);
 int LOOT_GetSpecificVariation(int nItemLevel, int nItemType);
 // Weapons
-int LOOT_GetWeaponType(int nItemLevel);
+int LOOT_GetWeaponType();
 int LOOT_GetPistolNum(int nItemLevel);
 int LOOT_GetRifleNum(int nItemLevel);
 int LOOT_GetMeleeNum(int nItemLevel);
@@ -224,7 +225,7 @@ int LOOT_GetDroidShieldTier(int nItemLevel);
 int LOOT_GetDroidShieldNum(int nItemLevel, int nItemType = 0, int nItemTier = 0);
 int LOOT_GetDroidDeviceNum(int nItemLevel);
 // Armor
-int LOOT_GetArmorType(int nItemLevel);
+int LOOT_GetArmorType();
 int LOOT_GetLightArmorNum(int nItemLevel);
 int LOOT_GetMediumArmorNum(int nItemLevel);
 int LOOT_GetHeavyArmorNum(int nItemLevel);
@@ -267,10 +268,19 @@ void PlaceHKFactoryTreasure(object oContainer = OBJECT_SELF, int numberOfItems =
 //	UTILITY FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
 
-int LOOT_D(int nItemLevel) {
-	int nRoll = Random(nItemLevel) + 1;
-	if( nRoll <= nItemLevel / 2 )
-		nRoll += Random(nItemLevel / 2);
+////////////////////////////////////////////////////////////////////////////////
+/*	LOOT_D()
+	
+	Rolls a die of a given size with probability skewed towards larger values.
+	
+	- nSize: Die size
+
+	JC 2024-05-25                                                             */
+////////////////////////////////////////////////////////////////////////////////
+int LOOT_D(int nSize) {
+	int nRoll = Random(nSize) + 1;
+	if( nRoll <= nSize / 2 )
+		nRoll += Random(nSize / 2);
 	return nRoll;
 }
 
@@ -543,6 +553,29 @@ void LOOT_SetUniqueFound(int nItemType, int nItemNum, int nState) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/*	LOOT_DebugItem()
+
+	Prints item details in the feedback screen, for testing.
+
+	- nClass: Item class
+	- nType:  Item type
+	- nSubtype: Item subtype
+	- nVariation: Item variation
+	- sTemplate: Item template
+
+	JC 2024-05-25                                                             */
+////////////////////////////////////////////////////////////////////////////////
+void LOOT_DebugItem(int nClass, int nType, int nSubtype, int nVariation, string sTemplate) {
+	SendMessageToPC(GetFirstPC(),
+		IntToString(nClass) + " -> " +
+		IntToString(nType) + " -> " +
+		IntToString(nSubtype) + " -> " +
+		"'" + sTemplate +  "' " +
+		"(" + IntToString(nVariation) + ")"
+	);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 //	SPECIFIC ITEMS
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -564,7 +597,7 @@ int LOOT_GetSpecificClass(int nItemLevel) {
 int LOOT_GetSpecificType(int nItemLevel, int nItemClass) {
 	switch( nItemClass ) {
 	case 100: // Weapons
-		return LOOT_GetWeaponType(nItemLevel);
+		return LOOT_GetWeaponType();
 	case 200: // Upgrades
 		// Restrict lightsaber upgrades
 		if( nItemLevel < 6 )
@@ -573,7 +606,7 @@ int LOOT_GetSpecificType(int nItemLevel, int nItemClass) {
 	case 300: // Equipment
 		return 300 + 10 * (Random(5) + 1);
 	case 400: // Armor
-		return LOOT_GetArmorType(nItemLevel);
+		return LOOT_GetArmorType();
 	case 500: // Droid
 		return LOOT_GetDroidItemType();
 	}
@@ -594,7 +627,8 @@ int LOOT_GetSpecificSubtype(int nItemLevel, int nItemType) {
 	case 340: // Implant
 		return 340 + LOOT_GetImplantTier(nItemLevel);
 	case 350: // Armband
-		return 300 + 10 * (Random(4) + 1);
+		// Vao Armband is the only possible armband
+		return 351;
 	case 540: // Droid Shield
 		return LOOT_GetDroidShieldSubtype();
 	}
@@ -686,7 +720,7 @@ int LOOT_GetSpecificVariation(int nItemLevel, int nItemType) {
 	JC 2024-05-18                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 
-int LOOT_GetWeaponType(int nItemLevel) {
+int LOOT_GetWeaponType() {
 	// Only Peragus weapons on Peragus
 	if( GetStringRight(GetModuleName(), 3) == "PER" )
 		return 150;
@@ -2022,6 +2056,26 @@ int LOOT_GetImplantNum(int nItemLevel) {
 ////////////////////////////////////////////////////////////////////////////////
 //	ARMOR
 ////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
+/*	LOOT_GetLightArmorNum()
+
+	Generates item variation number for light armor.
+
+	Replaces certain items when better versions are available and checks if
+	unique items have been found before granting them.
+
+	JC 2024-05-25                                                             */
+////////////////////////////////////////////////////////////////////////////////
+int LOOT_GetArmorType() {
+	// No Jedi robes on Peragus
+	string sMod = GetStringRight(GetModuleName(), 3);
+	if(  sMod == "PER" || sMod == "HAR" )
+		return 400 + 10 * (Random(3) + 1);
+	return 400 + 10 * (Random(4) + 1);
+}
+
+////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
 /*	LOOT_GetLightArmorNum()
@@ -3499,27 +3553,29 @@ string GetItemPrefix(int nItemType) {
 	JC 2024-04-27                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 string GetTreasureSpecific(int nItemLevel, int nItemType) {
-	SendMessageToPC(GetFirstPC(), "Treasure Specific (" + IntToString(nItemLevel) + ", " + IntToString(nItemType) + ")");
+	int class = nItemType;
+	int type = nItemType;
+	int subtype = nItemType;
+	// SendMessageToPC(GetFirstPC(), "Treasure Specific (" + IntToString(nItemLevel) + ", " + IntToString(nItemType) + ")");
 	// Cap the item level to avoid incidents
 	if( nItemLevel > 30 )
 		nItemLevel = 30;
 	// Determine item type if not known
 	if( nItemType < 100 ) {
 		nItemType = LOOT_GetSpecificClass(nItemLevel);
-		SendMessageToPC(GetFirstPC(), " -> class " + IntToString(nItemType));
+		class = nItemType;
 	}
 	if( (nItemType % 100) < 10 ) {
 		nItemType = LOOT_GetSpecificType(nItemLevel, nItemType);
-		SendMessageToPC(GetFirstPC(), " -> type " + IntToString(nItemType));
+		type = nItemType;
 	}
 	if( nItemType % 10 < 1 ) {
 		nItemType = LOOT_GetSpecificSubtype(nItemLevel, nItemType);
-		SendMessageToPC(GetFirstPC(), " -> subtype " + IntToString(nItemType));
+		subtype = nItemType;
 	}
 	int nItemVariation = LOOT_GetSpecificVariation(nItemLevel, nItemType);
-	SendMessageToPC(GetFirstPC(), " -> variation " + IntToString(nItemVariation));
 	string sTemplate = GetItemPrefix(nItemType) + LOOT_Suffix(nItemVariation);
-	SendMessageToPC(GetFirstPC(), " -> template '" + sTemplate + "'");
+	LOOT_DebugItem(class, type, subtype, nItemVariation, sTemplate);
 	return sTemplate;
 }
 
@@ -3681,7 +3737,10 @@ string GetBundlePrefix(int nItemLevel, int nItemType) {
 	JC 2024-05-19                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 string GetTreasureBundle(int nItemLevel, int nItemType) {
-	SendMessageToPC(GetFirstPC(), "Treasure Bundle (" + IntToString(nItemLevel) + ", " + IntToString(nItemType) + ")");
+	int class = nItemType;
+	int type = nItemType;
+	int subtype = nItemType;
+	// SendMessageToPC(GetFirstPC(), "Treasure Bundle (" + IntToString(nItemLevel) + ", " + IntToString(nItemType) + ")");
 	// Cap the item level to avoid incidents
 	if( nItemLevel > 30 )
 		nItemLevel = 30;
@@ -3690,14 +3749,14 @@ string GetTreasureBundle(int nItemLevel, int nItemType) {
 		nItemType = LOOT_GetDisposableLateGame(nItemLevel);
 	if( (nItemType % 100) < 10) {
 		nItemType = GetDisposableType();
-		SendMessageToPC(GetFirstPC(), " -> type " + IntToString(nItemType));
+		type = nItemType;
 	}
 	if( nItemType % 10 < 1 ) {
 		nItemType = GetDisposableSubtype(nItemLevel, nItemType);
-		SendMessageToPC(GetFirstPC(), " -> subtype " + IntToString(nItemType));
+		subtype = nItemType;
 	}
 	string sTemplate = GetBundlePrefix(nItemLevel, nItemType);
-	SendMessageToPC(GetFirstPC(), " -> template '" + sTemplate + "'");
+	LOOT_DebugItem(class, type, subtype, 0, sTemplate);
 	return sTemplate;
 }
 
@@ -3727,6 +3786,7 @@ string GetTreasureNormal(int nItemLevel, int nItemType) {
 	JC 2019-08-01                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 string GetTreasureRare(int nItemLevel, int nItemType) {
+	// SendMessageToPC(GetFirstPC(), "RARE!");
 	return GetTreasureSpecific(nItemLevel + 5, nItemType);
 }
 
