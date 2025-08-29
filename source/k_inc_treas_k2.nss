@@ -5,7 +5,7 @@
 
 	Header file for random loot.
 
-	JC 2024-05-26                                                             */
+	JC 2025-08-29                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 #include "k_inc_q_crystal"
 #include "k_inc_treasure"
@@ -185,6 +185,7 @@ int LOOT_D(int nItemLevel,);
 string LOOT_Suffix(int nItemNum);
 int LOOT_IsEarlyGame();
 int LOOT_IsLateGame();
+int LOOT_IsVeryEarlyGame();
 int LOOT_UniqueItemID(int nItemType, int nItemNum);
 string LOOT_UniqueItemTag(int nItemType, int nItemNum);
 string LOOT_UniqueGlobal(int nItemType);
@@ -317,31 +318,38 @@ string LOOT_Suffix(int nItemNum) {
 
 	Checks whether it's early in the game (before escaping Telos).
 
-	JC 2024-12-30                                                             */
+	JC 2025-08-26                                                      */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_IsEarlyGame() {
-	int nModule = StringToInt(GetStringLeft(GetModuleName(), 2)) >= 85;
-	// Peragus, Harbinger, Citadel Station (not under attack)
-	if( nModule >= 10 && nModule < 22 )
-		return TRUE;
-	// Telos Restoration Zone
-	if( nModule == 23 )
-		return TRUE;
-	// Telos Polar Academy
-	if( nModule == 26 )
-		return TRUE;
-	return FALSE;
+	if( GetGlobalNumber("262_Escape_Telos") > 0 )
+		return FALSE;
+	return TRUE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /*	LOOT_IsLateGame()
 
-	Checks whether it's late in the game (after boarding the Ravager).
+	Checks whether it's late in the game (from Battle of Telos on).
 
-	JC 2021-01-09                                                             */
+	JC 2025-08-26                                                      */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_IsLateGame() {
-	return StringToInt(GetStringLeft(GetModuleName(), 2)) >= 85;
+	if( GetGlobalBoolean("221_FIRST_ENTER") )
+		return TRUE;
+	return FALSE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/*	LOOT_IsVeryEarlyGame()
+
+	Checks whether it's very early in the game (before escaping Peragus).
+
+	JC 2025-08-26                                                      */
+////////////////////////////////////////////////////////////////////////////////
+int LOOT_IsVeryEarlyGame() {
+	if( GetGlobalBoolean("201_FIRST_ENTER") )
+		return FALSE;
+	return TRUE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -601,10 +609,19 @@ void LOOT_DebugItem(int nClass, int nType, int nSubtype, int nVariation, string 
 //	SPECIFIC ITEMS
 ////////////////////////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////////////////////////////
+/*	LOOT_GetSpecificClass()
+
+	Determines item class.
+	
+	- nItemLevel: Item level determining the quality of the items we can get
+
+	JC 2025-08-29                                                             */
+////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetSpecificClass(int nItemLevel) {
 	int nItemType;
 	// Player shouldn't find armor early on when they're meant to be naked
-	if( GetGlobalNumber("G_PC_LEVEL") < 4 )
+	if( GetGlobalNumber("103PER_Talk_HK50") <= 0 )
 		nItemType = 100 * (Random(3) + 1);
 	// Droid items and disposables aren't included in random loot
 	else
@@ -616,6 +633,16 @@ int LOOT_GetSpecificClass(int nItemLevel) {
 	return nItemType;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/*	LOOT_GetSpecificClass()
+
+	Determines item type.
+	
+	- nItemLevel: Item level determining the quality of the items we can get
+	- nItemClass: Item class (item classifications)
+
+	JC 2025-08-29                                                             */
+////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetSpecificType(int nItemLevel, int nItemClass) {
 	switch( nItemClass ) {
 	case 100: // Weapons
@@ -635,6 +662,17 @@ int LOOT_GetSpecificType(int nItemLevel, int nItemClass) {
 	return 910;
 }
 
+
+////////////////////////////////////////////////////////////////////////////////
+/*	LOOT_GetSpecificClass()
+
+	Determines item subtype.
+	
+	- nItemLevel: Item level determining the quality of the items we can get
+	- nItemType: Item type (item classifications)
+
+	JC 2025-08-29                                                             */
+////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetSpecificSubtype(int nItemLevel, int nItemType) {
 	switch( nItemType ) {
 	case 140: // Lightsaber
@@ -658,6 +696,17 @@ int LOOT_GetSpecificSubtype(int nItemLevel, int nItemType) {
 	return nItemType + 1;	
 }
 
+
+////////////////////////////////////////////////////////////////////////////////
+/*	LOOT_GetSpecificClass()
+
+	Determines item variation.
+	
+	- nItemLevel: Item level determining the quality of the items we can get
+	- nItemType: Item type (item classifications)
+
+	JC 2025-08-29                                                             */
+////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetSpecificVariation(int nItemLevel, int nItemType) {
 	switch( nItemType ) {
 	case 111: // Blaster Pistol
@@ -1658,12 +1707,12 @@ int LOOT_GetUpgradeNum(int nItemLevel, int nItemType, int nItemTier) {
 
 	Generates item variation number for equipment.
 
-	JC 2024-12-30                                                             */
+	JC 2025-08-29                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetEquipmentType() {
 	int nRoll;
 	// 5% Chance of rolling Vao Armband if not already found or too early in game
-	if( !LOOT_GetUniqueFound(351, 102) && !LOOT_IsEarlyGame() && Random(20) == 0 ) {
+	if( Random(20) == 0 && !LOOT_IsEarlyGame()&& !LOOT_GetUniqueFound(351, 102) ) {
 		nRoll = 5;
 		LOOT_SetUniqueFound(351, 102, TRUE);
 	}
@@ -1683,7 +1732,7 @@ int LOOT_GetEquipmentType() {
 
 	- nItemLevel: Item level determining the quality of the items we can get
 
-	JC 2024-05-26                                                             */
+	JC 2025-08-29                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetBeltNum(int nItemLevel) {
 	// Belts have 30 variations
@@ -1721,7 +1770,7 @@ int LOOT_GetBeltNum(int nItemLevel) {
 
 		case 3: // Stealth Field Generator
 			// No stealth belts on Peragus, to make the one in the security locker matter
-			if( GetStringRight(GetModuleName(), 3) == "PER" ) {
+			if( LOOT_IsVeryEarlyGame() ) {
 				nRoll = Random(2) + 1;
 			}
 			else if( nItemLevel >= 6 ) {
@@ -1745,7 +1794,7 @@ int LOOT_GetBeltNum(int nItemLevel) {
 		
 		case 6: // Aratech SD Belt
 			// No stealth belts on Peragus, to make the one in the security locker matter
-			if( GetStringRight(GetModuleName(), 3) == "PER" ) {
+			if( LOOT_IsVeryEarlyGame() ) {
 				nRoll = Random(5) + 1;
 				if( nRoll >= 3 )
 					nRoll += 1;
@@ -1773,7 +1822,7 @@ int LOOT_GetBeltNum(int nItemLevel) {
 		
 		case 10: // Exchange Shadow Caster
 			// No stealth belts on Peragus, to make the one in the security locker matter
-			if( GetStringRight(GetModuleName(), 3) == "PER" ) {
+			if( LOOT_IsVeryEarlyGame() ) {
 				nRoll = Random(7) + 1;
 				if( nRoll >= 3 )
 					nRoll += 1;
@@ -1929,7 +1978,7 @@ int LOOT_GetGloveNum(int nItemLevel) {
 
 	- nItemLevel: Item level determining the quality of the items we can get
 
-	JC 2024-05-19                                                             */
+	JC 2025-08-29                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetHeadgearNum(int nItemLevel) {
 	// Headgear have 30 variations
@@ -1948,7 +1997,7 @@ int LOOT_GetHeadgearNum(int nItemLevel) {
 			break;
 
 		case 2: // No Breath Mask on Peragus, to make the one in the dormitory matter
-			if( GetStringRight(GetModuleName(), 3) == "PER" ) {
+			if( LOOT_IsVeryEarlyGame() ) {
 				nRoll = LOOT_D(nItemLevel - 1);
 				if( nRoll >= 2 )
 					++nRoll;
@@ -2153,12 +2202,11 @@ int LOOT_GetImplantNum(int nItemLevel) {
 	Replaces certain items when better versions are available and checks if
 	unique items have been found before granting them.
 
-	JC 2024-05-25                                                             */
+	JC 2025-08-29                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetArmorType() {
 	// No Jedi robes on Peragus
-	string sMod = GetStringRight(GetModuleName(), 3);
-	if(  sMod == "PER" || sMod == "HAR" )
+	if(  LOOT_IsVeryEarlyGame() )
 		return 400 + 10 * (Random(3) + 1);
 	return 400 + 10 * (Random(4) + 1);
 }
@@ -2348,10 +2396,6 @@ int LOOT_GetHeavyArmorNum(int nItemLevel) {
 	JC 2021-01-03                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetRobeNum(int nItemLevel) {
-	// Item level is reduced because the scaling for robes has to be slowed
-	// down on account of how you can't roll for robes at all until after
-	// Peragus.
-	nItemLevel -= 5;
 	if( nItemLevel < 1 )
 		nItemLevel = 1;
 	// Robes have 30 variations
@@ -2948,12 +2992,12 @@ int LOOT_GetDroidDeviceNum(int nItemLevel) {
 
 	Determines disposable item type.
 	
-	JC 2024-05-19                                                             */
+	JC 2025-08-29                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int GetDisposableType() {
 	int nRange;
 	// Limited selection early on (no skill items or grenades)
-	if( GetGlobalNumber("G_PC_LEVEL") < 6 )
+	if( LOOT_IsVeryEarlyGame() )
 		nRange = 6;
 	// No rockets if no Mira
 	else if( !IsAvailableCreature(NPC_MIRA) )
