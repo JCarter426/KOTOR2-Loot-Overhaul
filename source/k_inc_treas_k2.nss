@@ -192,7 +192,7 @@ string LOOT_UniqueGlobal(int nItemType);
 int LOOT_GetUniqueGlobalState(int nItemType);
 int LOOT_GetUniqueFound(int nItemType, int nItemNum);
 void LOOT_SetUniqueFound(int nItemType, int nItemNum, int nState);
-void LOOT_DebugItem(int nClass, int nType, int nSubtype, int nVariation, string sTemplate);
+void LOOT_DebugItem(int nItemLevel, int nClass, int nType, int nSubtype, int nVariation, string sTemplate);
 // Specific Items
 int LOOT_GetSpecificClass(int nItemLevel);
 int LOOT_GetSpecificType(int nItemLevel, int nItemClass);
@@ -587,6 +587,7 @@ void LOOT_SetUniqueFound(int nItemType, int nItemNum, int nState) {
 
 	Prints item details in the feedback screen, for testing.
 
+	- nItemLevel: Item level determining the quality of the items we can get
 	- nClass: Item class
 	- nType:  Item type
 	- nSubtype: Item subtype
@@ -595,8 +596,9 @@ void LOOT_SetUniqueFound(int nItemType, int nItemNum, int nState) {
 
 	JC 2024-05-25                                                             */
 ////////////////////////////////////////////////////////////////////////////////
-void LOOT_DebugItem(int nClass, int nType, int nSubtype, int nVariation, string sTemplate) {
+void LOOT_DebugItem(int nItemLevel, int nClass, int nType, int nSubtype, int nVariation, string sTemplate) {
 	SendMessageToPC(GetFirstPC(),
+		IntToString(nItemLevel) + ": " +
 		IntToString(nClass) + " -> " +
 		IntToString(nType) + " -> " +
 		IntToString(nSubtype) + " -> " +
@@ -1703,7 +1705,7 @@ int LOOT_GetUpgradeNum(int nItemLevel, int nItemType, int nItemTier) {
 ////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_GetBeltNum()
+/*	LOOT_GetEquipmentType()
 
 	Generates item variation number for equipment.
 
@@ -1771,7 +1773,7 @@ int LOOT_GetBeltNum(int nItemLevel) {
 		case 3: // Stealth Field Generator
 			// No stealth belts on Peragus, to make the one in the security locker matter
 			if( LOOT_IsVeryEarlyGame() ) {
-				nRoll = Random(2) + 1;
+				nItemNum = Random(2) + 1;
 			}
 			else if( nItemLevel >= 6 ) {
 				// Stealth Field Generator --> Exchange Shadow Caster
@@ -1795,9 +1797,12 @@ int LOOT_GetBeltNum(int nItemLevel) {
 		case 6: // Aratech SD Belt
 			// No stealth belts on Peragus, to make the one in the security locker matter
 			if( LOOT_IsVeryEarlyGame() ) {
-				nRoll = Random(5) + 1;
-				if( nRoll >= 3 )
-					nRoll += 1;
+				nItemNum = Random(4) + 1;
+				if( nItemNum >= 3 )
+					nItemNum += 1;
+			}
+			else {
+				nItemNum = nRoll;
 			}
 			break;
 		
@@ -1823,11 +1828,14 @@ int LOOT_GetBeltNum(int nItemLevel) {
 		case 10: // Exchange Shadow Caster
 			// No stealth belts on Peragus, to make the one in the security locker matter
 			if( LOOT_IsVeryEarlyGame() ) {
-				nRoll = Random(7) + 1;
-				if( nRoll >= 3 )
-					nRoll += 1;
-				if( nRoll >= 6 )
-					nRoll += 1;
+				nItemNum = Random(7) + 1;
+				if( nItemNum >= 3 )
+					nItemNum += 1;
+				if( nItemNum >= 6 )
+					nItemNum += 1;
+			}
+			else {
+				nItemNum = nRoll;
 			}
 			break;
 		
@@ -2000,7 +2008,10 @@ int LOOT_GetHeadgearNum(int nItemLevel) {
 			if( LOOT_IsVeryEarlyGame() ) {
 				nRoll = LOOT_D(nItemLevel - 1);
 				if( nRoll >= 2 )
-					++nRoll;
+					nRoll += 1;
+			}
+			else {
+				nItemNum = nRoll;
 			}
 			break;
 
@@ -3710,7 +3721,7 @@ string GetTreasureSpecific(int nItemLevel, int nItemType) {
 	}
 	int nItemVariation = LOOT_GetSpecificVariation(nItemLevel, nItemType);
 	string sTemplate = GetItemPrefix(nItemType) + LOOT_Suffix(nItemVariation);
-	// LOOT_DebugItem(class, type, subtype, nItemVariation, sTemplate);
+	// LOOT_DebugItem(nItemLevel, class, type, subtype, nItemVariation, sTemplate);
 	return sTemplate;
 }
 
@@ -3891,7 +3902,7 @@ string GetTreasureBundle(int nItemLevel, int nItemType) {
 		subtype = nItemType;
 	}
 	string sTemplate = GetBundlePrefix(nItemLevel, nItemType);
-	// LOOT_DebugItem(class, type, subtype, 0, sTemplate);
+	// LOOT_DebugItem(nItemLevel, class, type, subtype, 0, sTemplate);
 	return sTemplate;
 }
 
