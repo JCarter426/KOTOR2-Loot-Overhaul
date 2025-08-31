@@ -636,7 +636,7 @@ int LOOT_GetSpecificClass(int nItemLevel) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_GetSpecificClass()
+/*	LOOT_GetSpecificType()
 
 	Determines item type.
 	
@@ -666,7 +666,7 @@ int LOOT_GetSpecificType(int nItemLevel, int nItemClass) {
 
 
 ////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_GetSpecificClass()
+/*	LOOT_GetSpecificSubtype()
 
 	Determines item subtype.
 	
@@ -700,7 +700,7 @@ int LOOT_GetSpecificSubtype(int nItemLevel, int nItemType) {
 
 
 ////////////////////////////////////////////////////////////////////////////////
-/*	LOOT_GetSpecificClass()
+/*	LOOT_GetSpecificVariation()
 
 	Determines item variation.
 	
@@ -1231,16 +1231,15 @@ int LOOT_GetSaberSubtype() {
 	* COMMON (blue, red, green, yellow, violet)
 	* RARE (cyan, silver, orange, viridian, and any additional colors added with
 		   EXTRA_SABER_COLORS)
-	Additionally, violet is considered semi-rare and is always half as likely
-	as the other common colors.
+	Additionally, violet is considered semi-rare.
 
 	Colors may be randomly chosen with one of four algorithms:
-	* COMMON - Only common colors (violet less likely)
+	* COMMON - Only common colors (violet half as likely)
 	* RARE - Only rare colors (equal chance amongst them)
 	* WEIGHTED - Roll for all colors, with up to 25% chance of getting a rare
-				 color. The initial roll determines common or rare, then
-				 another roll is performed for that.
-	* ANY - Equal chance for all colors, regardless of rarity
+				 color. An initial roll determines common or rare, then
+				 another roll is performed for the color.
+	* UNIFORM - Equal chance for all colors, regardless of rarity
 
 	Returns a number between 1 and 11 for the original game colors:
 	* 1 = BLUE
@@ -1260,37 +1259,43 @@ int LOOT_GetSaberSubtype() {
 
 	- nItemLevel: Item level determining the quality of the items we can get
 	- nColorType: Which color algorithm to use
-	  * -1: ANY
+	  * -1: UNIFORM
 	  *  0: WEIGHTED
 	  *  1: COMMON
 	  *  2: RARE
 
-	JC 2024-05-18                                                             */
+	JC 2025-08-31                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetSaberColor(int nItemLevel, int nColorType) {
-	if( nItemLevel > 20 )
-		nItemLevel = 20; // caps the die at d100
-	int nColor;	
 	// If we're using weighted odds, determine common or rare
 	if( nColorType == 0 ) {
+		if( nItemLevel > 20 )
+			nItemLevel = 20; // caps the die at d100
 		if( Random(nItemLevel * 5) < 75 )
 			nColorType = 1; // Common
 		else
 			nColorType = 2; // Rare
-	}	
-	// Roll for common colors
-	if( nColorType == 1 )
-		nColor = (Random(9) + 1) / 2;
-	// Roll for rare colors
-	else if( nColorType == 2 )
-		nColor = Random(5 + EXTRA_SABER_COLORS) + 6;
-	// Roll for even odds
-	else
+	}
+	int nColor;	
+	// Common
+	if( nColorType == 1 ) {
+		nColor = Random(9) / 2 + 1;
+	}
+	// Rare
+	else if( nColorType == 2 ) {
+		if( EXTRA_SABER_COLORS > 0 )
+			nColor = Random(4 + EXTRA_SABER_COLORS) + 7;
+		else
+			nColor = Random(4) + 8;
+	}
+	// Uniform
+	else {
 		nColor = Random(10 + EXTRA_SABER_COLORS) + 1;
-	// Get the real number
-	// No #6 (Malak's saber).
-	if( nColor >= 6 ) {
-		return nColor + 1;
+		
+		// No #6 (Malak's saber).
+		if( nColor >= 6 ) {
+			nColor += 1;
+		}
 	}
 	return nColor;
 }
@@ -3721,7 +3726,7 @@ string GetTreasureSpecific(int nItemLevel, int nItemType) {
 	}
 	int nItemVariation = LOOT_GetSpecificVariation(nItemLevel, nItemType);
 	string sTemplate = GetItemPrefix(nItemType) + LOOT_Suffix(nItemVariation);
-	// LOOT_DebugItem(nItemLevel, class, type, subtype, nItemVariation, sTemplate);
+	LOOT_DebugItem(nItemLevel, class, type, subtype, nItemVariation, sTemplate);
 	return sTemplate;
 }
 
@@ -3902,7 +3907,7 @@ string GetTreasureBundle(int nItemLevel, int nItemType) {
 		subtype = nItemType;
 	}
 	string sTemplate = GetBundlePrefix(nItemLevel, nItemType);
-	// LOOT_DebugItem(nItemLevel, class, type, subtype, 0, sTemplate);
+	LOOT_DebugItem(nItemLevel, class, type, subtype, 0, sTemplate);
 	return sTemplate;
 }
 
