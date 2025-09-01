@@ -2115,79 +2115,39 @@ int LOOT_GetHeadgearNum(int nItemLevel) {
 
 ////////////////////////////////////////////////////////////////////////////////
 /*	LOOT_GetImplantTier()
-
-	Determines which implant tier to use.
-
-	Implant tiers have a sort of bell curve distribution. You're more likely to
-	get implants matching your current Constitution score, or one level higher
-	or lower. However, it's possible to get any implant level with	any score,
-	so there's a chance of getting items to give to party members with higher
-	or lower Constitution than your own.
-
-	I've also incorporated the item level to skew the results towards higher
-	quality	items as the game progresses. The target values for each implant
-	tier are fixed, based on your Constitution score, but the die size is
-	determined by the item level. It can be anything from a d96 (level 1) to
-	a d125 (level 30+).
-
-	Implant Level:    1       2       3       4
+	
+	A random value in the range of 1-100 is determines the implant tier,
+	following the table below.
+	
+	Implant Tier   Range
 	----------------------------------------------
-	Target range
-		   CON 12:   1-60    1-20    1-10    1-10
-		   CON 14:  61-80   21-70   11-30   11-20
-		   CON 15:  81-90   71-90   31-80   21-40
-		   CON 18:   91+     91+     81+     41+
+	1               1-25
+	2              26-50
+	3              51-75
+	4              76-100
 
-	Probability with a d100 roll
-		   CON 12:   60%     20%     10%     10%
-		   CON 14:   20%     50%     20%     10%
-		   CON 16:   10%     20%     50%     20%
-		   CON 18:   10%     10%     20%     60%
-
-	- nItemLevel: Item level determining the quality of the items we can get
-
-	JC 2019-07-31                                                             */
+	Item level increases the range of possible values rolled, from 1-11 at litem
+	evel 1 to 1-100 at item level 30. Consequentially, implant tiers become
+	available at as item level increases.
+	
+	Item Level    Available Implant Tiers
+	----------------------------------------------
+	1-5           1 only
+	6-14          1-2
+	15-21         1-3
+    22+           1-4
+	
+	JC 2025-08-31                                                             */
 ////////////////////////////////////////////////////////////////////////////////
 int LOOT_GetImplantTier(int nItemLevel) {
-	int nRoll = Random(95 + nItemLevel);
-	int nCON = GetAbilityModifier(ABILITY_CONSTITUTION, GetFirstPC());
-
-	if( nCON <= 1 ) {
-		if( nRoll < 60 )
-			return 1;
-		if( nRoll < 80 )
-			return 2;
-		if( nRoll < 90 )
-			return 3;
+	int nRoll = Random(3 * nItemLevel + 10);
+	if( nRoll >= 75 )
 		return 4;
-	}
-	else if( nCON == 2 ) {
-		if( nRoll < 20 )
-			return 1;
-		if( nRoll < 70 )
-			return 2;
-		if( nRoll < 90 )
-			return 3;
-		return 4;
-	}
-	else if( nCON == 3 ) {
-		if( nRoll < 10 )
-			return 1;
-		if( nRoll < 30 )
-			return 2;
-		if( nRoll < 80 )
-			return 3;
-		return 4;
-	}
-	else {
-		if( nRoll < 10 )
-			return 1;
-		if( nRoll < 20 )
-			return 2;
-		if( nRoll < 40 )
-			return 3;
-		return 4;
-	}
+	if( nRoll >= 50 )
+		return 3;
+	if( nRoll >= 25 )
+		return 2;
+	return 1;
 }
 
 
